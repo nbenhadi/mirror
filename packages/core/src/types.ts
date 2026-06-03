@@ -29,5 +29,5 @@ export interface Tool<TInput = unknown, TOutput = unknown> {
   id: string
   description: string
   schema: ZodType<TInput, ZodTypeDef, unknown>
-  execute: (input: TInput, ctx: ToolContext) => Promise<ToolResult<TOutput>>
+  execute(input: TInput, ctx: ToolContext): Promise<ToolResult<TOutput>>
 }
