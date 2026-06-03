@@ -288,6 +288,22 @@ importers:
         specifier: ^8.34.0
         version: 8.60.1(eslint@9.39.4)(typescript@5.9.3)
 
+  packages/core:
+    dependencies:
+      '@mirror/logger':
+        specifier: workspace:*
+        version: link:../logger
+      zod:
+        specifier: ^3.25.28
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.21
+        version: 22.19.19
+      vitest:
+        specifier: ^3.2.3
+        version: 3.2.6(@types/node@22.19.19)(yaml@2.9.0)
+
   packages/errors:
     devDependencies:
       vitest:
@@ -2354,6 +2370,12 @@ packages:
       }
     engines: { node: '>=10' }
 
+  zod@3.25.76:
+    resolution:
+      {
+        integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==,
+      }
+
 snapshots:
   '@esbuild/aix-ppc64@0.27.7':
     optional: true
@@ -3477,3 +3499,5 @@ snapshots:
   yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}
+
+  zod@3.25.76: {}
