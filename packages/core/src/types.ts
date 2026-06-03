@@ -1,4 +1,4 @@
-import type { ZodSchema } from 'zod'
+import type { ZodType, ZodTypeDef } from 'zod'
 import type { Logger } from '@mirror/logger'
 
 export interface ToolContext {
@@ -28,6 +28,6 @@ export type ToolErrorCode =
 export interface Tool<TInput = unknown, TOutput = unknown> {
   id: string
   description: string
-  schema: ZodSchema<TInput>
+  schema: ZodType<TInput, ZodTypeDef, unknown>
   execute: (input: TInput, ctx: ToolContext) => Promise<ToolResult<TOutput>>
 }
