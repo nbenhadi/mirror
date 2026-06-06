@@ -1,0 +1,83 @@
+import { spawn, spawnSync } from 'node:child_process'
+
+const CLEAR_SECONDS = 15
+
+type ClipboardTool = { cmd: string; args: string[]; clearCmd: string; clearArgs: string[] }
+
+function detectTool(): ClipboardTool | null {
+  if (process.platform === 'darwin') {
+    return {
+      cmd: 'pbcopy',
+      args: [],
+      clearCmd: 'sh',
+      clearArgs: ['-c', 'printf "" | pbcopy'],
+    }
+  }
+
+  if (process.platform === 'win32' || process.env['WSL_DISTRO_NAME']) {
+    const exe = process.env['WSL_DISTRO_NAME'] ? 'clip.exe' : 'clip'
+    return {
+      cmd: exe,
+      args: [],
+      clearCmd: 'sh',
+      clearArgs: ['-c', `printf "" | ${exe}`],
+    }
+  }
+
+  if (process.env['WAYLAND_DISPLAY'] && available('wl-copy')) {
+    return {
+      cmd: 'wl-copy',
+      args: [],
+      clearCmd: 'wl-copy',
+      clearArgs: ['--clear'],
+    }
+  }
+
+  if (available('xclip')) {
+    return {
+      cmd: 'xclip',
+      args: ['-selection', 'clipboard'],
+      clearCmd: 'xclip',
+      clearArgs: ['-selection', 'clipboard', '-i', '/dev/null'],
+    }
+  }
+
+  if (available('xsel')) {
+    return {
+      cmd: 'xsel',
+      args: ['--clipboard', '--input'],
+      clearCmd: 'xsel',
+      clearArgs: ['--clipboard', '--clear'],
+    }
+  }
+
+  return null
+}
+
+function available(cmd: string): boolean {
+  return spawnSync('which', [cmd], { stdio: 'ignore' }).status === 0
+}
+
+function writeToClipboard(tool: ClipboardTool, text: string): void {
+  const child = spawn(tool.cmd, tool.args, { detached: true, stdio: ['pipe', 'ignore', 'ignore'] })
+  child.stdin!.write(text)
+  child.stdin!.end()
+  child.unref()
+}
+
+function scheduleClear(tool: ClipboardTool, seconds: number): void {
+  const script = `sleep ${seconds} && ${tool.clearCmd} ${tool.clearArgs.map((a) => `'${a}'`).join(' ')}`
+  const child = spawn('sh', ['-c', script], { detached: true, stdio: 'ignore' })
+  child.unref()
+}
+
+export function copyToClipboard(text: string): void {
+  const tool = detectTool()
+  if (!tool) {
+    console.log('Clipboard not available (install wl-clipboard or xclip)')
+    return
+  }
+  writeToClipboard(tool, text)
+  scheduleClear(tool, CLEAR_SECONDS)
+  console.log(`Password copied to clipboard (clears in ${CLEAR_SECONDS}s)`)
+}
