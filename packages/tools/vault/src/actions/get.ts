@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { loadVaultSession, findActiveEntry } from '../vault-helpers.js'
 
 type GetInput = { action: 'get'; title: string; showPassword: boolean }

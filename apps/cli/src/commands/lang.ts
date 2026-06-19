@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { getLocale, setLocale, SUPPORTED_LOCALES, t, type Locale } from '@mirror/i18n'
+import { getLocale, setLocale, SUPPORTED_LOCALES, t, type Locale } from '@nbenhadi/mirror-i18n'
 import { writeCliConfig } from '../cli-config.js'
 
 export function createLangCommand(): Command {

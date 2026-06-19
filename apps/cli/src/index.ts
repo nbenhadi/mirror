@@ -1,17 +1,16 @@
 #!/usr/bin/env node
-import { createRequire } from 'node:module'
 import { Command } from 'commander'
-import { registry } from '@mirror/core'
-import { setLocale, SUPPORTED_LOCALES, t, type Locale } from '@mirror/i18n'
-import { passwordTool } from '@mirror/tools-password'
-import { vaultTool } from '@mirror/tools-vault'
+import { registry } from '@nbenhadi/mirror-core'
+import { setLocale, SUPPORTED_LOCALES, t, type Locale } from '@nbenhadi/mirror-i18n'
+import { passwordTool } from '@nbenhadi/mirror-password'
+import { vaultTool } from '@nbenhadi/mirror-vault'
 import { readCliConfig } from './cli-config.js'
 import { createPasswordCommand } from './commands/password.js'
 import { createVaultCommand } from './commands/vault.js'
 import { createLangCommand } from './commands/lang.js'
+import pkg from '../package.json'
 
-const require = createRequire(import.meta.url)
-const { version } = require('../package.json') as { version: string }
+const { version } = pkg
 
 const { locale } = readCliConfig()
 if (locale && (SUPPORTED_LOCALES as readonly string[]).includes(locale)) {
@@ -22,7 +21,7 @@ registry.register(passwordTool)
 registry.register(vaultTool)
 
 const program = new Command()
-  .name('mirror')
+  .name('mir')
   .description(t('program.description'))
   .version(version, '-V, --version', t('cmd.help.version'))
   .helpOption('-h, --help', t('cmd.help.display_help'))
@@ -37,14 +36,14 @@ program.configureHelp({
       .commandUsage(cmd)
       .replace('[options]', `[${t('cmd.help.options').toLowerCase()}]`)
       .replace('[command]', `[${t('cmd.help.commands').toLowerCase()}]`)
-    lines.push(`${t('cmd.help.usage')}: ${usage}`)
-    lines.push('')
-
     const desc = helper.commandDescription(cmd)
     if (desc) {
       lines.push(desc)
       lines.push('')
     }
+
+    lines.push(`${t('cmd.help.usage')}: ${usage}`)
+    lines.push('')
 
     const optionList = helper.visibleOptions(cmd)
     if (optionList.length > 0) {

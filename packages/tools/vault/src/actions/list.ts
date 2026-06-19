@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { loadVaultSession } from '../vault-helpers.js'
 
 type EntryPreview = {

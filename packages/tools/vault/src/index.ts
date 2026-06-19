@@ -1,4 +1,4 @@
-import type { Tool } from '@mirror/core'
+import type { Tool } from '@nbenhadi/mirror-core'
 import { schema } from './schema.js'
 import { execute } from './execute.js'
 import type { VaultInput } from './schema.js'

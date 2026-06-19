@@ -24,6 +24,9 @@ export type TranslationKey =
   | 'password.error.empty_charset'
   | 'password.error.not_enough_chars'
 
+  // Vault errors
+  | 'vault.error.invalid_password'
+
   // Vault lifecycle
   | 'vault.init.success'
   | 'vault.unlock.success'
@@ -65,6 +68,9 @@ export type TranslationKey =
   | 'table.username'
   | 'table.url'
   | 'table.tags'
+  | 'table.notes'
+  | 'table.created_at'
+  | 'table.updated_at'
   | 'table.deleted_at'
 
   // Command: password

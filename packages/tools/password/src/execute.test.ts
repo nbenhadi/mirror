@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildContext } from '@mirror/core'
+import { buildContext } from '@nbenhadi/mirror-core'
 import { passwordTool } from './index.js'
 
 const ctx = buildContext()

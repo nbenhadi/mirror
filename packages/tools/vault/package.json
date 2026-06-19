@@ -1,13 +1,19 @@
 {
-  "name": "@mirror/tools-vault",
+  "name": "@nbenhadi/mirror-vault",
   "version": "1.0.1",
-  "private": true,
   "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "scripts": {
     "build": "tsc",
@@ -16,7 +22,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@mirror/core": "workspace:*",
+    "@nbenhadi/mirror-core": "workspace:*",
     "argon2": "^0.43.0",
     "zod": "^3.25.28"
   },

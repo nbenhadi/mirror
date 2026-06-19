@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { writeVault } from '../vault-file.js'
 import { loadVaultSession, findActiveEntryIndex } from '../vault-helpers.js'
 

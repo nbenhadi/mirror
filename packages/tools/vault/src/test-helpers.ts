@@ -1,4 +1,4 @@
-import { buildContext } from '@mirror/core'
+import { buildContext } from '@nbenhadi/mirror-core'
 import type { Entry, VaultData } from './types.js'
 
 export const ctx = buildContext()

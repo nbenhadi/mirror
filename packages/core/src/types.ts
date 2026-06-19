@@ -1,5 +1,5 @@
 import type { ZodType, ZodTypeDef } from 'zod'
-import type { Logger } from '@mirror/logger'
+import type { Logger } from '@nbenhadi/mirror-logger'
 
 export interface ToolContext {
   requestId: string

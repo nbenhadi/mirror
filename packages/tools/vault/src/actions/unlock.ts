@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { deriveKey } from '../crypto.js'
 import { loadConfig } from '../config.js'
 import { readVault } from '../vault-file.js'

@@ -9,6 +9,8 @@ export const es: Record<TranslationKey, string> = {
   'error.crypto': 'Error de cifrado.',
   'error.database': 'Error de base de datos.',
 
+  'vault.error.invalid_password': 'Contrasena maestra incorrecta.',
+
   'cli.passwords_mismatch': 'Las contrasenas no coinciden.',
   'cli.cancelled': 'Cancelado.',
 
@@ -55,6 +57,9 @@ export const es: Record<TranslationKey, string> = {
   'table.username': 'USUARIO',
   'table.url': 'URL',
   'table.tags': 'ETIQUETAS',
+  'table.notes': 'NOTAS',
+  'table.created_at': 'CREADO',
+  'table.updated_at': 'ACTUALIZADO',
   'table.deleted_at': 'ELIMINADO',
 
   'cmd.password.description': 'Herramientas de contrasenas',

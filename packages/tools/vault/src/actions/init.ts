@@ -1,6 +1,6 @@
 import { homedir } from 'node:os'
 import { join, resolve as resolvePath } from 'node:path'
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { deriveKey, generateSalt, DEFAULT_KDF } from '../crypto.js'
 import { loadConfig, saveConfig } from '../config.js'
 import { writeVault } from '../vault-file.js'

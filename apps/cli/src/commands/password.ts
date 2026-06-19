@@ -1,6 +1,6 @@
 import { Command } from 'commander'
-import { execute } from '@mirror/core'
-import { t } from '@mirror/i18n'
+import { execute } from '@nbenhadi/mirror-core'
+import { t } from '@nbenhadi/mirror-i18n'
 
 export function createPasswordCommand(): Command {
   const cmd = new Command('password').description(t('cmd.password.description'))
