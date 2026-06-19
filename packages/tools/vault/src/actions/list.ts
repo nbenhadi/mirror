@@ -1,6 +1,5 @@
 import type { ToolContext, ToolResult } from '@mirror/core'
-import { loadSession } from '../session.js'
-import { readVault } from '../vault-file.js'
+import { loadVaultSession } from '../vault-helpers.js'
 
 type EntryPreview = {
   id: string
@@ -16,14 +15,10 @@ export async function list(
   input: ListInput,
   _ctx: ToolContext
 ): Promise<ToolResult<{ entries: EntryPreview[]; count: number }>> {
-  const session = await loadSession()
-  if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
-  }
+  const loaded = await loadVaultSession()
+  if (!loaded.success) return loaded
 
-  const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
-
+  const { vault } = loaded.data
   const search = input.search?.toLowerCase()
   const tag = input.tag?.toLowerCase()
 

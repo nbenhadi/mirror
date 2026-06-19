@@ -10,12 +10,17 @@ export async function readVault(path: string, key: Buffer): Promise<VaultData> {
   return JSON.parse(decrypted) as VaultData
 }
 
-export async function writeVault(path: string, data: VaultData, key: Buffer): Promise<void> {
+export async function writeVault(
+  path: string,
+  data: VaultData,
+  key: Buffer,
+  flag?: string
+): Promise<void> {
   const dir = dirname(path)
   if (!existsSync(dir)) {
     await mkdir(dir, { recursive: true })
   }
   const encrypted = encryptBuffer(JSON.stringify(data), key)
-  await writeFile(path, encrypted, { mode: 0o600 })
+  await writeFile(path, encrypted, { mode: 0o600, ...(flag && { flag }) })
   await chmod(path, 0o600)
 }

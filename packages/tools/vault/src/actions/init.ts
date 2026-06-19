@@ -1,6 +1,5 @@
-import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
-import { join } from 'node:path'
+import { join, resolve as resolvePath } from 'node:path'
 import type { ToolContext, ToolResult } from '@mirror/core'
 import { deriveKey, generateSalt, DEFAULT_KDF } from '../crypto.js'
 import { loadConfig, saveConfig } from '../config.js'
@@ -28,14 +27,7 @@ export async function init(
     }
   }
 
-  const vaultPath = input.path ?? DEFAULT_VAULT_PATH
-
-  if (existsSync(vaultPath)) {
-    return {
-      success: false,
-      error: { code: 'EXECUTION_ERROR', message: `File already exists at ${vaultPath}` },
-    }
-  }
+  const vaultPath = resolvePath(input.path ?? DEFAULT_VAULT_PATH)
 
   const salt = generateSalt()
   const key = await deriveKey(input.masterPassword, salt, DEFAULT_KDF)
@@ -46,7 +38,17 @@ export async function init(
     created_at: new Date().toISOString(),
   }
 
-  await writeVault(vaultPath, vaultData, key)
+  try {
+    await writeVault(vaultPath, vaultData, key, 'wx')
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'EEXIST') {
+      return {
+        success: false,
+        error: { code: 'EXECUTION_ERROR', message: `File already exists at ${vaultPath}` },
+      }
+    }
+    throw err
+  }
   await saveConfig({
     ...config,
     vault: {

@@ -81,6 +81,7 @@ function getActiveTypeChars(charset: string, input: PasswordInput): string[] {
 }
 
 function pickRandom(str: string): string {
+  if (str.length === 0) throw new Error('Cannot pick from empty charset')
   return str[randomInt(str.length)]!
 }
 
@@ -154,7 +155,7 @@ export async function execute(
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: `Cannot generate ${input.length} unique chars — charset only has ${charset.length}`,
+        message: `Cannot generate ${input.length} unique chars. Charset only has ${charset.length}.`,
       },
     }
   }

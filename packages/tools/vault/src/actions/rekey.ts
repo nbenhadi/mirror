@@ -51,6 +51,6 @@ export async function rekey(
 
   return {
     success: true,
-    data: { message: 'Master password changed. Vault locked — unlock with new password.' },
+    data: { message: 'Master password changed. Vault locked. Unlock with your new password.' },
   }
 }

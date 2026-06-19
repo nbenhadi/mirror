@@ -1,25 +1,19 @@
 import { randomUUID } from 'node:crypto'
 import type { ToolContext, ToolResult } from '@mirror/core'
-import { loadSession } from '../session.js'
-import { readVault, writeVault } from '../vault-file.js'
+import { writeVault } from '../vault-file.js'
+import { loadVaultSession, findActiveEntry } from '../vault-helpers.js'
 import type { Entry } from '../types.js'
 import type { VaultInput } from '../schema.js'
 
 type AddInput = Extract<VaultInput, { action: 'add' }>
 
 export async function add(input: AddInput, _ctx: ToolContext): Promise<ToolResult<{ id: string }>> {
-  const session = await loadSession()
-  if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
-  }
+  const loaded = await loadVaultSession()
+  if (!loaded.success) return loaded
 
-  const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
+  const { session, key, vault } = loaded.data
 
-  const duplicate = vault.entries.find(
-    (e) => e.title.toLowerCase() === input.title.toLowerCase() && !e.deleted_at
-  )
-  if (duplicate) {
+  if (findActiveEntry(vault.entries, input.title)) {
     return {
       success: false,
       error: { code: 'EXECUTION_ERROR', message: `Entry "${input.title}" already exists` },

@@ -14,7 +14,7 @@ export const generateSchema = z.object({
   separator: z
     .object({
       char: z.string().length(1),
-      every: z.number().int().min(1),
+      every: z.number().int().min(1).max(128),
     })
     .optional(),
   prefix: z.string().optional(),

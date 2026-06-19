@@ -1,6 +1,6 @@
 import type { ToolContext, ToolResult } from '@mirror/core'
-import { loadSession } from '../session.js'
-import { readVault, writeVault } from '../vault-file.js'
+import { writeVault } from '../vault-file.js'
+import { loadVaultSession, findActiveEntryIndex } from '../vault-helpers.js'
 
 type DeleteInput = { action: 'delete'; title: string; force: boolean }
 
@@ -8,17 +8,11 @@ export async function deleteEntry(
   input: DeleteInput,
   _ctx: ToolContext
 ): Promise<ToolResult<{ title: string; permanent: boolean }>> {
-  const session = await loadSession()
-  if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
-  }
+  const loaded = await loadVaultSession()
+  if (!loaded.success) return loaded
 
-  const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
-
-  const idx = vault.entries.findIndex(
-    (e) => e.title.toLowerCase() === input.title.toLowerCase() && !e.deleted_at
-  )
+  const { session, key, vault } = loaded.data
+  const idx = findActiveEntryIndex(vault.entries, input.title)
 
   if (idx === -1) {
     return {

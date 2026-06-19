@@ -1,6 +1,5 @@
 import type { ToolContext, ToolResult } from '@mirror/core'
-import { loadSession } from '../session.js'
-import { readVault } from '../vault-file.js'
+import { loadVaultSession, findActiveEntry } from '../vault-helpers.js'
 
 type GetInput = { action: 'get'; title: string; showPassword: boolean }
 
@@ -17,17 +16,11 @@ type EntryResult = {
 }
 
 export async function get(input: GetInput, _ctx: ToolContext): Promise<ToolResult<EntryResult>> {
-  const session = await loadSession()
-  if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
-  }
+  const loaded = await loadVaultSession()
+  if (!loaded.success) return loaded
 
-  const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
-
-  const entry = vault.entries.find(
-    (e) => e.title.toLowerCase() === input.title.toLowerCase() && !e.deleted_at
-  )
+  const { vault } = loaded.data
+  const entry = findActiveEntry(vault.entries, input.title)
 
   if (!entry) {
     return {
