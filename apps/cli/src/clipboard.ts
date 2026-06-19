@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process'
+import { t } from '@mirror/i18n'
 
 const CLEAR_SECONDS = 15
 
@@ -9,8 +10,8 @@ function detectTool(): ClipboardTool | null {
     return {
       cmd: 'pbcopy',
       args: [],
-      clearCmd: 'sh',
-      clearArgs: ['-c', 'printf "" | pbcopy'],
+      clearCmd: 'pbcopy',
+      clearArgs: [],
     }
   }
 
@@ -19,8 +20,8 @@ function detectTool(): ClipboardTool | null {
     return {
       cmd: exe,
       args: [],
-      clearCmd: 'sh',
-      clearArgs: ['-c', `printf "" | ${exe}`],
+      clearCmd: exe,
+      clearArgs: [],
     }
   }
 
@@ -60,24 +61,27 @@ function available(cmd: string): boolean {
 
 function writeToClipboard(tool: ClipboardTool, text: string): void {
   const child = spawn(tool.cmd, tool.args, { detached: true, stdio: ['pipe', 'ignore', 'ignore'] })
+  child.on('error', () => {})
+  child.stdin!.on('error', () => {})
   child.stdin!.write(text)
   child.stdin!.end()
   child.unref()
 }
 
 function scheduleClear(tool: ClipboardTool, seconds: number): void {
-  const script = `sleep ${seconds} && ${tool.clearCmd} ${tool.clearArgs.map((a) => `'${a}'`).join(' ')}`
-  const child = spawn('sh', ['-c', script], { detached: true, stdio: 'ignore' })
+  const code = `setTimeout(()=>{require('child_process').spawnSync(${JSON.stringify(tool.clearCmd)},${JSON.stringify(tool.clearArgs)},{input:''})},${seconds * 1000})`
+  const child = spawn(process.execPath, ['-e', code], { detached: true, stdio: 'ignore' })
+  child.on('error', () => {})
   child.unref()
 }
 
 export function copyToClipboard(text: string): void {
   const tool = detectTool()
   if (!tool) {
-    console.log('Clipboard not available (install wl-clipboard or xclip)')
+    console.log(t('clipboard.unavailable'))
     return
   }
   writeToClipboard(tool, text)
   scheduleClear(tool, CLEAR_SECONDS)
-  console.log(`Password copied to clipboard (clears in ${CLEAR_SECONDS}s)`)
+  console.log(t('clipboard.copied', { seconds: CLEAR_SECONDS }))
 }

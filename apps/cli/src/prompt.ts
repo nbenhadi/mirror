@@ -21,31 +21,35 @@ export function promptPassword(message: string): Promise<string> {
   return new Promise((resolve) => {
     process.stdout.write(message)
 
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true)
-    }
-
+    const isTTY = process.stdin.isTTY
+    if (isTTY) process.stdin.setRawMode(true)
     process.stdin.resume()
     process.stdin.setEncoding('utf8')
 
     let password = ''
 
+    const done = (value: string) => {
+      if (isTTY) process.stdin.setRawMode(false)
+      process.stdin.pause()
+      process.stdin.removeListener('data', onData)
+      process.stdout.write('\n')
+      resolve(value)
+    }
+
     const onData = (char: string) => {
       switch (char) {
         case '\n':
         case '\r':
-        case '':
-          if (process.stdin.isTTY) process.stdin.setRawMode(false)
-          process.stdin.pause()
-          process.stdin.removeListener('data', onData)
-          process.stdout.write('\n')
-          resolve(password)
+        case '\u0004': // Ctrl+D (EOT)
+          done(password)
           break
-        case '':
+        case '\u0003': // Ctrl+C (ETX)
+          done('')
           process.exit()
           break
-        case '':
-          password = password.slice(0, -1)
+        case '\u0008': // BS
+        case '\x7f': // DEL, most terminals send this for backspace
+          if (password.length > 0) password = password.slice(0, -1)
           break
         default:
           password += char

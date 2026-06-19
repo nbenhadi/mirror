@@ -1,20 +1,21 @@
 import { Command } from 'commander'
 import { execute } from '@mirror/core'
+import { t } from '@mirror/i18n'
 import { copyToClipboard } from '../clipboard.js'
 import { promptPassword, promptConfirm } from '../prompt.js'
 
-function fail(code: string, message: string): never {
-  console.error(`Error [${code}]: ${message}`)
+function fail(message: string): never {
+  console.error(message)
   process.exit(1)
 }
 
 async function autoUnlock(): Promise<void> {
-  const masterPassword = await promptPassword('Master password: ')
+  const masterPassword = await promptPassword(t('prompt.master_password'))
   const result = await execute({
     toolId: 'vault',
     input: { action: 'unlock', masterPassword, minutes: 30 },
   })
-  if (!result.success) fail(result.error.code, result.error.message)
+  if (!result.success) fail(result.error.message)
 }
 
 async function vaultExecute<T>(input: unknown): Promise<T> {
@@ -23,7 +24,7 @@ async function vaultExecute<T>(input: unknown): Promise<T> {
     await autoUnlock()
     result = await execute({ toolId: 'vault', input })
   }
-  if (!result.success) fail(result.error.code, result.error.message)
+  if (!result.success) fail(result.error.message)
   return result.data as T
 }
 
@@ -31,301 +32,324 @@ function fmt(label: string, value: string) {
   console.log(`  ${label.padEnd(12)}${value}`)
 }
 
-export const vaultCommand = new Command('vault').description('Encrypted vault management')
+export function createVaultCommand(): Command {
+  const cmd = new Command('vault').description(t('cmd.vault.description'))
 
-vaultCommand
-  .command('init')
-  .description('Initialize a new vault')
-  .option('-p, --path <path>', 'Custom vault file path')
-  .action(async (options: { path?: string }) => {
-    const masterPassword = await promptPassword('Master password: ')
-    const confirm = await promptPassword('Confirm password: ')
+  cmd
+    .command('init')
+    .description(t('cmd.vault.init.description'))
+    .option('-p, --path <path>', t('cmd.vault.init.opt.path'))
+    .action(async (options: { path?: string }) => {
+      const masterPassword = await promptPassword(t('prompt.master_password'))
+      const confirm = await promptPassword(t('prompt.confirm_password'))
 
-    if (masterPassword !== confirm) {
-      console.error('Passwords do not match')
-      process.exit(1)
-    }
+      if (masterPassword !== confirm) {
+        console.error(t('cli.passwords_mismatch'))
+        process.exit(1)
+      }
 
-    const result = await execute({
-      toolId: 'vault',
-      input: {
-        action: 'init',
-        masterPassword,
-        ...(options.path !== undefined && { path: options.path }),
-      },
-    })
-
-    if (!result.success) fail(result.error.code, result.error.message)
-    const data = result.data as { path: string }
-    console.log(`Vault created at ${data.path}`)
-  })
-
-vaultCommand
-  .command('unlock [minutes]')
-  .description('Unlock vault (default: 30 minutes)')
-  .action(async (minutes?: string) => {
-    const masterPassword = await promptPassword('Master password: ')
-
-    const result = await execute({
-      toolId: 'vault',
-      input: { action: 'unlock', masterPassword, minutes: parseInt(minutes ?? '30', 10) },
-    })
-
-    if (!result.success) fail(result.error.code, result.error.message)
-    const data = result.data as { expiresAt: string }
-    console.log(`Vault unlocked until ${data.expiresAt}`)
-  })
-
-vaultCommand
-  .command('lock')
-  .description('Lock vault immediately')
-  .action(async () => {
-    const result = await execute({ toolId: 'vault', input: { action: 'lock' } })
-    if (!result.success) fail(result.error.code, result.error.message)
-    console.log('Vault locked')
-  })
-
-vaultCommand
-  .command('path [newPath]')
-  .description('Show or set vault file path')
-  .action(async (newPath?: string) => {
-    const result = await execute({
-      toolId: 'vault',
-      input: { action: 'path', ...(newPath !== undefined && { newPath }) },
-    })
-    if (!result.success) fail(result.error.code, result.error.message)
-    const data = result.data as { path: string }
-    console.log(data.path)
-  })
-
-vaultCommand
-  .command('add')
-  .description('Add a new entry')
-  .requiredOption('-t, --title <title>', 'Entry title')
-  .option('-u, --username <username>', 'Username or email')
-  .option('-p, --password <password>', 'Password')
-  .option('--url <url>', 'Website URL')
-  .option('-n, --notes <notes>', 'Notes')
-  .option('--tags <tags>', 'Comma-separated tags')
-  .action(
-    async (options: {
-      title: string
-      username?: string
-      password?: string
-      url?: string
-      notes?: string
-      tags?: string
-    }) => {
-      const tags = options.tags ? options.tags.split(',').map((t) => t.trim()) : []
-
-      const data = await vaultExecute<{ id: string }>({
-        action: 'add',
-        title: options.title,
-        tags,
-        ...(options.password !== undefined && { password: options.password }),
-        ...(options.username !== undefined && { username: options.username }),
-        ...(options.url !== undefined && { url: options.url }),
-        ...(options.notes !== undefined && { notes: options.notes }),
+      const result = await execute({
+        toolId: 'vault',
+        input: {
+          action: 'init',
+          masterPassword,
+          ...(options.path !== undefined && { path: options.path }),
+        },
       })
 
-      console.log(`Entry added (${data.id})`)
-    }
-  )
-
-vaultCommand
-  .command('list')
-  .description('List entries')
-  .option('-s, --search <query>', 'Filter by title, username or URL')
-  .option('--tag <tag>', 'Filter by tag')
-  .action(async (options: { search?: string; tag?: string }) => {
-    const { entries, count } = await vaultExecute<{
-      entries: { title: string; username?: string; url?: string; tags: string[] }[]
-      count: number
-    }>({
-      action: 'list',
-      ...(options.search !== undefined && { search: options.search }),
-      ...(options.tag !== undefined && { tag: options.tag }),
+      if (!result.success) fail(result.error.message)
+      const data = result.data as { path: string }
+      console.log(t('vault.init.success', { path: data.path }))
     })
 
-    if (count === 0) {
-      console.log('No entries')
-      return
-    }
+  cmd
+    .command('unlock [minutes]')
+    .description(t('cmd.vault.unlock.description'))
+    .action(async (minutes?: string) => {
+      const masterPassword = await promptPassword(t('prompt.master_password'))
 
-    const titleW = Math.max(5, ...entries.map((e) => e.title.length))
-    const userW = Math.max(8, ...entries.map((e) => (e.username ?? '').length))
-    const urlW = Math.max(3, ...entries.map((e) => (e.url ?? '').length))
+      const result = await execute({
+        toolId: 'vault',
+        input: {
+          action: 'unlock',
+          masterPassword,
+          minutes: Math.min(parseInt(minutes ?? '30', 10), 1440),
+        },
+      })
 
-    console.log(
-      `\n  ${'TITLE'.padEnd(titleW)}  ${'USERNAME'.padEnd(userW)}  ${'URL'.padEnd(urlW)}  TAGS`
-    )
-    console.log(`  ${'─'.repeat(titleW + userW + urlW + 20)}`)
+      if (!result.success) fail(result.error.message)
+      const data = result.data as { expiresAt: string }
+      console.log(t('vault.unlock.success', { expiresAt: data.expiresAt }))
+    })
 
-    for (const e of entries) {
-      const tags = e.tags.length ? e.tags.join(', ') : ''
-      console.log(
-        `  ${e.title.padEnd(titleW)}  ${(e.username ?? '').padEnd(userW)}  ${(e.url ?? '').padEnd(urlW)}  ${tags}`
-      )
-    }
+  cmd
+    .command('lock')
+    .description(t('cmd.vault.lock.description'))
+    .action(async () => {
+      const result = await execute({ toolId: 'vault', input: { action: 'lock' } })
+      if (!result.success) fail(result.error.message)
+      console.log(t('vault.lock.success'))
+    })
 
-    console.log(`\n  ${count} entr${count === 1 ? 'y' : 'ies'}`)
-  })
+  cmd
+    .command('path [newPath]')
+    .description(t('cmd.vault.path.description'))
+    .action(async (newPath?: string) => {
+      const result = await execute({
+        toolId: 'vault',
+        input: { action: 'path', ...(newPath !== undefined && { newPath }) },
+      })
+      if (!result.success) fail(result.error.message)
+      const data = result.data as { path: string }
+      console.log(data.path)
+    })
 
-vaultCommand
-  .command('get <title>')
-  .description('Get an entry — copies password to clipboard')
-  .action(async (title: string) => {
-    const e = await vaultExecute<{
-      title: string
-      username?: string
-      password?: string
-      url?: string
-      notes?: string
-      tags: string[]
-      created_at: string
-      updated_at: string
-    }>({ action: 'get', title, showPassword: true })
-
-    console.log()
-    fmt('Title:', e.title)
-    if (e.username) fmt('Username:', e.username)
-    if (e.url) fmt('URL:', e.url)
-    if (e.notes) fmt('Notes:', e.notes)
-    if (e.tags.length) fmt('Tags:', e.tags.join(', '))
-    fmt('Created:', e.created_at)
-    fmt('Updated:', e.updated_at)
-    console.log()
-
-    if (e.password) {
-      copyToClipboard(e.password)
-    }
-  })
-
-vaultCommand
-  .command('edit <title>')
-  .description('Edit an existing entry')
-  .option('--new-title <title>', 'Rename entry')
-  .option('-u, --username <username>', 'New username')
-  .option('-p, --password <password>', 'New password')
-  .option('--url <url>', 'New URL')
-  .option('-n, --notes <notes>', 'New notes')
-  .option('--tags <tags>', 'New tags (comma-separated)')
-  .action(
-    async (
-      title: string,
-      options: {
-        newTitle?: string
+  cmd
+    .command('add')
+    .description(t('cmd.vault.add.description'))
+    .requiredOption('-t, --title <title>', t('cmd.vault.add.opt.title'))
+    .option('-u, --username <username>', t('cmd.vault.add.opt.username'))
+    .option('-p, --password <password>', t('cmd.vault.add.opt.password'))
+    .option('--url <url>', t('cmd.vault.add.opt.url'))
+    .option('-n, --notes <notes>', t('cmd.vault.add.opt.notes'))
+    .option('--tags <tags>', t('cmd.vault.add.opt.tags'))
+    .action(
+      async (options: {
+        title: string
         username?: string
         password?: string
         url?: string
         notes?: string
         tags?: string
-      }
-    ) => {
-      const tags = options.tags ? options.tags.split(',').map((t) => t.trim()) : undefined
+      }) => {
+        const tags = options.tags ? options.tags.split(',').map((tag) => tag.trim()) : []
 
-      const data = await vaultExecute<{ title: string }>({
-        action: 'edit',
-        title,
-        ...(options.newTitle !== undefined && { newTitle: options.newTitle }),
-        ...(options.username !== undefined && { username: options.username }),
-        ...(options.password !== undefined && { password: options.password }),
-        ...(options.url !== undefined && { url: options.url }),
-        ...(options.notes !== undefined && { notes: options.notes }),
-        ...(tags !== undefined && { tags }),
+        await vaultExecute<{ id: string }>({
+          action: 'add',
+          title: options.title,
+          tags,
+          ...(options.password !== undefined && { password: options.password }),
+          ...(options.username !== undefined && { username: options.username }),
+          ...(options.url !== undefined && { url: options.url }),
+          ...(options.notes !== undefined && { notes: options.notes }),
+        })
+
+        console.log(t('vault.add.success'))
+      }
+    )
+
+  cmd
+    .command('list')
+    .description(t('cmd.vault.list.description'))
+    .option('-s, --search <query>', t('cmd.vault.list.opt.search'))
+    .option('--tag <tag>', t('cmd.vault.list.opt.tag'))
+    .action(async (options: { search?: string; tag?: string }) => {
+      const { entries, count } = await vaultExecute<{
+        entries: { title: string; username?: string; url?: string; tags: string[] }[]
+        count: number
+      }>({
+        action: 'list',
+        ...(options.search !== undefined && { search: options.search }),
+        ...(options.tag !== undefined && { tag: options.tag }),
       })
 
-      console.log(`"${data.title}" updated`)
-    }
-  )
-
-vaultCommand
-  .command('delete <title>')
-  .description('Move entry to trash (use --force to skip trash)')
-  .option('-f, --force', 'Permanently delete without going through trash', false)
-  .action(async (title: string, options: { force: boolean }) => {
-    const data = await vaultExecute<{ title: string; permanent: boolean }>({
-      action: 'delete',
-      title,
-      force: options.force,
-    })
-    console.log(data.permanent ? `"${title}" permanently deleted` : `"${title}" moved to trash`)
-  })
-
-vaultCommand
-  .command('restore <title>')
-  .description('Restore entry from trash')
-  .action(async (title: string) => {
-    await vaultExecute({ action: 'restore', title })
-    console.log(`"${title}" restored`)
-  })
-
-vaultCommand
-  .command('trash')
-  .description('List entries in trash')
-  .action(async () => {
-    const { entries, count } = await vaultExecute<{
-      entries: { title: string; username?: string; deleted_at: string }[]
-      count: number
-    }>({ action: 'trash' })
-
-    if (count === 0) {
-      console.log('Trash is empty')
-      return
-    }
-
-    console.log(`\n  ${'TITLE'.padEnd(30)}  DELETED AT`)
-    console.log(`  ${'─'.repeat(50)}`)
-    for (const e of entries) {
-      console.log(`  ${e.title.padEnd(30)}  ${e.deleted_at}`)
-    }
-    console.log(`\n  ${count} entr${count === 1 ? 'y' : 'ies'} in trash`)
-  })
-
-vaultCommand
-  .command('rekey')
-  .description('Change master password and re-encrypt vault')
-  .action(async () => {
-    const currentPassword = await promptPassword('Current master password: ')
-    const newPassword = await promptPassword('New master password: ')
-    const confirm = await promptPassword('Confirm new password: ')
-
-    if (newPassword !== confirm) {
-      console.error('Passwords do not match')
-      process.exit(1)
-    }
-
-    const data = await vaultExecute<{ message: string }>({
-      action: 'rekey',
-      currentPassword,
-      newPassword,
-    })
-    console.log(data.message)
-  })
-
-vaultCommand
-  .command('purge [title]')
-  .description('Permanently delete from trash — one entry or all if no title given')
-  .option('-y, --yes', 'Skip confirmation', false)
-  .action(async (title: string | undefined, options: { yes: boolean }) => {
-    if (title === undefined && !options.yes) {
-      const confirmed = await promptConfirm('Permanently delete all trash entries?')
-      if (!confirmed) {
-        console.log('Cancelled')
+      if (count === 0) {
+        console.log(t('vault.list.empty'))
         return
       }
-    }
 
-    const data = await vaultExecute<{ title?: string; count?: number }>({
-      action: 'purge',
-      ...(title !== undefined && { title }),
-    })
-    if (data.title !== undefined) {
-      console.log(`"${data.title}" permanently deleted`)
-    } else {
-      const n = data.count ?? 0
+      const titleW = Math.max(5, ...entries.map((e) => e.title.length))
+      const userW = Math.max(8, ...entries.map((e) => (e.username ?? '').length))
+      const urlW = Math.max(3, ...entries.map((e) => (e.url ?? '').length))
+
+      const colTitle = t('table.title').padEnd(titleW)
+      const colUser = t('table.username').padEnd(userW)
+      const colUrl = t('table.url').padEnd(urlW)
+
+      const headerWidth = titleW + userW + urlW + 20
+      const termWidth = process.stdout.columns ?? 80
+      console.log(`\n  ${colTitle}  ${colUser}  ${colUrl}  ${t('table.tags')}`)
+      console.log(`  ${'-'.repeat(Math.min(headerWidth, termWidth - 2))}`)
+
+      for (const e of entries) {
+        const tags = e.tags.length ? e.tags.join(', ') : ''
+        console.log(
+          `  ${e.title.padEnd(titleW)}  ${(e.username ?? '').padEnd(userW)}  ${(e.url ?? '').padEnd(urlW)}  ${tags}`
+        )
+      }
+
       console.log(
-        n === 0 ? 'Trash already empty' : `${n} entr${n === 1 ? 'y' : 'ies'} permanently deleted`
+        `\n  ${count === 1 ? t('vault.list.count_one') : t('vault.list.count_many', { n: count })}`
       )
-    }
-  })
+    })
+
+  cmd
+    .command('get <title>')
+    .description(t('cmd.vault.get.description'))
+    .action(async (title: string) => {
+      const e = await vaultExecute<{
+        title: string
+        username?: string
+        password?: string
+        url?: string
+        notes?: string
+        tags: string[]
+        created_at: string
+        updated_at: string
+      }>({ action: 'get', title, showPassword: true })
+
+      console.log()
+      fmt('Title:', e.title)
+      if (e.username) fmt('Username:', e.username)
+      if (e.url) fmt('URL:', e.url)
+      if (e.notes) fmt('Notes:', e.notes)
+      if (e.tags.length) fmt('Tags:', e.tags.join(', '))
+      fmt('Created:', e.created_at)
+      fmt('Updated:', e.updated_at)
+      console.log()
+
+      if (e.password) {
+        copyToClipboard(e.password)
+      }
+    })
+
+  cmd
+    .command('edit <title>')
+    .description(t('cmd.vault.edit.description'))
+    .option('--new-title <title>', t('cmd.vault.edit.opt.new_title'))
+    .option('-u, --username <username>', t('cmd.vault.edit.opt.username'))
+    .option('-p, --password <password>', t('cmd.vault.edit.opt.password'))
+    .option('--url <url>', t('cmd.vault.edit.opt.url'))
+    .option('-n, --notes <notes>', t('cmd.vault.edit.opt.notes'))
+    .option('--tags <tags>', t('cmd.vault.edit.opt.tags'))
+    .action(
+      async (
+        title: string,
+        options: {
+          newTitle?: string
+          username?: string
+          password?: string
+          url?: string
+          notes?: string
+          tags?: string
+        }
+      ) => {
+        const tags = options.tags ? options.tags.split(',').map((tag) => tag.trim()) : undefined
+
+        const data = await vaultExecute<{ title: string }>({
+          action: 'edit',
+          title,
+          ...(options.newTitle !== undefined && { newTitle: options.newTitle }),
+          ...(options.username !== undefined && { username: options.username }),
+          ...(options.password !== undefined && { password: options.password }),
+          ...(options.url !== undefined && { url: options.url }),
+          ...(options.notes !== undefined && { notes: options.notes }),
+          ...(tags !== undefined && { tags }),
+        })
+
+        console.log(t('vault.edit.success', { title: data.title }))
+      }
+    )
+
+  cmd
+    .command('delete <title>')
+    .description(t('cmd.vault.delete.description'))
+    .option('-f, --force', t('cmd.vault.delete.opt.force'), false)
+    .action(async (title: string, options: { force: boolean }) => {
+      const data = await vaultExecute<{ title: string; permanent: boolean }>({
+        action: 'delete',
+        title,
+        force: options.force,
+      })
+      console.log(
+        data.permanent
+          ? t('vault.delete.permanent', { title })
+          : t('vault.delete.trashed', { title })
+      )
+    })
+
+  cmd
+    .command('restore <title>')
+    .description(t('cmd.vault.restore.description'))
+    .action(async (title: string) => {
+      await vaultExecute({ action: 'restore', title })
+      console.log(t('vault.restore.success', { title }))
+    })
+
+  cmd
+    .command('trash')
+    .description(t('cmd.vault.trash.description'))
+    .action(async () => {
+      const { entries, count } = await vaultExecute<{
+        entries: { title: string; username?: string; deleted_at: string }[]
+        count: number
+      }>({ action: 'trash' })
+
+      if (count === 0) {
+        console.log(t('vault.trash.empty'))
+        return
+      }
+
+      console.log(`\n  ${'TITLE'.padEnd(30)}  ${t('table.deleted_at')}`)
+      console.log(`  ${'-'.repeat(50)}`)
+      for (const e of entries) {
+        console.log(`  ${e.title.padEnd(30)}  ${e.deleted_at}`)
+      }
+      console.log(
+        `\n  ${count === 1 ? t('vault.trash.count_one') : t('vault.trash.count_many', { n: count })}`
+      )
+    })
+
+  cmd
+    .command('rekey')
+    .description(t('cmd.vault.rekey.description'))
+    .action(async () => {
+      const currentPassword = await promptPassword(t('prompt.current_password'))
+      const newPassword = await promptPassword(t('prompt.new_password'))
+      const confirm = await promptPassword(t('prompt.confirm_new_password'))
+
+      if (newPassword !== confirm) {
+        console.error(t('cli.passwords_mismatch'))
+        process.exit(1)
+      }
+
+      await vaultExecute<{ message: string }>({
+        action: 'rekey',
+        currentPassword,
+        newPassword,
+      })
+      console.log(t('vault.rekey.success'))
+    })
+
+  cmd
+    .command('purge [title]')
+    .description(t('cmd.vault.purge.description'))
+    .option('-y, --yes', t('cmd.vault.purge.opt.yes'), false)
+    .action(async (title: string | undefined, options: { yes: boolean }) => {
+      if (title === undefined && !options.yes) {
+        const confirmed = await promptConfirm(t('prompt.purge_all_confirm'))
+        if (!confirmed) {
+          console.log(t('cli.cancelled'))
+          return
+        }
+      }
+
+      const data = await vaultExecute<{ title?: string; count?: number }>({
+        action: 'purge',
+        ...(title !== undefined && { title }),
+      })
+
+      if (data.title !== undefined) {
+        console.log(t('vault.purge.success', { title: data.title }))
+      } else {
+        const n = data.count ?? 0
+        if (n === 0) {
+          console.log(t('vault.purge.already_empty'))
+        } else {
+          console.log(n === 1 ? t('vault.purge.all_one') : t('vault.purge.all_many', { n }))
+        }
+      }
+    })
+
+  return cmd
+}
