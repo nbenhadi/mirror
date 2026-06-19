@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { VaultInput } from './schema.js'
 import { init } from './actions/init.js'
 import { unlock } from './actions/unlock.js'

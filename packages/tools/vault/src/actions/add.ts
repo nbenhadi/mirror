@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { writeVault } from '../vault-file.js'
 import { loadVaultSession, findActiveEntry } from '../vault-helpers.js'
 import type { Entry } from '../types.js'

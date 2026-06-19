@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { loadConfig, saveConfig } from '../config.js'
 import type { VaultInput } from '../schema.js'
 

@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { loadSession, clearSession } from '../session.js'
 import { loadConfig, saveConfig } from '../config.js'
 import { readVault, writeVault } from '../vault-file.js'

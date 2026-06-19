@@ -1,4 +1,4 @@
-import type { ToolResult } from '@mirror/core'
+import type { ToolResult } from '@nbenhadi/mirror-core'
 import type { Entry, VaultData } from './types.js'
 import { loadSession } from './session.js'
 import { readVault } from './vault-file.js'

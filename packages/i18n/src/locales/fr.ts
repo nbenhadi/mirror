@@ -9,6 +9,8 @@ export const fr: Record<TranslationKey, string> = {
   'error.crypto': 'Erreur de chiffrement.',
   'error.database': 'Erreur de base de donnees.',
 
+  'vault.error.invalid_password': 'Mot de passe maitre invalide.',
+
   'cli.passwords_mismatch': 'Les mots de passe ne correspondent pas.',
   'cli.cancelled': 'Annule.',
 
@@ -55,6 +57,9 @@ export const fr: Record<TranslationKey, string> = {
   'table.username': 'UTILISATEUR',
   'table.url': 'URL',
   'table.tags': 'TAGS',
+  'table.notes': 'NOTES',
+  'table.created_at': 'CREE LE',
+  'table.updated_at': 'MIS A JOUR',
   'table.deleted_at': 'SUPPRIME LE',
 
   'cmd.password.description': 'Outils de mots de passe',

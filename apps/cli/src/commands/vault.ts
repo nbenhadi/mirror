@@ -1,6 +1,6 @@
 import { Command } from 'commander'
-import { execute } from '@mirror/core'
-import { t } from '@mirror/i18n'
+import { execute } from '@nbenhadi/mirror-core'
+import { t } from '@nbenhadi/mirror-i18n'
 import { copyToClipboard } from '../clipboard.js'
 import { promptPassword, promptConfirm } from '../prompt.js'
 
@@ -9,13 +9,35 @@ function fail(message: string): never {
   process.exit(1)
 }
 
+function failWithCode(error: { code: string; message: string }): never {
+  const map: Record<string, Parameters<typeof t>[0]> = {
+    VALIDATION: 'error.validation',
+    NOT_FOUND: 'error.not_found',
+    UNAUTHORIZED: 'vault.error.invalid_password',
+    FORBIDDEN: 'error.forbidden',
+    EXECUTION: 'error.execution',
+    CRYPTO: 'error.crypto',
+    DATABASE: 'error.database',
+  }
+  const key = map[error.code]
+  fail(key ? t(key) : error.message)
+}
+
 async function autoUnlock(): Promise<void> {
-  const masterPassword = await promptPassword(t('prompt.master_password'))
-  const result = await execute({
-    toolId: 'vault',
-    input: { action: 'unlock', masterPassword, minutes: 30 },
-  })
-  if (!result.success) fail(result.error.message)
+  const MAX_ATTEMPTS = 3
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const masterPassword = await promptPassword(t('prompt.master_password'))
+    const result = await execute({
+      toolId: 'vault',
+      input: { action: 'unlock', masterPassword, minutes: 30 },
+    })
+    if (result.success) return
+    if (attempt < MAX_ATTEMPTS) {
+      console.error(t('vault.error.invalid_password'))
+    } else {
+      fail(t('vault.error.invalid_password'))
+    }
+  }
 }
 
 async function vaultExecute<T>(input: unknown): Promise<T> {
@@ -24,7 +46,7 @@ async function vaultExecute<T>(input: unknown): Promise<T> {
     await autoUnlock()
     result = await execute({ toolId: 'vault', input })
   }
-  if (!result.success) fail(result.error.message)
+  if (!result.success) failWithCode(result.error)
   return result.data as T
 }
 
@@ -57,7 +79,7 @@ export function createVaultCommand(): Command {
         },
       })
 
-      if (!result.success) fail(result.error.message)
+      if (!result.success) failWithCode(result.error)
       const data = result.data as { path: string }
       console.log(t('vault.init.success', { path: data.path }))
     })
@@ -77,7 +99,7 @@ export function createVaultCommand(): Command {
         },
       })
 
-      if (!result.success) fail(result.error.message)
+      if (!result.success) failWithCode(result.error)
       const data = result.data as { expiresAt: string }
       console.log(t('vault.unlock.success', { expiresAt: data.expiresAt }))
     })
@@ -87,7 +109,7 @@ export function createVaultCommand(): Command {
     .description(t('cmd.vault.lock.description'))
     .action(async () => {
       const result = await execute({ toolId: 'vault', input: { action: 'lock' } })
-      if (!result.success) fail(result.error.message)
+      if (!result.success) failWithCode(result.error)
       console.log(t('vault.lock.success'))
     })
 
@@ -99,7 +121,7 @@ export function createVaultCommand(): Command {
         toolId: 'vault',
         input: { action: 'path', ...(newPath !== undefined && { newPath }) },
       })
-      if (!result.success) fail(result.error.message)
+      if (!result.success) failWithCode(result.error)
       const data = result.data as { path: string }
       console.log(data.path)
     })
@@ -199,13 +221,13 @@ export function createVaultCommand(): Command {
       }>({ action: 'get', title, showPassword: true })
 
       console.log()
-      fmt('Title:', e.title)
-      if (e.username) fmt('Username:', e.username)
-      if (e.url) fmt('URL:', e.url)
-      if (e.notes) fmt('Notes:', e.notes)
-      if (e.tags.length) fmt('Tags:', e.tags.join(', '))
-      fmt('Created:', e.created_at)
-      fmt('Updated:', e.updated_at)
+      fmt(t('table.title') + ':', e.title)
+      if (e.username) fmt(t('table.username') + ':', e.username)
+      if (e.url) fmt(t('table.url') + ':', e.url)
+      if (e.notes) fmt(t('table.notes') + ':', e.notes)
+      if (e.tags.length) fmt(t('table.tags') + ':', e.tags.join(', '))
+      fmt(t('table.created_at') + ':', e.created_at)
+      fmt(t('table.updated_at') + ':', e.updated_at)
       console.log()
 
       if (e.password) {
@@ -290,7 +312,7 @@ export function createVaultCommand(): Command {
         return
       }
 
-      console.log(`\n  ${'TITLE'.padEnd(30)}  ${t('table.deleted_at')}`)
+      console.log(`\n  ${t('table.title').padEnd(30)}  ${t('table.deleted_at')}`)
       console.log(`  ${'-'.repeat(50)}`)
       for (const e of entries) {
         console.log(`  ${e.title.padEnd(30)}  ${e.deleted_at}`)

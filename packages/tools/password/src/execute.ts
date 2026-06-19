@@ -1,5 +1,5 @@
 import { randomInt } from 'node:crypto'
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { PasswordInput } from './schema.js'
 
 const LOWERCASE = 'abcdefghijklmnopqrstuvwxyz'

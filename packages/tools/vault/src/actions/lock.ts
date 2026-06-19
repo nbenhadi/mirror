@@ -1,4 +1,4 @@
-import type { ToolContext, ToolResult } from '@mirror/core'
+import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { clearSession } from '../session.js'
 
 export async function lock(

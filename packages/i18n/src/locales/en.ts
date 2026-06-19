@@ -9,6 +9,8 @@ export const en: Record<TranslationKey, string> = {
   'error.crypto': 'Encryption error.',
   'error.database': 'Database error.',
 
+  'vault.error.invalid_password': 'Invalid master password.',
+
   'cli.passwords_mismatch': "Passwords don't match.",
   'cli.cancelled': 'Cancelled.',
 
@@ -53,6 +55,9 @@ export const en: Record<TranslationKey, string> = {
   'table.username': 'USERNAME',
   'table.url': 'URL',
   'table.tags': 'TAGS',
+  'table.notes': 'NOTES',
+  'table.created_at': 'CREATED',
+  'table.updated_at': 'UPDATED',
   'table.deleted_at': 'DELETED AT',
 
   'cmd.password.description': 'Password tools',

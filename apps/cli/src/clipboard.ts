@@ -1,5 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process'
-import { t } from '@mirror/i18n'
+import { t } from '@nbenhadi/mirror-i18n'
 
 const CLEAR_SECONDS = 15
 
