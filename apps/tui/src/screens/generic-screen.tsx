@@ -109,8 +109,6 @@ export function GenericScreen({
 
   const extraKeys = useMemo(() => new Set(extraFields?.map((f) => f.key) ?? []), [extraFields])
 
-  const resetValues = () => setValues(makeInitialValues())
-
   const onSubmit = async () => {
     setLocalError(null)
     clearError()
@@ -134,10 +132,8 @@ export function GenericScreen({
         onSuccess()
       } else if (renderResult || shouldAutoRender(data)) {
         setResult(data)
-        resetValues()
       } else {
         notify(formatResult(data), 'success')
-        resetValues()
       }
     }
   }
