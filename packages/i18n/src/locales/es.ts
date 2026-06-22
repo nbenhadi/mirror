@@ -46,6 +46,28 @@ export const es: Record<TranslationKey, string> = {
   'cmd.password.error.empty_charset': 'No hay caracteres disponibles. Revisa tus opciones.',
   'cmd.password.error.not_enough_chars':
     'Se necesitan {length} caracteres únicos pero el conjunto solo tiene {size}.',
+  'cmd.password.check.description': 'Analiza la fortaleza de una contraseña',
+  'cmd.password.check.opt.password': 'Contraseña a analizar',
+  'cmd.password.check.arg.password': 'contraseña',
+  'cmd.password.check.label.strength': 'Fortaleza',
+  'cmd.password.check.label.entropy': 'Entropía',
+  'cmd.password.check.label.crack_time': 'Tiempo de descifrado',
+  'cmd.password.check.label.warnings': 'Avisos',
+  'cmd.password.check.warning.too_short': 'Menos de 8 caracteres',
+  'cmd.password.check.warning.single_type': 'Usa un solo tipo de carácter',
+  'cmd.password.check.warning.repeated_run': 'Contiene caracteres repetidos (p. ej. aaa)',
+  'cmd.password.check.warning.sequence': 'Contiene una secuencia (p. ej. abc, 123)',
+  'cmd.password.check.warning.low_variety': 'Muchos caracteres repetidos',
+  'cmd.password.check.strength.very_weak': 'Muy débil',
+  'cmd.password.check.strength.weak': 'Débil',
+  'cmd.password.check.strength.fair': 'Aceptable',
+  'cmd.password.check.strength.strong': 'Fuerte',
+  'cmd.password.check.strength.very_strong': 'Muy fuerte',
+  'cmd.password.passphrase.description': 'Genera una frase de contraseña memorable',
+  'cmd.password.passphrase.opt.words': 'Número de palabras (3-20)',
+  'cmd.password.passphrase.opt.separator': 'Separador entre palabras',
+  'cmd.password.passphrase.opt.capitalize': 'Poner cada palabra en mayúscula inicial',
+  'cmd.password.passphrase.opt.number': 'Añadir un dígito aleatorio',
 
   // Vault tool
   'cmd.vault.description': 'Gestiona tu bóveda cifrada',
@@ -115,11 +137,13 @@ export const es: Record<TranslationKey, string> = {
 
   // Lang command
   'cmd.lang.description': 'Mostrar o establecer el idioma de visualización',
+  'cmd.lang.arg.locale': 'idioma',
   'cmd.lang.success': 'Idioma establecido a {locale}',
   'cmd.lang.error': 'Idioma no compatible. Disponibles: {locales}',
 
   // Help command
   'cmd.help.usage': 'Uso',
+  'cmd.help.arguments': 'Argumentos',
   'cmd.help.options': 'Opciones',
   'cmd.help.commands': 'Comandos',
   'cmd.help.version': 'mostrar el número de versión',

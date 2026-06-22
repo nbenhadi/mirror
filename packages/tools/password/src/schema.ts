@@ -24,6 +24,26 @@ export const generateSchema = z.object({
   suffix: z.string().optional().describe('cmd.password.generate.opt.suffix'),
 })
 
-export const schema = generateSchema
+export const checkSchema = z.object({
+  action: z.literal('check'),
+  password: z.string().min(1).describe('cmd.password.check.opt.password'),
+})
+
+export const passphraseSchema = z.object({
+  action: z.literal('passphrase'),
+  words: z.number().int().min(3).max(20).default(6).describe('cmd.password.passphrase.opt.words'),
+  separator: z.string().default('-').describe('cmd.password.passphrase.opt.separator'),
+  capitalize: z.boolean().default(false).describe('cmd.password.passphrase.opt.capitalize'),
+  number: z.boolean().default(false).describe('cmd.password.passphrase.opt.number'),
+})
+
+export const schema = z.discriminatedUnion('action', [
+  generateSchema,
+  checkSchema,
+  passphraseSchema,
+])
 
 export type PasswordInput = z.infer<typeof schema>
+export type GenerateInput = z.infer<typeof generateSchema>
+export type CheckInput = z.infer<typeof checkSchema>
+export type PassphraseInput = z.infer<typeof passphraseSchema>

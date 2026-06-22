@@ -45,6 +45,28 @@ export const en: Record<TranslationKey, string> = {
   'cmd.password.generate.opt.suffix': 'Fixed suffix',
   'cmd.password.error.empty_charset': 'No characters available. Check your options.',
   'cmd.password.error.not_enough_chars': 'Need {length} unique chars but charset only has {size}.',
+  'cmd.password.check.description': 'Analyze the strength of a password',
+  'cmd.password.check.opt.password': 'Password to analyze',
+  'cmd.password.check.arg.password': 'password',
+  'cmd.password.check.label.strength': 'Strength',
+  'cmd.password.check.label.entropy': 'Entropy',
+  'cmd.password.check.label.crack_time': 'Crack time',
+  'cmd.password.check.label.warnings': 'Warnings',
+  'cmd.password.check.warning.too_short': 'Shorter than 8 characters',
+  'cmd.password.check.warning.single_type': 'Uses only one character type',
+  'cmd.password.check.warning.repeated_run': 'Contains repeated characters (e.g. aaa)',
+  'cmd.password.check.warning.sequence': 'Contains a sequence (e.g. abc, 123)',
+  'cmd.password.check.warning.low_variety': 'Many repeated characters',
+  'cmd.password.check.strength.very_weak': 'Very weak',
+  'cmd.password.check.strength.weak': 'Weak',
+  'cmd.password.check.strength.fair': 'Fair',
+  'cmd.password.check.strength.strong': 'Strong',
+  'cmd.password.check.strength.very_strong': 'Very strong',
+  'cmd.password.passphrase.description': 'Generate a memorable passphrase',
+  'cmd.password.passphrase.opt.words': 'Number of words (3-20)',
+  'cmd.password.passphrase.opt.separator': 'Separator between words',
+  'cmd.password.passphrase.opt.capitalize': 'Capitalize each word',
+  'cmd.password.passphrase.opt.number': 'Append a random digit',
 
   // Vault tool
   'cmd.vault.description': 'Manage your encrypted vault',
@@ -114,11 +136,13 @@ export const en: Record<TranslationKey, string> = {
 
   // Lang command
   'cmd.lang.description': 'Show or set display language',
+  'cmd.lang.arg.locale': 'locale',
   'cmd.lang.success': 'Language set to {locale}',
   'cmd.lang.error': 'Unsupported locale. Available: {locales}',
 
   // Help command
   'cmd.help.usage': 'Usage',
+  'cmd.help.arguments': 'Arguments',
   'cmd.help.options': 'Options',
   'cmd.help.commands': 'Commands',
   'cmd.help.version': 'output the version number',

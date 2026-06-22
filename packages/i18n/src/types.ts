@@ -49,6 +49,28 @@ export type TranslationKey =
   | 'cmd.password.generate.opt.suffix'
   | 'cmd.password.error.empty_charset'
   | 'cmd.password.error.not_enough_chars'
+  | 'cmd.password.check.description'
+  | 'cmd.password.check.opt.password'
+  | 'cmd.password.check.arg.password'
+  | 'cmd.password.check.label.strength'
+  | 'cmd.password.check.label.entropy'
+  | 'cmd.password.check.label.crack_time'
+  | 'cmd.password.check.label.warnings'
+  | 'cmd.password.check.warning.too_short'
+  | 'cmd.password.check.warning.single_type'
+  | 'cmd.password.check.warning.repeated_run'
+  | 'cmd.password.check.warning.sequence'
+  | 'cmd.password.check.warning.low_variety'
+  | 'cmd.password.check.strength.very_weak'
+  | 'cmd.password.check.strength.weak'
+  | 'cmd.password.check.strength.fair'
+  | 'cmd.password.check.strength.strong'
+  | 'cmd.password.check.strength.very_strong'
+  | 'cmd.password.passphrase.description'
+  | 'cmd.password.passphrase.opt.words'
+  | 'cmd.password.passphrase.opt.separator'
+  | 'cmd.password.passphrase.opt.capitalize'
+  | 'cmd.password.passphrase.opt.number'
 
   // Vault tool
   | 'cmd.vault.description'
@@ -118,11 +140,13 @@ export type TranslationKey =
 
   // Lang command
   | 'cmd.lang.description'
+  | 'cmd.lang.arg.locale'
   | 'cmd.lang.success'
   | 'cmd.lang.error'
 
   // Help command
   | 'cmd.help.usage'
+  | 'cmd.help.arguments'
   | 'cmd.help.options'
   | 'cmd.help.commands'
   | 'cmd.help.version'

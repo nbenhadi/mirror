@@ -1,18 +1,19 @@
-import React from 'react'
-import { Text } from 'ink'
+import React, { type ReactNode } from 'react'
+import { Box, Text } from 'ink'
 import { colors } from '../theme.js'
 import { useTerminalSize } from '../hooks/use-terminal-size.js'
 
 interface BlockProps {
-  text: string
+  text?: string
+  children?: ReactNode
+  color?: string
 }
 
-export function Block({ text }: BlockProps) {
+export function Block({ text, children, color = colors.secondary }: BlockProps) {
   const { width } = useTerminalSize()
-  const content = ` ${text} `
   return (
-    <Text bold backgroundColor={colors.secondary} color="black">
-      {content.padEnd(width)}
-    </Text>
+    <Box width={width} borderStyle="round" borderColor={color} paddingX={1}>
+      {children ?? <Text>{text}</Text>}
+    </Box>
   )
 }
