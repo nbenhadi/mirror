@@ -2,12 +2,11 @@ import { Command } from 'commander'
 import { execute } from '@nbenhadi/mirror-core'
 import { t } from '@nbenhadi/mirror-i18n'
 import { STRENGTH_KEYS, WARNING_KEYS, type CheckResult } from '@nbenhadi/mirror-password'
+import { symbols } from '@nbenhadi/mirror-brand'
+import chalk from 'chalk'
 import { copyToClipboard } from '../clipboard.js'
 import { promptPassword } from '../prompt.js'
-
-function fmt(label: string, value: string) {
-  console.log(`  ${label.padEnd(20)}${value}`)
-}
+import * as ui from '../ui.js'
 
 function createGenerateCommand(): Command {
   return new Command('generate')
@@ -51,12 +50,9 @@ function createGenerateCommand(): Command {
         },
       })
 
-      if (result.success) {
-        console.log(result.data.password)
-      } else {
-        console.error(t('error.validation'))
-        process.exit(1)
-      }
+      if (!result.success) ui.fatal(t('error.validation'))
+      ui.printPassword(result.data.password)
+      copyToClipboard(result.data.password)
     })
 }
 
@@ -72,24 +68,27 @@ function createCheckCommand(): Command {
         input: { action: 'check', password: value },
       })
 
-      if (!result.success) {
-        console.error(t('error.validation'))
-        process.exit(1)
-      }
+      if (!result.success) ui.fatal(t('error.validation'))
 
       const d = result.data
+      const scoreColor = ui.strengthColor(d.score)
+
+      const lStrength = t('cmd.password.check.label.strength')
+      const lEntropy = t('cmd.password.check.label.entropy')
+      const lCrack = t('cmd.password.check.label.crack_time')
+      const labelW = Math.max(lStrength.length, lEntropy.length, lCrack.length) + 3
 
       console.log()
-      fmt(
-        t('cmd.password.check.label.strength') + ':',
-        `${t(STRENGTH_KEYS[d.label])} (${d.score}/4)`
-      )
-      fmt(t('cmd.password.check.label.entropy') + ':', `${d.effectiveBits} bits`)
-      fmt(t('cmd.password.check.label.crack_time') + ':', d.crackTime)
+      ui.row(lStrength, scoreColor(`${t(STRENGTH_KEYS[d.label])} (${d.score}/4)`), labelW)
+      ui.row(lEntropy, `${d.effectiveBits} bits`, labelW)
+      ui.row(lCrack, d.crackTime, labelW)
+
       if (d.warnings.length > 0) {
         console.log()
-        console.log(`  ${t('cmd.password.check.label.warnings')}:`)
-        for (const w of d.warnings) console.log(`    - ${t(WARNING_KEYS[w])}`)
+        console.log(`  ${chalk.dim(t('cmd.password.check.label.warnings'))}`)
+        for (const w of d.warnings) {
+          console.log(`    ${chalk.dim(symbols.bullet)} ${t(WARNING_KEYS[w])}`)
+        }
       }
       console.log()
     })
@@ -120,12 +119,8 @@ function createPassphraseCommand(): Command {
           },
         })
 
-        if (!result.success) {
-          console.error(t('error.validation'))
-          process.exit(1)
-        }
-
-        console.log(result.data.passphrase)
+        if (!result.success) ui.fatal(t('error.validation'))
+        ui.printPassword(result.data.passphrase)
         copyToClipboard(result.data.passphrase)
       }
     )

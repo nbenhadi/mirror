@@ -10,6 +10,7 @@ export function fieldKeyHints(spec: FieldSpec): KeyHint[] {
     case 'number':
       return [{ key: keybindings.adjust.label, label: t('tui.key.adjust') }]
     case 'text':
+    case 'text-array':
     case 'group-header':
       return []
   }

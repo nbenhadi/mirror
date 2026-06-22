@@ -126,7 +126,28 @@ export function GenericScreen({
         ? Object.fromEntries(Object.entries(values).filter(([k]) => !extraKeys.has(k)))
         : values
 
-    const data = await run({ ...constants, ...unflattenValues(cleanValues) })
+    const allFields = [...fields, ...(extraFields ?? [])]
+    const arrayKeys = new Set<string>(
+      allFields.filter((f) => f.type === 'text-array').map((f) => f.key)
+    )
+
+    const plainValues: FieldValues = {}
+    const arrayData: Record<string, string[]> = {}
+    for (const [k, v] of Object.entries(cleanValues)) {
+      if (arrayKeys.has(k)) {
+        const str = typeof v === 'string' ? v.trim() : ''
+        arrayData[k] = str
+          ? str
+              .split(',')
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : []
+      } else {
+        plainValues[k] = v
+      }
+    }
+
+    const data = await run({ ...constants, ...unflattenValues(plainValues), ...arrayData })
     if (data !== null) {
       if (onSuccess) {
         onSuccess()

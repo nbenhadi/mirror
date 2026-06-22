@@ -40,7 +40,7 @@ export function Table({ columns, rows, selectedIndex }: TableProps) {
               if (raw === '') {
                 return (
                   <Text key={col.key} {...dim}>
-                    {'-'.padEnd(colW)}
+                    {symbols.separator.padEnd(colW)}
                   </Text>
                 )
               }

@@ -150,6 +150,21 @@ function processShape(
         fields.push(textField(key, label, inner._def, defaultValue, indent, desc))
         break
 
+      case 'ZodArray': {
+        const elem = (inner._def as { type?: ZodTypeLike }).type
+        if (elem?._def?.typeName === 'ZodString') {
+          fields.push({
+            type: 'text-array',
+            key,
+            label,
+            default: Array.isArray(defaultValue) ? (defaultValue as string[]).join(', ') : '',
+            ...(indent && { indent }),
+            ...(desc !== undefined && { description: t(desc as TranslationKey) }),
+          })
+        }
+        break
+      }
+
       case 'ZodObject':
         if (inner.shape) {
           fields.push({ type: 'group-header', key, label })
@@ -225,7 +240,8 @@ export function initialValues(fields: FieldSpec[]): FieldValues {
   const values: FieldValues = {}
   for (const field of fields) {
     if (field.type === 'group-header') continue
-    values[field.key] = field.type === 'text' ? (field.default ?? '') : field.default
+    values[field.key] =
+      field.type === 'text' || field.type === 'text-array' ? (field.default ?? '') : field.default
   }
   return values
 }

@@ -78,7 +78,9 @@ export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldPro
     )
   }
 
-  const maxLength = spec.maxLength
+  const maxLength = 'maxLength' in spec ? spec.maxLength : undefined
+  const mask = spec.type === 'text' && spec.mask
+  const placeholder = 'placeholder' in spec ? spec.placeholder : undefined
   const handleChange =
     maxLength !== undefined ? (v: string) => onChange(v.slice(0, maxLength)) : onChange
 
@@ -88,8 +90,8 @@ export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldPro
         value={asString(value)}
         onChange={handleChange}
         focus={focus}
-        {...(spec.mask && { mask: symbols.bullet })}
-        {...(spec.placeholder !== undefined && { placeholder: spec.placeholder })}
+        {...(mask && { mask: symbols.bullet })}
+        {...(placeholder !== undefined && { placeholder })}
       />
     </FieldShell>
   )

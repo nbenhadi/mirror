@@ -40,10 +40,16 @@ importers:
       argon2:
         specifier: ^0.43.0
         version: 0.43.1
+      chalk:
+        specifier: ^5.4.1
+        version: 5.6.2
       commander:
         specifier: ^13.1.0
         version: 13.1.0
     devDependencies:
+      '@nbenhadi/mirror-brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
       '@nbenhadi/mirror-core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -68,6 +74,9 @@ importers:
 
   apps/tui:
     dependencies:
+      '@nbenhadi/mirror-brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
       '@nbenhadi/mirror-cli':
         specifier: workspace:*
         version: link:../cli
@@ -111,6 +120,12 @@ importers:
       tsx:
         specifier: ^4.19.4
         version: 4.22.4
+
+  packages/brand:
+    devDependencies:
+      '@types/node':
+        specifier: ^22.15.21
+        version: 22.19.21
 
   packages/core:
     dependencies:

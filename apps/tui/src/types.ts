@@ -34,4 +34,11 @@ export interface TextField extends BaseField {
   maxLength?: number
 }
 
-export type FieldSpec = FieldGroupHeader | ToggleField | NumberField | TextField
+export interface TextArrayField extends BaseField {
+  type: 'text-array'
+  default?: string
+  placeholder?: string
+  maxLength?: number
+}
+
+export type FieldSpec = FieldGroupHeader | ToggleField | NumberField | TextField | TextArrayField
