@@ -1,5 +1,7 @@
 export const SUPPORTED_LOCALES = ['en', 'es', 'fr'] as const
+
 export type Locale = (typeof SUPPORTED_LOCALES)[number]
+
 export const DEFAULT_LOCALE: Locale = 'en'
 
 export type TranslationKey =
@@ -12,68 +14,24 @@ export type TranslationKey =
   | 'error.crypto'
   | 'error.database'
 
-  // CLI
-  | 'cli.passwords_mismatch'
-  | 'cli.cancelled'
-
-  // Clipboard
-  | 'clipboard.copied'
-  | 'clipboard.unavailable'
-
-  // Password tool
-  | 'password.error.empty_charset'
-  | 'password.error.not_enough_chars'
-
-  // Vault errors
-  | 'vault.error.invalid_password'
-
-  // Vault lifecycle
-  | 'vault.init.success'
-  | 'vault.unlock.success'
-  | 'vault.lock.success'
-  | 'vault.rekey.success'
-
-  // Vault entries
-  | 'vault.add.success'
-  | 'vault.list.empty'
-  | 'vault.list.count_one'
-  | 'vault.list.count_many'
-  | 'vault.edit.success'
-  | 'vault.delete.permanent'
-  | 'vault.delete.trashed'
-  | 'vault.restore.success'
-
-  // Vault trash
-  | 'vault.trash.empty'
-  | 'vault.trash.count_one'
-  | 'vault.trash.count_many'
-  | 'vault.purge.success'
-  | 'vault.purge.all_one'
-  | 'vault.purge.all_many'
-  | 'vault.purge.already_empty'
-
   // Program
   | 'program.description'
 
-  // Prompts
-  | 'prompt.master_password'
-  | 'prompt.confirm_password'
-  | 'prompt.current_password'
-  | 'prompt.new_password'
-  | 'prompt.confirm_new_password'
-  | 'prompt.purge_all_confirm'
+  // CLI
+  | 'cli.passwords_mismatch'
 
-  // Table headers
-  | 'table.title'
-  | 'table.username'
-  | 'table.url'
-  | 'table.tags'
-  | 'table.notes'
-  | 'table.created_at'
-  | 'table.updated_at'
-  | 'table.deleted_at'
+  // TUI
+  | 'tui.select_tool'
+  | 'tui.key.navigate'
+  | 'tui.key.select'
+  | 'tui.key.back'
+  | 'tui.key.toggle'
+  | 'tui.key.adjust'
+  | 'tui.key.submit'
+  | 'tui.confirm_quit'
+  | 'tui.working'
 
-  // Command: password
+  // Password tool
   | 'cmd.password.description'
   | 'cmd.password.generate.description'
   | 'cmd.password.generate.opt.length'
@@ -89,14 +47,23 @@ export type TranslationKey =
   | 'cmd.password.generate.opt.every'
   | 'cmd.password.generate.opt.prefix'
   | 'cmd.password.generate.opt.suffix'
+  | 'cmd.password.error.empty_charset'
+  | 'cmd.password.error.not_enough_chars'
 
-  // Command: vault
+  // Vault tool
   | 'cmd.vault.description'
   | 'cmd.vault.init.description'
+  | 'cmd.vault.init.opt.masterPassword'
   | 'cmd.vault.init.opt.path'
+  | 'cmd.vault.init.success'
   | 'cmd.vault.unlock.description'
+  | 'cmd.vault.unlock.opt.masterPassword'
+  | 'cmd.vault.unlock.opt.minutes'
+  | 'cmd.vault.unlock.success'
   | 'cmd.vault.lock.description'
+  | 'cmd.vault.lock.success'
   | 'cmd.vault.path.description'
+  | 'cmd.vault.path.opt.newPath'
   | 'cmd.vault.add.description'
   | 'cmd.vault.add.opt.title'
   | 'cmd.vault.add.opt.username'
@@ -104,34 +71,81 @@ export type TranslationKey =
   | 'cmd.vault.add.opt.url'
   | 'cmd.vault.add.opt.notes'
   | 'cmd.vault.add.opt.tags'
+  | 'cmd.vault.add.success'
   | 'cmd.vault.list.description'
   | 'cmd.vault.list.opt.search'
   | 'cmd.vault.list.opt.tag'
+  | 'cmd.vault.list.empty'
+  | 'cmd.vault.list.count_one'
+  | 'cmd.vault.list.count_many'
   | 'cmd.vault.get.description'
+  | 'cmd.vault.get.opt.title'
+  | 'cmd.vault.get.opt.showPassword'
   | 'cmd.vault.edit.description'
+  | 'cmd.vault.edit.opt.title'
   | 'cmd.vault.edit.opt.new_title'
   | 'cmd.vault.edit.opt.username'
   | 'cmd.vault.edit.opt.password'
   | 'cmd.vault.edit.opt.url'
   | 'cmd.vault.edit.opt.notes'
   | 'cmd.vault.edit.opt.tags'
+  | 'cmd.vault.edit.success'
   | 'cmd.vault.delete.description'
+  | 'cmd.vault.delete.opt.title'
   | 'cmd.vault.delete.opt.force'
+  | 'cmd.vault.delete.permanent'
+  | 'cmd.vault.delete.trashed'
   | 'cmd.vault.restore.description'
+  | 'cmd.vault.restore.opt.title'
+  | 'cmd.vault.restore.success'
   | 'cmd.vault.trash.description'
+  | 'cmd.vault.trash.empty'
+  | 'cmd.vault.trash.count_one'
+  | 'cmd.vault.trash.count_many'
   | 'cmd.vault.rekey.description'
+  | 'cmd.vault.rekey.opt.currentPassword'
+  | 'cmd.vault.rekey.opt.newPassword'
+  | 'cmd.vault.rekey.success'
   | 'cmd.vault.purge.description'
+  | 'cmd.vault.purge.opt.title'
   | 'cmd.vault.purge.opt.yes'
+  | 'cmd.vault.purge.success'
+  | 'cmd.vault.purge.all_one'
+  | 'cmd.vault.purge.all_many'
+  | 'cmd.vault.purge.already_empty'
+  | 'cmd.vault.purge.all_confirm'
+  | 'cmd.vault.error.invalid_password'
 
-  // Command: lang
+  // Lang command
   | 'cmd.lang.description'
-  | 'cmd.lang.error.unsupported'
   | 'cmd.lang.success'
+  | 'cmd.lang.error'
 
-  // Commander UI
+  // Help command
   | 'cmd.help.usage'
   | 'cmd.help.options'
   | 'cmd.help.commands'
   | 'cmd.help.version'
-  | 'cmd.help.help_command'
   | 'cmd.help.display_help'
+
+  // Clipboard
+  | 'clipboard.copied'
+  | 'clipboard.unavailable'
+
+  // Prompt
+  | 'prompt.master_password'
+  | 'prompt.confirm_password'
+  | 'prompt.current_password'
+  | 'prompt.new_password'
+  | 'prompt.confirm_new_password'
+
+  // Generic
+  | 'title'
+  | 'username'
+  | 'url'
+  | 'tags'
+  | 'notes'
+  | 'created_at'
+  | 'updated_at'
+  | 'deleted_at'
+  | 'cancelled'

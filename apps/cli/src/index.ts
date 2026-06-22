@@ -8,7 +8,7 @@ import { readCliConfig } from './cli-config.js'
 import { createPasswordCommand } from './commands/password.js'
 import { createVaultCommand } from './commands/vault.js'
 import { createLangCommand } from './commands/lang.js'
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 
 const { version } = pkg
 
@@ -25,7 +25,7 @@ const program = new Command()
   .description(t('program.description'))
   .version(version, '-V, --version', t('cmd.help.version'))
   .helpOption('-h, --help', t('cmd.help.display_help'))
-  .addHelpCommand('help [command]', t('cmd.help.help_command'))
+  .addHelpCommand('help [command]', t('cmd.help.commands'))
 
 program.configureHelp({
   formatHelp: (cmd, helper) => {

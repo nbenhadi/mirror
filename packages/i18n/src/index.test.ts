@@ -25,21 +25,21 @@ describe('getLocale / setLocale', () => {
 
 describe('t()', () => {
   it('returns translation for current locale', () => {
-    expect(t('program.description')).toBe('One platform. Every interface.')
+    expect(t('program.description')).toBe('All your tools in one place')
   })
 
   it('returns spanish translation', () => {
     setLocale('es')
-    expect(t('program.description')).toBe('Una plataforma. Cada interfaz.')
+    expect(t('program.description')).toBe('Todas tus herramientas en un solo lugar')
   })
 
   it('returns french translation', () => {
     setLocale('fr')
-    expect(t('program.description')).toBe('Une plateforme. Chaque interface.')
+    expect(t('program.description')).toBe('Tous vos outils au même endroit')
   })
 
   it('interpolates params', () => {
-    expect(t('vault.list.count_many', { n: 5 })).toBe('5 entries')
+    expect(t('cmd.vault.list.count_many', { n: 5 })).toBe('5 entries')
   })
 
   it('interpolates multiple params', () => {
@@ -47,7 +47,7 @@ describe('t()', () => {
   })
 
   it('leaves unmatched placeholders intact', () => {
-    expect(t('vault.list.count_many', { wrong: 5 })).toBe('{n} entries')
+    expect(t('cmd.vault.list.count_many', { wrong: 5 })).toBe('{n} entries')
   })
 
   it('does not re-substitute param values containing placeholders', () => {
@@ -66,7 +66,7 @@ describe('locale completeness', () => {
   it('all locales return non-empty strings for core keys', () => {
     const testKeys = [
       'program.description',
-      'vault.init.success',
+      'cmd.vault.init.success',
       'cmd.password.description',
       'cmd.vault.description',
       'cmd.lang.description',

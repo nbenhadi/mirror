@@ -3,7 +3,6 @@ import { loadSession } from '../session.js'
 import { readVault } from '../vault-file.js'
 
 type TrashedEntry = {
-  id: string
   title: string
   username?: string
   deleted_at: string
@@ -24,10 +23,9 @@ export async function trash(
   const entries: TrashedEntry[] = vault.entries
     .filter((e): e is typeof e & { deleted_at: string } => e.deleted_at !== undefined)
     .map((e) => ({
-      id: e.id,
       title: e.title,
-      deleted_at: e.deleted_at,
       ...(e.username !== undefined && { username: e.username }),
+      deleted_at: e.deleted_at,
     }))
 
   return { success: true, data: { entries, count: entries.length } }

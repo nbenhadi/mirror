@@ -1,13 +1,25 @@
 import type { Tool } from '@nbenhadi/mirror-core'
+import { t } from '@nbenhadi/mirror-i18n'
 import { schema } from './schema.js'
 import { execute } from './execute.js'
+import { loadConfig } from './config.js'
+import { loadSession } from './session.js'
 import type { VaultInput } from './schema.js'
 
 export const vaultTool: Tool<VaultInput, unknown> = {
   id: 'vault',
-  description: 'Encrypted local vault for storing sensitive entries',
+  description: t('cmd.vault.description'),
   schema,
   execute,
+}
+
+export type VaultStatus = 'no-vault' | 'locked' | 'unlocked'
+
+export async function getVaultStatus(): Promise<VaultStatus> {
+  const config = await loadConfig()
+  if (!config.vault) return 'no-vault'
+  const session = await loadSession()
+  return session !== null ? 'unlocked' : 'locked'
 }
 
 export type { VaultInput } from './schema.js'

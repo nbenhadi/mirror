@@ -13,7 +13,7 @@ function failWithCode(error: { code: string; message: string }): never {
   const map: Record<string, Parameters<typeof t>[0]> = {
     VALIDATION: 'error.validation',
     NOT_FOUND: 'error.not_found',
-    UNAUTHORIZED: 'vault.error.invalid_password',
+    UNAUTHORIZED: 'cmd.vault.error.invalid_password',
     FORBIDDEN: 'error.forbidden',
     EXECUTION: 'error.execution',
     CRYPTO: 'error.crypto',
@@ -33,9 +33,9 @@ async function autoUnlock(): Promise<void> {
     })
     if (result.success) return
     if (attempt < MAX_ATTEMPTS) {
-      console.error(t('vault.error.invalid_password'))
+      console.error(t('cmd.vault.error.invalid_password'))
     } else {
-      fail(t('vault.error.invalid_password'))
+      fail(t('cmd.vault.error.invalid_password'))
     }
   }
 }
@@ -81,7 +81,7 @@ export function createVaultCommand(): Command {
 
       if (!result.success) failWithCode(result.error)
       const data = result.data as { path: string }
-      console.log(t('vault.init.success', { path: data.path }))
+      console.log(t('cmd.vault.init.success', { path: data.path }))
     })
 
   cmd
@@ -101,7 +101,7 @@ export function createVaultCommand(): Command {
 
       if (!result.success) failWithCode(result.error)
       const data = result.data as { expiresAt: string }
-      console.log(t('vault.unlock.success', { expiresAt: data.expiresAt }))
+      console.log(t('cmd.vault.unlock.success', { expiresAt: data.expiresAt }))
     })
 
   cmd
@@ -110,7 +110,7 @@ export function createVaultCommand(): Command {
     .action(async () => {
       const result = await execute({ toolId: 'vault', input: { action: 'lock' } })
       if (!result.success) failWithCode(result.error)
-      console.log(t('vault.lock.success'))
+      console.log(t('cmd.vault.lock.success'))
     })
 
   cmd
@@ -156,7 +156,7 @@ export function createVaultCommand(): Command {
           ...(options.notes !== undefined && { notes: options.notes }),
         })
 
-        console.log(t('vault.add.success'))
+        console.log(t('cmd.vault.add.success'))
       }
     )
 
@@ -176,7 +176,7 @@ export function createVaultCommand(): Command {
       })
 
       if (count === 0) {
-        console.log(t('vault.list.empty'))
+        console.log(t('cmd.vault.list.empty'))
         return
       }
 
@@ -184,13 +184,13 @@ export function createVaultCommand(): Command {
       const userW = Math.max(8, ...entries.map((e) => (e.username ?? '').length))
       const urlW = Math.max(3, ...entries.map((e) => (e.url ?? '').length))
 
-      const colTitle = t('table.title').padEnd(titleW)
-      const colUser = t('table.username').padEnd(userW)
-      const colUrl = t('table.url').padEnd(urlW)
+      const colTitle = t('title').padEnd(titleW)
+      const colUser = t('username').padEnd(userW)
+      const colUrl = t('url').padEnd(urlW)
 
       const headerWidth = titleW + userW + urlW + 20
       const termWidth = process.stdout.columns ?? 80
-      console.log(`\n  ${colTitle}  ${colUser}  ${colUrl}  ${t('table.tags')}`)
+      console.log(`\n  ${colTitle}  ${colUser}  ${colUrl}  ${t('tags')}`)
       console.log(`  ${'-'.repeat(Math.min(headerWidth, termWidth - 2))}`)
 
       for (const e of entries) {
@@ -201,7 +201,7 @@ export function createVaultCommand(): Command {
       }
 
       console.log(
-        `\n  ${count === 1 ? t('vault.list.count_one') : t('vault.list.count_many', { n: count })}`
+        `\n  ${count === 1 ? t('cmd.vault.list.count_one') : t('cmd.vault.list.count_many', { n: count })}`
       )
     })
 
@@ -221,13 +221,13 @@ export function createVaultCommand(): Command {
       }>({ action: 'get', title, showPassword: true })
 
       console.log()
-      fmt(t('table.title') + ':', e.title)
-      if (e.username) fmt(t('table.username') + ':', e.username)
-      if (e.url) fmt(t('table.url') + ':', e.url)
-      if (e.notes) fmt(t('table.notes') + ':', e.notes)
-      if (e.tags.length) fmt(t('table.tags') + ':', e.tags.join(', '))
-      fmt(t('table.created_at') + ':', e.created_at)
-      fmt(t('table.updated_at') + ':', e.updated_at)
+      fmt(t('title') + ':', e.title)
+      if (e.username) fmt(t('username') + ':', e.username)
+      if (e.url) fmt(t('url') + ':', e.url)
+      if (e.notes) fmt(t('notes') + ':', e.notes)
+      if (e.tags.length) fmt(t('tags') + ':', e.tags.join(', '))
+      fmt(t('created_at') + ':', e.created_at)
+      fmt(t('updated_at') + ':', e.updated_at)
       console.log()
 
       if (e.password) {
@@ -269,7 +269,7 @@ export function createVaultCommand(): Command {
           ...(tags !== undefined && { tags }),
         })
 
-        console.log(t('vault.edit.success', { title: data.title }))
+        console.log(t('cmd.vault.edit.success', { title: data.title }))
       }
     )
 
@@ -285,8 +285,8 @@ export function createVaultCommand(): Command {
       })
       console.log(
         data.permanent
-          ? t('vault.delete.permanent', { title })
-          : t('vault.delete.trashed', { title })
+          ? t('cmd.vault.delete.permanent', { title })
+          : t('cmd.vault.delete.trashed', { title })
       )
     })
 
@@ -295,7 +295,7 @@ export function createVaultCommand(): Command {
     .description(t('cmd.vault.restore.description'))
     .action(async (title: string) => {
       await vaultExecute({ action: 'restore', title })
-      console.log(t('vault.restore.success', { title }))
+      console.log(t('cmd.vault.restore.success', { title }))
     })
 
   cmd
@@ -308,17 +308,17 @@ export function createVaultCommand(): Command {
       }>({ action: 'trash' })
 
       if (count === 0) {
-        console.log(t('vault.trash.empty'))
+        console.log(t('cmd.vault.trash.empty'))
         return
       }
 
-      console.log(`\n  ${t('table.title').padEnd(30)}  ${t('table.deleted_at')}`)
+      console.log(`\n  ${t('title').padEnd(30)}  ${t('deleted_at')}`)
       console.log(`  ${'-'.repeat(50)}`)
       for (const e of entries) {
         console.log(`  ${e.title.padEnd(30)}  ${e.deleted_at}`)
       }
       console.log(
-        `\n  ${count === 1 ? t('vault.trash.count_one') : t('vault.trash.count_many', { n: count })}`
+        `\n  ${count === 1 ? t('cmd.vault.trash.count_one') : t('cmd.vault.trash.count_many', { n: count })}`
       )
     })
 
@@ -340,7 +340,7 @@ export function createVaultCommand(): Command {
         currentPassword,
         newPassword,
       })
-      console.log(t('vault.rekey.success'))
+      console.log(t('cmd.vault.rekey.success'))
     })
 
   cmd
@@ -349,9 +349,9 @@ export function createVaultCommand(): Command {
     .option('-y, --yes', t('cmd.vault.purge.opt.yes'), false)
     .action(async (title: string | undefined, options: { yes: boolean }) => {
       if (title === undefined && !options.yes) {
-        const confirmed = await promptConfirm(t('prompt.purge_all_confirm'))
+        const confirmed = await promptConfirm(t('cmd.vault.purge.all_confirm'))
         if (!confirmed) {
-          console.log(t('cli.cancelled'))
+          console.log(t('cancelled'))
           return
         }
       }
@@ -362,13 +362,13 @@ export function createVaultCommand(): Command {
       })
 
       if (data.title !== undefined) {
-        console.log(t('vault.purge.success', { title: data.title }))
+        console.log(t('cmd.vault.purge.success', { title: data.title }))
       } else {
         const n = data.count ?? 0
         if (n === 0) {
-          console.log(t('vault.purge.already_empty'))
+          console.log(t('cmd.vault.purge.already_empty'))
         } else {
-          console.log(n === 1 ? t('vault.purge.all_one') : t('vault.purge.all_many', { n }))
+          console.log(n === 1 ? t('cmd.vault.purge.all_one') : t('cmd.vault.purge.all_many', { n }))
         }
       }
     })

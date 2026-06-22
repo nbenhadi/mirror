@@ -1,25 +1,26 @@
 {
-  "name": "@nbenhadi/mirror-cli",
-  "version": "1.1.1",
+  "name": "@nbenhadi/mirror-tui",
+  "version": "1.0.0",
   "type": "module",
+  "private": true,
   "bin": {
-    "mir-cli": "./dist/index.cjs"
+    "mir": "./dist/index.js"
   },
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
   "scripts": {
     "build": "tsup",
-    "dev": "tsx src/index.ts",
+    "dev": "tsx src/index.tsx",
     "lint": "eslint src"
   },
   "dependencies": {
+    "@nbenhadi/mirror-cli": "workspace:*",
     "argon2": "^0.43.0",
-    "commander": "^13.1.0"
+    "ink": "^5.0.0",
+    "ink-text-input": "^6.0.0",
+    "pino": "^9.0.0",
+    "react": "^18.0.0"
   },
   "devDependencies": {
     "@nbenhadi/mirror-core": "workspace:*",
@@ -27,6 +28,7 @@
     "@nbenhadi/mirror-password": "workspace:*",
     "@nbenhadi/mirror-vault": "workspace:*",
     "@types/node": "^22.15.21",
+    "@types/react": "^18.0.0",
     "tsup": "^8.5.0",
     "tsx": "^4.19.4"
   }

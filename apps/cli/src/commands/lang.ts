@@ -13,7 +13,7 @@ export function createLangCommand(): Command {
       }
 
       if (!(SUPPORTED_LOCALES as readonly string[]).includes(locale)) {
-        console.error(t('cmd.lang.error.unsupported', { locales: SUPPORTED_LOCALES.join(', ') }))
+        console.error(t('cmd.lang.error', { locales: SUPPORTED_LOCALES.join(', ') }))
         process.exit(1)
       }
 
