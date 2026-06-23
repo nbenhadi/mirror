@@ -1,6 +1,6 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { loadSession, clearSession } from '../session.js'
-import { loadConfig, saveConfig } from '../config.js'
+import { loadConfig } from '../config.js'
 import { readVault, writeVault } from '../vault-file.js'
 import { deriveKey, generateSalt, DEFAULT_KDF } from '../crypto.js'
 
@@ -20,10 +20,20 @@ export async function rekey(
     return { success: false, error: { code: 'NOT_FOUND', message: 'No vault initialized' } }
   }
 
-  const currentSalt = Buffer.from(config.vault.salt, 'base64')
+  const currentKey = Buffer.from(session.key, 'base64')
+  const vault = await readVault(config.vault.path, currentKey)
+
+  const newSalt = generateSalt()
+  const newKey = await deriveKey(input.newPassword, newSalt, DEFAULT_KDF)
+
+  // Verify current password by checking if derived key matches session key
   let derivedKey: Buffer
   try {
-    derivedKey = await deriveKey(input.currentPassword, currentSalt, config.vault.kdf)
+    derivedKey = await deriveKey(
+      input.currentPassword,
+      Buffer.from(vault.salt, 'base64'),
+      vault.kdf
+    )
   } catch {
     return { success: false, error: { code: 'EXECUTION_ERROR', message: 'Failed to derive key' } }
   }
@@ -35,17 +45,8 @@ export async function rekey(
     }
   }
 
-  const currentKey = Buffer.from(session.key, 'base64')
-  const vault = await readVault(config.vault.path, currentKey)
-
-  const newSalt = generateSalt()
-  const newKey = await deriveKey(input.newPassword, newSalt, DEFAULT_KDF)
-
-  await writeVault(config.vault.path, vault, newKey)
-  await saveConfig({
-    ...config,
-    vault: { ...config.vault, salt: newSalt.toString('base64'), kdf: DEFAULT_KDF },
-  })
+  const updatedVault = { ...vault, salt: newSalt.toString('base64'), kdf: DEFAULT_KDF }
+  await writeVault(config.vault.path, updatedVault, newKey)
 
   await clearSession()
 

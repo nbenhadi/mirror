@@ -15,6 +15,8 @@ export interface VaultData {
   version: number
   entries: Entry[]
   created_at: string
+  salt: string
+  kdf: KdfParams
 }
 
 export interface KdfParams {
@@ -25,8 +27,6 @@ export interface KdfParams {
 
 export interface VaultConfig {
   path: string
-  salt: string
-  kdf: KdfParams
 }
 
 export interface MirrorConfig {

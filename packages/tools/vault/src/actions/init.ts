@@ -36,6 +36,8 @@ export async function init(
     version: 1,
     entries: [],
     created_at: new Date().toISOString(),
+    salt: salt.toString('base64'),
+    kdf: DEFAULT_KDF,
   }
 
   try {
@@ -53,8 +55,6 @@ export async function init(
     ...config,
     vault: {
       path: vaultPath,
-      salt: salt.toString('base64'),
-      kdf: DEFAULT_KDF,
     },
   })
 

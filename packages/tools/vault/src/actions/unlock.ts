@@ -1,8 +1,9 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { deriveKey } from '../crypto.js'
 import { loadConfig } from '../config.js'
-import { readVault } from '../vault-file.js'
+import { readVault, getVaultSaltAndKdf } from '../vault-file.js'
 import { saveSession } from '../session.js'
+import type { KdfParams } from '../types.js'
 
 type UnlockInput = { action: 'unlock'; masterPassword: string; minutes: number }
 
@@ -19,11 +20,24 @@ export async function unlock(
     }
   }
 
-  const salt = Buffer.from(config.vault.salt, 'base64')
+  let salt: Buffer
+  let kdf: KdfParams
+
+  try {
+    const vaultSaltAndKdf = await getVaultSaltAndKdf(config.vault.path)
+    salt = vaultSaltAndKdf.salt
+    kdf = vaultSaltAndKdf.kdf
+  } catch {
+    return {
+      success: false,
+      error: { code: 'NOT_FOUND', message: 'Vault file not found or corrupted' },
+    }
+  }
+
   let key: Buffer
 
   try {
-    key = await deriveKey(input.masterPassword, salt, config.vault.kdf)
+    key = await deriveKey(input.masterPassword, salt, kdf)
   } catch {
     return {
       success: false,
