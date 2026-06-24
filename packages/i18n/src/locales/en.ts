@@ -81,7 +81,7 @@ export const en: Record<TranslationKey, string> = {
   'cmd.vault.lock.description': 'lock vault immediately',
   'cmd.vault.lock.success': 'vault locked',
   'cmd.vault.path.description': 'show or set vault file path',
-  'cmd.vault.path.opt.newPath': 'new vault path (empty = show current)',
+  'cmd.vault.path.opt.newPath': 'vault directory or file path (empty to show current)',
   'cmd.vault.add.description': 'add a new entry',
   'cmd.vault.add.opt.title': 'entry title',
   'cmd.vault.add.opt.username': 'username or email',
@@ -134,6 +134,23 @@ export const en: Record<TranslationKey, string> = {
   'cmd.vault.purge.all_confirm': 'permanently delete all trash entries?',
   'cmd.vault.error.invalid_password': 'invalid master password',
 
+  // Vault tool errors
+  'tool.vault.error.locked': 'vault is locked',
+  'tool.vault.error.not_initialized': 'no vault. run: mirror vault init',
+  'tool.vault.error.already_initialized': 'vault already exists',
+  'tool.vault.error.file_exists': 'file already exists at {path}',
+  'tool.vault.error.vault_not_found': 'vault file not found or corrupted',
+  'tool.vault.error.invalid_password': 'invalid master password',
+  'tool.vault.error.derive_failed': 'invalid master password',
+  'tool.vault.error.file_not_found': 'no file at {path}',
+  'tool.vault.error.not_a_file': '{path} is not a file',
+  'tool.vault.error.no_vault_in_dir': 'no vault file found in {path}',
+  'tool.vault.error.invalid_vault_file': 'not a valid vault file: {path}',
+  'tool.vault.error.entry_exists': '"{title}" already exists',
+  'tool.vault.error.entry_not_found': '"{title}" not found',
+  'tool.vault.error.not_in_trash': '"{title}" not in trash',
+  'tool.vault.error.init_failed': 'failed to create vault',
+
   // Settings tool
   'cmd.settings.description': 'view and edit your settings',
   'cmd.settings.get.description': 'show a setting value',
@@ -147,6 +164,7 @@ export const en: Record<TranslationKey, string> = {
   'cmd.settings.reset.opt.key': 'setting key to reset',
   'cmd.settings.reset.confirm': 'reset all settings to defaults ?',
   'cmd.settings.reset.success': 'settings reset',
+  'cmd.settings.reset.no_changes': 'nothing to reset',
   'cmd.settings.reset.col.key': 'key',
   'cmd.settings.reset.col.before': 'before',
   'cmd.settings.reset.col.after': 'after',
@@ -161,7 +179,13 @@ export const en: Record<TranslationKey, string> = {
   'cmd.settings.opt.tui.keybindings.adjustRight': 'key to adjust value right',
   'cmd.settings.opt.tui.keybindings.select': 'key to confirm or select',
   'cmd.settings.opt.tui.keybindings.toggle': 'key to toggle on/off',
-  'cmd.settings.opt.tools.vault.path': 'path to the vault file',
+  'cmd.settings.opt.tools.vault.path': 'directory containing the vault file',
+
+  // Settings tool errors
+  'tool.settings.error.protected': '"{key}" is protected',
+  'tool.settings.error.unknown_key': 'unknown key: {key}',
+  'tool.settings.error.invalid_value': 'invalid value for {key}',
+  'tool.settings.error.no_default': '{key} has no default',
 
   // Help command
   'cmd.help.usage': 'usage',

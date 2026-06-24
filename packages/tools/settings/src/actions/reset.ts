@@ -18,7 +18,8 @@ export async function reset(input: ResetInput): Promise<ToolResult<ResetOutput>>
         success: false,
         error: {
           code: 'FORBIDDEN',
-          message: `${key} is a protected field and cannot be reset`,
+          message: 'tool.settings.error.protected',
+          params: { key },
         },
       }
     }
@@ -26,7 +27,11 @@ export async function reset(input: ResetInput): Promise<ToolResult<ResetOutput>>
     if (!field) {
       return {
         success: false,
-        error: { code: 'NOT_FOUND', message: `Unknown config key: ${key}` },
+        error: {
+          code: 'NOT_FOUND',
+          message: 'tool.settings.error.unknown_key',
+          params: { key },
+        },
       }
     }
     if (field.default === undefined) {
@@ -34,7 +39,8 @@ export async function reset(input: ResetInput): Promise<ToolResult<ResetOutput>>
         success: false,
         error: {
           code: 'EXECUTION_ERROR',
-          message: `${key} has no default value to reset to`,
+          message: 'tool.settings.error.no_default',
+          params: { key },
         },
       }
     }

@@ -1,6 +1,6 @@
 import type { Command, Help } from 'commander'
 import { t, type TranslationKey } from '@nbenhadi/mirror-i18n'
-import { capitalize } from './capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 
 const ARG_KEYS: Record<string, TranslationKey> = {
   password: 'cmd.password.check.arg.password',

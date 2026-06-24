@@ -21,13 +21,16 @@ import { fieldKeyHints } from '../utils/field-key-hints.js'
 import { useExecute } from '../hooks/use-execute.js'
 import { useFlash } from '../hooks/use-flash.js'
 import { useQuitConfirm } from '../hooks/use-quit-confirm.js'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 import { colors, dim } from '../theme.js'
 import type { Navigate } from '../navigation.js'
 import type { FieldSpec, FieldValue } from '../types.js'
 
 const FIELD_KEYS = EDITABLE_FIELDS.map((f) => f.key)
-const RESET_KEYS = ['all', ...FIELD_KEYS]
+const RESET_KEYS = [
+  'all',
+  ...EDITABLE_FIELDS.filter((f) => f.default !== undefined).map((f) => f.key),
+]
 const MENU_ACTIONS = ['get', 'set', 'reset', 'list'] as const
 
 interface ResetChange {
@@ -50,39 +53,15 @@ type Phase =
     }
   | { id: 'list.result'; data: unknown }
 
-function getAtPath(obj: unknown, path: string): unknown {
-  let cur: unknown = obj
-  for (const p of path.split('.')) {
-    if (cur === null || typeof cur !== 'object') return undefined
-    cur = (cur as Record<string, unknown>)[p]
-  }
-  return cur
-}
-
-function computeResetChanges(resetKey: string, allSettings: unknown): ResetChange[] {
-  const fields =
-    resetKey === 'all'
-      ? EDITABLE_FIELDS.filter((f) => f.default !== undefined)
-      : EDITABLE_FIELDS.filter((f) => f.key === resetKey && f.default !== undefined)
-  return fields.map((f) => ({
-    key: f.key,
-    before: getAtPath(allSettings, f.key) ?? f.default,
-    after: f.default as unknown,
-  }))
-}
-
-function defaultForKey(key: string): string {
-  return String(EDITABLE_FIELDS.find((f) => f.key === key)?.default ?? '')
-}
-
 function buildValueSpec(key: string): FieldSpec {
-  if (key === 'general.lang') {
+  const field = EDITABLE_FIELDS.find((f) => f.key === key)
+  if (field?.options) {
     return {
       type: 'select',
       key: 'value',
       label: 'value',
-      options: [...SUPPORTED_LOCALES],
-      default: 'en',
+      options: field.options,
+      default: field.default ?? '',
     }
   }
   return {
@@ -90,7 +69,7 @@ function buildValueSpec(key: string): FieldSpec {
     key: 'value',
     label: 'value',
     default: '',
-    placeholder: defaultForKey(key),
+    placeholder: field?.default !== undefined ? String(field.default) : '',
   }
 }
 
@@ -213,7 +192,8 @@ export function SettingsScreen({ navigate }: { navigate: Navigate }) {
 
     if (phase.id === 'set') {
       const { key, value } = phase
-      const strVal = String(value) || defaultForKey(key)
+      const field = EDITABLE_FIELDS.find((f) => f.key === key)
+      const strVal = String(value) || (field?.default !== undefined ? String(field.default) : '')
       const data = await run({ action: 'set', key, value: strVal })
       if (data !== null) {
         if (key === 'general.lang' && (SUPPORTED_LOCALES as readonly string[]).includes(strVal)) {
@@ -229,14 +209,26 @@ export function SettingsScreen({ navigate }: { navigate: Navigate }) {
     }
 
     if (phase.id === 'reset.key') {
-      const changes = computeResetChanges(phase.selectedKey, phase.allSettings)
-      goTo({
-        id: 'reset.preview',
-        resetKey: phase.selectedKey,
-        changes,
-        prevKey: phase.selectedKey,
-        allSettings: phase.allSettings,
-      })
+      const key = phase.selectedKey === 'all' ? undefined : phase.selectedKey
+      const input =
+        key !== undefined
+          ? { action: 'reset', key, apply: false }
+          : { action: 'reset', apply: false }
+      const data = await run(input)
+      if (data !== null) {
+        const diff = (data as { diff: { changes: ResetChange[]; hasChanges: boolean } }).diff
+        if (!diff.hasChanges) {
+          notify(t('cmd.settings.reset.no_changes'), 'info')
+          return
+        }
+        goTo({
+          id: 'reset.preview',
+          resetKey: phase.selectedKey,
+          changes: diff.changes,
+          prevKey: phase.selectedKey,
+          allSettings: phase.allSettings,
+        })
+      }
       return
     }
 
@@ -306,7 +298,7 @@ export function SettingsScreen({ navigate }: { navigate: Navigate }) {
                         </Box>
                         <Box gap={2}>
                           <Text>{phase.key.padEnd(keyW)}</Text>
-                          <Text color={colors.success}>{phase.result}</Text>
+                          <Text>{phase.result}</Text>
                         </Box>
                       </Box>
                     </Block>

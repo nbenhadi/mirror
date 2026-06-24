@@ -39,6 +39,7 @@ export function App() {
     case 'generic': {
       const { toolId, action } = screen
       const tool = registry.get(toolId)
+      if (!tool) return null
       const toolProps = getToolProps(toolId, action, navigate)
       const renderer = getResultRenderer(toolId)
 

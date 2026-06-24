@@ -138,6 +138,23 @@ export type TranslationKey =
   | 'cmd.vault.purge.all_confirm'
   | 'cmd.vault.error.invalid_password'
 
+  // Vault tool errors
+  | 'tool.vault.error.locked'
+  | 'tool.vault.error.not_initialized'
+  | 'tool.vault.error.already_initialized'
+  | 'tool.vault.error.file_exists'
+  | 'tool.vault.error.vault_not_found'
+  | 'tool.vault.error.invalid_password'
+  | 'tool.vault.error.derive_failed'
+  | 'tool.vault.error.file_not_found'
+  | 'tool.vault.error.not_a_file'
+  | 'tool.vault.error.no_vault_in_dir'
+  | 'tool.vault.error.invalid_vault_file'
+  | 'tool.vault.error.entry_exists'
+  | 'tool.vault.error.entry_not_found'
+  | 'tool.vault.error.not_in_trash'
+  | 'tool.vault.error.init_failed'
+
   // Settings tool
   | 'cmd.settings.description'
   | 'cmd.settings.get.description'
@@ -151,6 +168,7 @@ export type TranslationKey =
   | 'cmd.settings.reset.opt.key'
   | 'cmd.settings.reset.confirm'
   | 'cmd.settings.reset.success'
+  | 'cmd.settings.reset.no_changes'
   | 'cmd.settings.reset.col.key'
   | 'cmd.settings.reset.col.before'
   | 'cmd.settings.reset.col.after'
@@ -166,6 +184,12 @@ export type TranslationKey =
   | 'cmd.settings.opt.tui.keybindings.select'
   | 'cmd.settings.opt.tui.keybindings.toggle'
   | 'cmd.settings.opt.tools.vault.path'
+
+  // Settings tool errors
+  | 'tool.settings.error.protected'
+  | 'tool.settings.error.unknown_key'
+  | 'tool.settings.error.invalid_value'
+  | 'tool.settings.error.no_default'
 
   // Help command
   | 'cmd.help.usage'

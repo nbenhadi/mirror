@@ -82,7 +82,8 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.vault.lock.description': 'verrouiller le coffre-fort immédiatement',
   'cmd.vault.lock.success': 'coffre-fort verrouillé',
   'cmd.vault.path.description': 'afficher ou définir le chemin du fichier coffre-fort',
-  'cmd.vault.path.opt.newPath': 'nouveau chemin du coffre-fort (vide = afficher actuel)',
+  'cmd.vault.path.opt.newPath':
+    'répertoire ou chemin du fichier coffre-fort (vide pour afficher actuel)',
   'cmd.vault.add.description': 'ajouter une nouvelle entrée',
   'cmd.vault.add.opt.title': "titre de l'entrée",
   'cmd.vault.add.opt.username': "nom d'utilisateur ou e-mail",
@@ -136,6 +137,23 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.vault.purge.all_confirm': 'supprimer définitivement toutes les entrées de la corbeille ?',
   'cmd.vault.error.invalid_password': 'mot de passe maître incorrect',
 
+  // Vault tool errors
+  'tool.vault.error.locked': 'coffre-fort verrouillé',
+  'tool.vault.error.not_initialized': 'aucun coffre-fort. exécutez : mirror vault init',
+  'tool.vault.error.already_initialized': 'le coffre-fort existe déjà',
+  'tool.vault.error.file_exists': 'un fichier existe déjà à {path}',
+  'tool.vault.error.vault_not_found': 'fichier coffre-fort introuvable ou corrompu',
+  'tool.vault.error.invalid_password': 'mot de passe maître incorrect',
+  'tool.vault.error.derive_failed': 'mot de passe maître incorrect',
+  'tool.vault.error.file_not_found': 'aucun fichier à {path}',
+  'tool.vault.error.not_a_file': "{path} n'est pas un fichier",
+  'tool.vault.error.no_vault_in_dir': 'aucun fichier coffre-fort trouvé dans {path}',
+  'tool.vault.error.invalid_vault_file': 'fichier coffre-fort invalide : {path}',
+  'tool.vault.error.entry_exists': '"{title}" existe déjà',
+  'tool.vault.error.entry_not_found': '"{title}" introuvable',
+  'tool.vault.error.not_in_trash': '"{title}" absent de la corbeille',
+  'tool.vault.error.init_failed': 'échec de la création du coffre-fort',
+
   // Settings tool
   'cmd.settings.description': 'voir et modifier votre configuration',
   'cmd.settings.get.description': "afficher la valeur d'un paramètre",
@@ -149,6 +167,7 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.settings.reset.opt.key': 'paramètre à réinitialiser',
   'cmd.settings.reset.confirm': 'réinitialiser tous les paramètres ?',
   'cmd.settings.reset.success': 'paramètres réinitialisés',
+  'cmd.settings.reset.no_changes': 'rien à réinitialiser',
   'cmd.settings.reset.col.key': 'clé',
   'cmd.settings.reset.col.before': 'avant',
   'cmd.settings.reset.col.after': 'après',
@@ -163,7 +182,13 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.settings.opt.tui.keybindings.adjustRight': 'touche pour ajuster la valeur vers la droite',
   'cmd.settings.opt.tui.keybindings.select': 'touche pour confirmer ou sélectionner',
   'cmd.settings.opt.tui.keybindings.toggle': 'touche pour activer ou désactiver',
-  'cmd.settings.opt.tools.vault.path': 'chemin vers le fichier coffre-fort',
+  'cmd.settings.opt.tools.vault.path': 'répertoire contenant le fichier coffre-fort',
+
+  // Settings tool errors
+  'tool.settings.error.protected': '"{key}" est protégé',
+  'tool.settings.error.unknown_key': 'clé inconnue : {key}',
+  'tool.settings.error.invalid_value': 'valeur invalide pour {key}',
+  'tool.settings.error.no_default': "{key} n'a pas de valeur par défaut",
 
   // Help command
   'cmd.help.usage': 'utilisation',

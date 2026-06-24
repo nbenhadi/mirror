@@ -5,18 +5,12 @@ import { copyToClipboard } from '../utils/clipboard.js'
 import { promptPassword, promptConfirm } from '../utils/prompt.js'
 import * as ui from '../utils/ui.js'
 
-function failWithCode(error: { code: string; message: string }): never {
-  const map: Record<string, Parameters<typeof t>[0]> = {
-    VALIDATION: 'error.validation',
-    NOT_FOUND: 'error.not_found',
-    UNAUTHORIZED: 'cmd.vault.error.invalid_password',
-    FORBIDDEN: 'error.forbidden',
-    EXECUTION: 'error.execution',
-    CRYPTO: 'error.crypto',
-    DATABASE: 'error.database',
-  }
-  const key = map[error.code]
-  ui.fatal(key ? t(key) : error.message)
+function failWithCode(error: {
+  code: string
+  message: string
+  params?: Record<string, string | number>
+}): never {
+  ui.fatal(t(error.message as Parameters<typeof t>[0], error.params))
 }
 
 async function autoUnlock(): Promise<void> {

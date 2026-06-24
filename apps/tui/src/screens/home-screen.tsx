@@ -13,7 +13,7 @@ import { colors, dim } from '../theme.js'
 import { keybindings } from '../utils/keybindings.js'
 import { getSubcommands } from '../utils/schema-to-fields.js'
 import { resolveToolEntry } from '../utils/tool-nav.js'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 import type { Navigate } from '../navigation.js'
 import pkg from '../../package.json' with { type: 'json' }
 
@@ -45,6 +45,7 @@ export function HomeScreen({ navigate }: HomeScreenProps) {
         return
       }
       const tool = registry.get(toolId)
+      if (!tool) return
       const subs = getSubcommands(tool.schema)
       if (subs.length === 1 && subs[0]) {
         navigate({ id: 'generic', toolId, action: subs[0].action })

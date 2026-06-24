@@ -77,12 +77,13 @@ export const es: Record<TranslationKey, string> = {
   'cmd.vault.init.success': 'bóveda creada en {path}',
   'cmd.vault.unlock.description': 'desbloquear bóveda (predeterminado: {minutes} minutos)',
   'cmd.vault.unlock.opt.masterPassword': 'contraseña maestra',
-  'cmd.vault.unlock.opt.minutes': 'duración de sesión en minutos ({min}–{max})',
+  'cmd.vault.unlock.opt.minutes': 'duración de sesión en minutos ({min}-{max})',
   'cmd.vault.unlock.success': 'bóveda desbloqueada hasta {expiresAt}',
   'cmd.vault.lock.description': 'bloquear bóveda inmediatamente',
   'cmd.vault.lock.success': 'bóveda bloqueada',
   'cmd.vault.path.description': 'mostrar o establecer la ruta de la bóveda',
-  'cmd.vault.path.opt.newPath': 'nueva ruta de la bóveda (vacío = mostrar actual)',
+  'cmd.vault.path.opt.newPath':
+    'directorio o ruta del archivo de bóveda (vacío para mostrar actual)',
   'cmd.vault.add.description': 'añadir una nueva entrada',
   'cmd.vault.add.opt.title': 'título de la entrada',
   'cmd.vault.add.opt.username': 'usuario o correo electrónico',
@@ -135,6 +136,23 @@ export const es: Record<TranslationKey, string> = {
   'cmd.vault.purge.all_confirm': '¿eliminar permanentemente todas las entradas de la papelera?',
   'cmd.vault.error.invalid_password': 'contraseña maestra incorrecta',
 
+  // Vault tool errors
+  'tool.vault.error.locked': 'bóveda bloqueada',
+  'tool.vault.error.not_initialized': 'sin bóveda. ejecuta: mirror vault init',
+  'tool.vault.error.already_initialized': 'la bóveda ya existe',
+  'tool.vault.error.file_exists': 'ya existe un archivo en {path}',
+  'tool.vault.error.vault_not_found': 'archivo de bóveda no encontrado o corrupto',
+  'tool.vault.error.invalid_password': 'contraseña maestra incorrecta',
+  'tool.vault.error.derive_failed': 'contraseña maestra incorrecta',
+  'tool.vault.error.file_not_found': 'no hay archivo en {path}',
+  'tool.vault.error.not_a_file': '{path} no es un archivo',
+  'tool.vault.error.no_vault_in_dir': 'no se encontró archivo de bóveda en {path}',
+  'tool.vault.error.invalid_vault_file': 'archivo de bóveda inválido: {path}',
+  'tool.vault.error.entry_exists': '"{title}" ya existe',
+  'tool.vault.error.entry_not_found': '"{title}" no encontrado',
+  'tool.vault.error.not_in_trash': '"{title}" no está en la papelera',
+  'tool.vault.error.init_failed': 'error al crear la bóveda',
+
   // Settings tool
   'cmd.settings.description': 'ver y editar tu configuración',
   'cmd.settings.get.description': 'mostrar el valor de un ajuste',
@@ -148,6 +166,7 @@ export const es: Record<TranslationKey, string> = {
   'cmd.settings.reset.opt.key': 'ajuste a restablecer',
   'cmd.settings.reset.confirm': 'restaurar configuraciones a valores predeterminados',
   'cmd.settings.reset.success': 'configuración restaurada',
+  'cmd.settings.reset.no_changes': 'nada que restablecer',
   'cmd.settings.reset.col.key': 'clave',
   'cmd.settings.reset.col.before': 'antes',
   'cmd.settings.reset.col.after': 'después',
@@ -162,7 +181,13 @@ export const es: Record<TranslationKey, string> = {
   'cmd.settings.opt.tui.keybindings.adjustRight': 'tecla para ajustar el valor a la derecha',
   'cmd.settings.opt.tui.keybindings.select': 'tecla para confirmar o seleccionar',
   'cmd.settings.opt.tui.keybindings.toggle': 'tecla para activar o desactivar',
-  'cmd.settings.opt.tools.vault.path': 'ruta al archivo de bóveda',
+  'cmd.settings.opt.tools.vault.path': 'directorio que contiene el archivo de bóveda',
+
+  // Settings tool errors
+  'tool.settings.error.protected': '"{key}" está protegido',
+  'tool.settings.error.unknown_key': 'clave desconocida: {key}',
+  'tool.settings.error.invalid_value': 'valor inválido para {key}',
+  'tool.settings.error.no_default': '{key} no tiene valor predeterminado',
 
   // Help command
   'cmd.help.usage': 'uso',

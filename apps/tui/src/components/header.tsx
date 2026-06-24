@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { colors, dim, symbols } from '../theme.js'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 
 interface HeaderProps {
   title: string

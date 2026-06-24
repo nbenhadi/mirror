@@ -5,7 +5,7 @@ import { Key } from './key.js'
 import { Flash } from './flash.js'
 import { Separator } from './separator.js'
 import { useTerminalSize } from '../hooks/use-terminal-size.js'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 import type { FlashMessage } from '../hooks/use-flash.js'
 
 export interface KeyHint {

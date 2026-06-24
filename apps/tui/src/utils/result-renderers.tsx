@@ -25,7 +25,9 @@ function checkView(data: CheckResult): Record<string, unknown> {
     [t('cmd.password.check.label.crack_time')]: data.crackTime,
   }
   if (data.warnings.length > 0) {
-    view[t('cmd.password.check.label.warnings')] = data.warnings.map((w) => t(WARNING_KEYS[w]))
+    view[t('cmd.password.check.label.warnings')] = data.warnings.map((w) =>
+      t(WARNING_KEYS[w], w === 'too-short' ? { min: 8 } : undefined)
+    )
   }
   return view
 }

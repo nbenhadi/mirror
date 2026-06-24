@@ -1,3 +1,7 @@
+import type { KdfParams, VaultConfig } from '@nbenhadi/mirror-config'
+
+export type { KdfParams, VaultConfig }
+
 export interface Entry {
   id: string
   title: string
@@ -17,18 +21,6 @@ export interface VaultData {
   created_at: string
   salt: string
   kdf: KdfParams
-}
-
-export interface KdfParams {
-  memoryCost: number
-  timeCost: number
-  parallelism: number
-}
-
-export interface VaultConfig {
-  path: string
-  salt?: string
-  kdf?: KdfParams
 }
 
 export interface MirrorConfig {

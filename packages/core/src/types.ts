@@ -13,6 +13,7 @@ export type ToolResult<T> = { success: true; data: T } | { success: false; error
 export interface ToolError {
   code: ToolErrorCode
   message: string
+  params?: Record<string, string | number>
   details?: unknown
 }
 

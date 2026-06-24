@@ -63,9 +63,11 @@ function available(cmd: string): boolean {
 function writeToClipboard(tool: ClipboardTool, text: string): void {
   const child = spawn(tool.cmd, tool.args, { detached: true, stdio: ['pipe', 'ignore', 'ignore'] })
   child.on('error', () => {})
-  child.stdin!.on('error', () => {})
-  child.stdin!.write(text)
-  child.stdin!.end()
+  if (child.stdin) {
+    child.stdin.on('error', () => {})
+    child.stdin.write(text)
+    child.stdin.end()
+  }
   child.unref()
 }
 

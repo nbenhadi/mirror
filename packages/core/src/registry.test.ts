@@ -28,8 +28,8 @@ describe('ToolRegistry', () => {
     expect(() => registry.register(makeTool('dup'))).toThrow('already registered')
   })
 
-  it('throws when tool not found', () => {
-    expect(() => registry.get('ghost')).toThrow('not found in registry')
+  it('returns undefined when tool not found', () => {
+    expect(registry.get('ghost')).toBeUndefined()
   })
 
   it('lists all registered tools', () => {

@@ -4,8 +4,10 @@ import { schema, type ConfigInput } from './schema.js'
 import { execute } from './execute.js'
 import type { ConfigOutput } from './types.js'
 
+export const SETTINGS_TOOL_ID = 'settings' as const
+
 export const settingsTool: Tool<ConfigInput, ConfigOutput> = {
-  id: 'settings',
+  id: SETTINGS_TOOL_ID,
   description: t('cmd.settings.description' as TranslationKey),
   schema,
   execute: (input) => execute(input),

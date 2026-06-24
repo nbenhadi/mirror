@@ -1,15 +1,16 @@
-import { getVaultStatus } from '@nbenhadi/mirror-vault'
+import { getVaultStatus, VAULT_TOOL_ID } from '@nbenhadi/mirror-vault'
+import { SETTINGS_TOOL_ID } from '@nbenhadi/mirror-settings'
 import { t } from '@nbenhadi/mirror-i18n'
 import type { FieldSpec, FieldValues } from '../types.js'
 import type { Navigate, Screen } from '../navigation.js'
 
 export async function resolveToolEntry(toolId: string): Promise<Screen | null> {
-  if (toolId === 'settings') return { id: 'settings' }
-  if (toolId === 'vault') {
+  if (toolId === SETTINGS_TOOL_ID) return { id: 'settings' }
+  if (toolId === VAULT_TOOL_ID) {
     const status = await getVaultStatus()
-    if (status === 'unlocked') return { id: 'generic', toolId: 'vault' }
-    if (status === 'no-vault') return { id: 'generic', toolId: 'vault', action: 'init' }
-    return { id: 'generic', toolId: 'vault', action: 'unlock' }
+    if (status === 'unlocked') return { id: 'generic', toolId: VAULT_TOOL_ID }
+    if (status === 'no-vault') return { id: 'generic', toolId: VAULT_TOOL_ID, action: 'init' }
+    return { id: 'generic', toolId: VAULT_TOOL_ID, action: 'unlock' }
   }
   return null
 }
@@ -53,13 +54,13 @@ export function getToolProps(
 
   const base: ToolProps = {
     onBack: () =>
-      action ? navigate({ id: 'generic', toolId: 'vault' }) : navigate({ id: 'home' }),
+      action ? navigate({ id: 'generic', toolId: VAULT_TOOL_ID }) : navigate({ id: 'home' }),
     ...(action === 'lock' && { onSuccess: () => navigate({ id: 'home' }) }),
     ...(action === 'unlock' && {
-      onSuccess: () => navigate({ id: 'generic', toolId: 'vault' }),
+      onSuccess: () => navigate({ id: 'generic', toolId: VAULT_TOOL_ID }),
     }),
     ...(action === 'init' && {
-      onSuccess: () => navigate({ id: 'generic', toolId: 'vault', action: 'unlock' }),
+      onSuccess: () => navigate({ id: 'generic', toolId: VAULT_TOOL_ID, action: 'unlock' }),
     }),
   }
 

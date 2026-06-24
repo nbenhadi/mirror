@@ -1,9 +1,10 @@
 import { SUPPORTED_LOCALES } from '@nbenhadi/mirror-i18n'
-import { KEYBINDINGS_DEFAULTS } from '@nbenhadi/mirror-config'
+import { KEYBINDINGS_DEFAULTS, getUserDataDir } from '@nbenhadi/mirror-config'
 
 export interface FieldDef {
   key: string
   default?: string
+  options?: string[]
   description?: string
   validate(value: unknown): string | null
 }
@@ -24,6 +25,7 @@ export const EDITABLE_FIELDS: FieldDef[] = [
   {
     key: 'general.lang',
     default: 'en',
+    options: [...SUPPORTED_LOCALES],
     description: 'cmd.settings.opt.general.lang',
     validate: oneOfLocales,
   },
@@ -77,6 +79,7 @@ export const EDITABLE_FIELDS: FieldDef[] = [
   },
   {
     key: 'tools.vault.path',
+    default: getUserDataDir(),
     description: 'cmd.settings.opt.tools.vault.path',
     validate: nonEmptyString,
   },

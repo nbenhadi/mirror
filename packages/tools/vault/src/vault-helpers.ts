@@ -12,11 +12,27 @@ export type LoadedVault = {
 export async function loadVaultSession(): Promise<ToolResult<LoadedVault>> {
   const session = await loadSession()
   if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
+    return { success: false, error: { code: 'UNAUTHORIZED', message: 'tool.vault.error.locked' } }
   }
   const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
+  let vault: VaultData
+  try {
+    vault = await readVault(session.vaultPath, key)
+  } catch {
+    return {
+      success: false,
+      error: { code: 'CRYPTO_ERROR', message: 'tool.vault.error.vault_not_found' },
+    }
+  }
   return { success: true, data: { session, key, vault } }
+}
+
+export async function withVaultSession<T>(
+  fn: (data: LoadedVault) => Promise<ToolResult<T>>
+): Promise<ToolResult<T>> {
+  const loaded = await loadVaultSession()
+  if (!loaded.success) return loaded
+  return fn(loaded.data)
 }
 
 export function findActiveEntry(entries: Entry[], title: string): Entry | undefined {

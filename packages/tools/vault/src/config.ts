@@ -1,16 +1,43 @@
+import { readdirSync, statSync } from 'node:fs'
+import { join, dirname } from 'node:path'
 import { readConfig, patchConfig } from '@nbenhadi/mirror-config'
 import type { MirrorConfig } from './types.js'
+
+function findVaultFile(storedPath: string): string | null {
+  try {
+    const stat = statSync(storedPath)
+    if (stat.isFile()) return storedPath
+    const files = readdirSync(storedPath)
+      .filter((f) => f.endsWith('.vault'))
+      .sort()
+    return files.length > 0 ? join(storedPath, files[0]!) : null
+  } catch {
+    return null
+  }
+}
+
+export function vaultDirFromPath(filePath: string): string {
+  try {
+    const stat = statSync(filePath)
+    return stat.isFile() ? dirname(filePath) : filePath
+  } catch {
+    return dirname(filePath)
+  }
+}
 
 export async function loadConfig(): Promise<MirrorConfig> {
   const config = await readConfig()
   const vault = config.tools?.vault
   if (vault?.path) {
-    return {
-      vault: {
-        path: vault.path,
-        ...(vault.salt !== undefined && { salt: vault.salt }),
-        ...(vault.kdf !== undefined && { kdf: vault.kdf }),
-      },
+    const vaultFile = findVaultFile(vault.path)
+    if (vaultFile) {
+      return {
+        vault: {
+          path: vaultFile,
+          ...(vault.salt !== undefined && { salt: vault.salt }),
+          ...(vault.kdf !== undefined && { kdf: vault.kdf }),
+        },
+      }
     }
   }
   return {}

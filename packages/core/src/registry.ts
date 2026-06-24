@@ -10,10 +10,8 @@ export class ToolRegistry {
     this.tools.set(tool.id, tool)
   }
 
-  get(id: string): Tool {
-    const tool = this.tools.get(id)
-    if (!tool) throw new Error(`Tool "${id}" not found in registry`)
-    return tool
+  get(id: string): Tool | undefined {
+    return this.tools.get(id)
   }
 
   list(): Tool[] {

@@ -1,24 +1,21 @@
 import { Command } from 'commander'
 import { execute } from '@nbenhadi/mirror-core'
 import {
-  EDITABLE_FIELDS,
   type GetOutput,
   type SetOutput,
   type ResetOutput,
   type ListOutput,
 } from '@nbenhadi/mirror-settings'
-import { t } from '@nbenhadi/mirror-i18n'
+import { t, type TranslationKey } from '@nbenhadi/mirror-i18n'
 import chalk from 'chalk'
 import { promptConfirm } from '../utils/prompt.js'
 import * as ui from '../utils/ui.js'
 
-function getAtPath(obj: unknown, path: string): unknown {
-  let cur: unknown = obj
-  for (const p of path.split('.')) {
-    if (cur === null || typeof cur !== 'object') return undefined
-    cur = (cur as Record<string, unknown>)[p]
-  }
-  return cur
+function fatalFromError(error: {
+  message: string
+  params?: Record<string, string | number>
+}): never {
+  ui.fatal(t(error.message as TranslationKey, error.params))
 }
 
 function flattenSettings(obj: unknown, prefix = ''): Array<{ key: string; value: string }> {
@@ -39,9 +36,9 @@ function createGetCommand(): Command {
         toolId: 'settings',
         input: { action: 'get', key: options.key },
       })
-      if (!result.success) ui.fatal(t('error.validation'))
+      if (!result.success) fatalFromError(result.error)
 
-      const key = String(result.data.key)
+      const key = String(result.data.key ?? '')
       const value = String(result.data.value ?? '')
       const keyW = Math.max('KEY'.length, key.length)
       ui.tableHeader(['KEY', 'VALUE'], [keyW, 0])
@@ -60,7 +57,7 @@ function createSetCommand(): Command {
         toolId: 'settings',
         input: { action: 'set', key: options.key, value: options.value },
       })
-      if (!result.success) ui.fatal(t('error.validation'))
+      if (!result.success) fatalFromError(result.error)
       ui.printSuccess(
         t('cmd.settings.set.success', { key: result.data.key, value: result.data.after as string })
       )
@@ -72,30 +69,19 @@ function createResetCommand(): Command {
     .description(t('cmd.settings.reset.description'))
     .option('-k, --key <value>', t('cmd.settings.reset.opt.key'))
     .action(async (options) => {
-      const listResult = await execute<ListOutput>({
-        toolId: 'settings',
-        input: { action: 'list' },
-      })
-      if (!listResult.success) ui.fatal(t('error.validation'))
-
-      const settings = listResult.data.settings
       const key = options.key as string | undefined
-
-      const fields =
+      const dryInput =
         key && key !== 'all'
-          ? EDITABLE_FIELDS.filter((f) => f.key === key && f.default !== undefined)
-          : EDITABLE_FIELDS.filter((f) => f.default !== undefined)
+          ? { action: 'reset', key, apply: false }
+          : { action: 'reset', apply: false }
 
-      const changes = fields
-        .map((f) => ({
-          key: f.key,
-          before: getAtPath(settings, f.key) ?? f.default,
-          after: f.default as unknown,
-        }))
-        .filter((c) => String(c.before) !== String(c.after))
+      const dryResult = await execute<ResetOutput>({ toolId: 'settings', input: dryInput })
+      if (!dryResult.success) fatalFromError(dryResult.error)
+
+      const { changes } = dryResult.data.diff
 
       if (changes.length === 0) {
-        ui.hint(t('cmd.settings.reset.success'))
+        ui.hint(t('cmd.settings.reset.no_changes'))
         return
       }
 
@@ -116,11 +102,10 @@ function createResetCommand(): Command {
       const confirmed = await promptConfirm(t('cmd.settings.reset.confirm'))
       if (!confirmed) return
 
-      const result = await execute<ResetOutput>({
-        toolId: 'settings',
-        input: { action: 'reset', ...(key && key !== 'all' ? { key } : {}) },
-      })
-      if (!result.success) ui.fatal(t('error.validation'))
+      const applyInput = key && key !== 'all' ? { action: 'reset', key } : { action: 'reset' }
+
+      const result = await execute<ResetOutput>({ toolId: 'settings', input: applyInput })
+      if (!result.success) fatalFromError(result.error)
       ui.printSuccess(t('cmd.settings.reset.success'))
     })
 }
@@ -131,7 +116,7 @@ function createListCommand(): Command {
       toolId: 'settings',
       input: { action: 'list' },
     })
-    if (!result.success) ui.fatal(t('error.validation'))
+    if (!result.success) fatalFromError(result.error)
 
     const entries = flattenSettings(result.data.settings)
     const keyW = Math.max('KEY'.length, ...entries.map((e) => e.key.length))

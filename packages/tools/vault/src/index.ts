@@ -6,8 +6,10 @@ import { loadConfig } from './config.js'
 import { loadSession } from './session.js'
 import type { VaultInput } from './schema.js'
 
+export const VAULT_TOOL_ID = 'vault' as const
+
 export const vaultTool: Tool<VaultInput, unknown> = {
-  id: 'vault',
+  id: VAULT_TOOL_ID,
   description: t('cmd.vault.description'),
   schema,
   execute,

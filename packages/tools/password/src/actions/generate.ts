@@ -81,7 +81,6 @@ function getActiveTypeChars(charset: string, input: GenerateInput): string[] {
 }
 
 function pickRandom(str: string): string {
-  if (str.length === 0) throw new Error('Cannot pick from empty charset')
   return str[randomInt(str.length)]!
 }
 
@@ -146,7 +145,7 @@ export async function generate(
   if (charset.length === 0) {
     return {
       success: false,
-      error: { code: 'VALIDATION_ERROR', message: 'No character set available after exclusions' },
+      error: { code: 'VALIDATION_ERROR', message: 'cmd.password.error.empty_charset' },
     }
   }
 
@@ -155,7 +154,8 @@ export async function generate(
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: `Cannot generate ${input.length} unique chars. Charset only has ${charset.length}.`,
+        message: 'cmd.password.error.not_enough_chars',
+        params: { length: input.length, size: charset.length },
       },
     }
   }

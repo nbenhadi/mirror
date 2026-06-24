@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 
 export type FlashVariant = 'success' | 'error' | 'warning' | 'info'
 

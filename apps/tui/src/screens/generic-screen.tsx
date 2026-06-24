@@ -21,7 +21,7 @@ import {
   unflattenValues,
   type Subcommand,
 } from '../utils/schema-to-fields.js'
-import { capitalize } from '../utils/capitalize.js'
+import { capitalize } from '@nbenhadi/mirror-brand'
 import { pickString } from '../utils/result.js'
 import { useExecute } from '../hooks/use-execute.js'
 import { useFlash } from '../hooks/use-flash.js'
@@ -208,7 +208,7 @@ export function GenericScreen({
     { key: editingText ? 'esc' : `esc/${keybindings.back.label}`, label: t('tui.key.back') },
   ]
 
-  const displayError = localError ?? (execError ? parseZodError(execError) : null)
+  const displayError = localError ?? execError
 
   return (
     <Box flexDirection="column">
@@ -276,23 +276,6 @@ export function GenericScreen({
       </Box>
     </Box>
   )
-}
-
-function parseZodError(msg: string): string {
-  try {
-    const issues = JSON.parse(msg) as Array<{ message: string; path: string[] }>
-    if (Array.isArray(issues) && issues.length > 0) {
-      return issues
-        .map((i) => {
-          const field = i.path?.length > 0 ? `${i.path.join('.')}: ` : ''
-          return `${field}${i.message}`
-        })
-        .join(', ')
-    }
-  } catch {
-    // nothing
-  }
-  return msg
 }
 
 function shouldAutoRender(data: unknown): boolean {

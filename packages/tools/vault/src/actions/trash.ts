@@ -1,6 +1,5 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
-import { loadSession } from '../session.js'
-import { readVault } from '../vault-file.js'
+import { withVaultSession } from '../vault-helpers.js'
 
 type TrashedEntry = {
   title: string
@@ -12,21 +11,15 @@ export async function trash(
   _input: { action: 'trash' },
   _ctx: ToolContext
 ): Promise<ToolResult<{ entries: TrashedEntry[]; count: number }>> {
-  const session = await loadSession()
-  if (!session) {
-    return { success: false, error: { code: 'UNAUTHORIZED', message: 'Vault is locked' } }
-  }
+  return withVaultSession(async ({ vault }) => {
+    const entries: TrashedEntry[] = vault.entries
+      .filter((e): e is typeof e & { deleted_at: string } => e.deleted_at !== undefined)
+      .map((e) => ({
+        title: e.title,
+        ...(e.username !== undefined && { username: e.username }),
+        deleted_at: e.deleted_at,
+      }))
 
-  const key = Buffer.from(session.key, 'base64')
-  const vault = await readVault(session.vaultPath, key)
-
-  const entries: TrashedEntry[] = vault.entries
-    .filter((e): e is typeof e & { deleted_at: string } => e.deleted_at !== undefined)
-    .map((e) => ({
-      title: e.title,
-      ...(e.username !== undefined && { username: e.username }),
-      deleted_at: e.deleted_at,
-    }))
-
-  return { success: true, data: { entries, count: entries.length } }
+    return { success: true, data: { entries, count: entries.length } }
+  })
 }

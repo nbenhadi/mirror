@@ -127,10 +127,9 @@ describe('reset', () => {
     }
   })
 
-  it('rejects resetting a field with no default', async () => {
+  it('allows resetting tools.vault.path (has a default)', async () => {
     const r = await reset({ action: 'reset', key: 'tools.vault.path', apply: false })
-    expect(r.success).toBe(false)
-    if (!r.success) expect(r.error.code).toBe('EXECUTION_ERROR')
+    expect(r.success).toBe(true)
   })
 
   it('rejects resetting a protected field', async () => {

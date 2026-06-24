@@ -12,7 +12,7 @@ export interface ConfigDiffEntry {
 }
 
 export interface GetOutput {
-  key: string
+  key: string | undefined
   value: unknown
 }
 

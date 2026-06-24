@@ -9,6 +9,17 @@ export function getByPath(obj: unknown, key: string): unknown {
   return current
 }
 
+export function setByPath(obj: Record<string, unknown>, path: string, value: unknown): void {
+  const parts = path.split('.')
+  let cur = obj
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i]!
+    if (typeof cur[p] !== 'object' || cur[p] === null) cur[p] = {}
+    cur = cur[p] as Record<string, unknown>
+  }
+  cur[parts[parts.length - 1]!] = value
+}
+
 export function buildPatch(key: string, value: unknown): Record<string, unknown> {
   const segments = key.split('.')
   const root: Record<string, unknown> = {}

@@ -1,6 +1,6 @@
-import { homedir } from 'node:os'
-import { join, resolve as resolvePath } from 'node:path'
+import { join, dirname, resolve as resolvePath } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
+import { getUserDataDir } from '@nbenhadi/mirror-config'
 import { deriveKey, generateSalt, DEFAULT_KDF } from '../crypto.js'
 import { loadConfig, saveConfig } from '../config.js'
 import { writeVault } from '../vault-file.js'
@@ -9,7 +9,7 @@ import type { VaultInput } from '../schema.js'
 
 type InitInput = Extract<VaultInput, { action: 'init' }>
 
-const DEFAULT_VAULT_PATH = join(homedir(), '.local', 'share', 'mirror', 'vault.vault')
+const DEFAULT_VAULT_FILE = join(getUserDataDir(), 'vault.vault')
 
 export async function init(
   input: InitInput,
@@ -20,14 +20,12 @@ export async function init(
   if (config.vault) {
     return {
       success: false,
-      error: {
-        code: 'EXECUTION_ERROR',
-        message: 'Vault already initialized. Use `mirror vault path` to see its location.',
-      },
+      error: { code: 'EXECUTION_ERROR', message: 'tool.vault.error.already_initialized' },
     }
   }
 
-  const vaultPath = resolvePath(input.path ?? DEFAULT_VAULT_PATH)
+  const vaultPath = resolvePath(input.path ?? DEFAULT_VAULT_FILE)
+  const vaultDir = dirname(vaultPath)
 
   const salt = generateSalt()
   const key = await deriveKey(input.masterPassword, salt, DEFAULT_KDF)
@@ -46,15 +44,22 @@ export async function init(
     if ((err as NodeJS.ErrnoException).code === 'EEXIST') {
       return {
         success: false,
-        error: { code: 'EXECUTION_ERROR', message: `File already exists at ${vaultPath}` },
+        error: {
+          code: 'EXECUTION_ERROR',
+          message: 'tool.vault.error.file_exists',
+          params: { path: vaultPath },
+        },
       }
     }
-    throw err
+    return {
+      success: false,
+      error: { code: 'EXECUTION_ERROR', message: 'tool.vault.error.init_failed' },
+    }
   }
   await saveConfig({
     ...config,
     vault: {
-      path: vaultPath,
+      path: vaultDir,
     },
   })
 

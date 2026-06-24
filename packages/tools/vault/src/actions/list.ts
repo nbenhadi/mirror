@@ -1,5 +1,5 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
-import { loadVaultSession } from '../vault-helpers.js'
+import { withVaultSession } from '../vault-helpers.js'
 
 type EntryPreview = {
   title: string
@@ -47,29 +47,27 @@ export async function list(
   input: ListInput,
   _ctx: ToolContext
 ): Promise<ToolResult<{ entries: EntryPreview[]; count: number }>> {
-  const loaded = await loadVaultSession()
-  if (!loaded.success) return loaded
+  return withVaultSession(async ({ vault }) => {
+    const search = input.search?.toLowerCase()
+    const tag = input.tag
 
-  const { vault } = loaded.data
-  const search = input.search?.toLowerCase()
-  const tag = input.tag
+    const entries: EntryPreview[] = vault.entries
+      .filter((e) => {
+        if (e.deleted_at) return false
+        if (tag && !matchTagPattern(tag, e.tags)) return false
+        if (search) {
+          const fields = [e.title, e.username ?? '', e.url ?? ''].filter(Boolean)
+          if (!matchSearchPattern(search, fields)) return false
+        }
+        return true
+      })
+      .map((e) => ({
+        title: e.title,
+        username: e.username ?? '',
+        url: e.url ?? '',
+        tags: e.tags,
+      }))
 
-  const entries: EntryPreview[] = vault.entries
-    .filter((e) => {
-      if (e.deleted_at) return false
-      if (tag && !matchTagPattern(tag, e.tags)) return false
-      if (search) {
-        const fields = [e.title, e.username ?? '', e.url ?? ''].filter(Boolean)
-        if (!matchSearchPattern(search, fields)) return false
-      }
-      return true
-    })
-    .map((e) => ({
-      title: e.title,
-      username: e.username ?? '',
-      url: e.url ?? '',
-      tags: e.tags,
-    }))
-
-  return { success: true, data: { entries, count: entries.length } }
+    return { success: true, data: { entries, count: entries.length } }
+  })
 }

@@ -5,7 +5,7 @@ const keys = EDITABLE_FIELDS.map((f) => f.key) as [string, ...string[]]
 
 const getSchema = z.object({
   action: z.literal('get'),
-  key: z.enum(keys).describe('cmd.settings.get.opt.key'),
+  key: z.enum(keys).optional().describe('cmd.settings.get.opt.key'),
 })
 
 const setSchema = z.object({
