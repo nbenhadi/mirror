@@ -7,8 +7,8 @@ import { Selector } from '../components/selector.js'
 import { Field } from '../components/field.js'
 import { Footer, type KeyHint } from '../components/footer.js'
 import { Table } from '../components/table.js'
+import { Block } from '../components/block.js'
 import { JsonView } from '../components/json-view.js'
-import { ErrorMessage } from '../components/error-message.js'
 import { Spinner } from '../components/spinner.js'
 import { keybindings } from '../utils/keybindings.js'
 import { matchesCode } from '../utils/key-match.js'
@@ -21,6 +21,7 @@ import {
   unflattenValues,
   type Subcommand,
 } from '../utils/schema-to-fields.js'
+import { capitalize } from '../utils/capitalize.js'
 import { pickString } from '../utils/result.js'
 import { useExecute } from '../hooks/use-execute.js'
 import { useFlash } from '../hooks/use-flash.js'
@@ -227,7 +228,9 @@ export function GenericScreen({
                 <Box minWidth={subWidth}>
                   <Text {...(selected ? { color: colors.primary } : dim)}>{item.sub.action}</Text>
                 </Box>
-                {desc && <Text {...(selected ? { color: colors.primary } : dim)}>{desc}</Text>}
+                {desc && (
+                  <Text {...(selected ? { color: colors.primary } : dim)}>{capitalize(desc)}</Text>
+                )}
               </Box>
             )
           }
@@ -250,12 +253,14 @@ export function GenericScreen({
       )}
 
       {!loading && result !== null && (
-        <Box marginTop={1}>{renderResult ? renderResult(result) : autoRenderResult(result)}</Box>
+        <Box marginTop={1}>
+          {renderResult ? renderResult(result) : <Block>{autoRenderResult(result)}</Block>}
+        </Box>
       )}
 
       {!loading && displayError && (
-        <Box marginTop={1} paddingLeft={2}>
-          <ErrorMessage message={displayError} />
+        <Box marginTop={1}>
+          <Block text={displayError} color={colors.danger} />
         </Box>
       )}
 
@@ -285,7 +290,7 @@ function parseZodError(msg: string): string {
         .join(', ')
     }
   } catch {
-    // Not a JSON-encoded Zod issue list; show the raw message.
+    // nothing
   }
   return msg
 }

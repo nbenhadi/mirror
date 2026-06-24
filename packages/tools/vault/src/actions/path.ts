@@ -22,7 +22,6 @@ export async function path(
     return { success: true, data: { path: config.vault.path } }
   }
 
-  // Validate file exists
   if (!existsSync(input.newPath)) {
     return {
       success: false,
@@ -30,7 +29,6 @@ export async function path(
     }
   }
 
-  // Validate it's a regular file
   const stats = statSync(input.newPath)
   if (!stats.isFile()) {
     return {
@@ -39,7 +37,6 @@ export async function path(
     }
   }
 
-  // Validate it's a valid vault (can read salt and kdf)
   try {
     await getVaultSaltAndKdf(input.newPath)
   } catch {

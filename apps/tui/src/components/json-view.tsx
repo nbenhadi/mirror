@@ -1,13 +1,13 @@
 import React from 'react'
 import { Box, Text } from 'ink'
-import { dim } from '../theme.js'
+import { colors, dim } from '../theme.js'
 
 interface JsonViewProps {
   data: unknown
-  labelWidth?: number
+  indent?: number
 }
 
-export function JsonView({ data, labelWidth }: JsonViewProps) {
+export function JsonView({ data, indent = 0 }: JsonViewProps) {
   if (data === null || data === undefined) return null
 
   if (typeof data !== 'object' || Array.isArray(data)) {
@@ -18,16 +18,41 @@ export function JsonView({ data, labelWidth }: JsonViewProps) {
     ([, v]) => v !== undefined && v !== null && v !== ''
   )
 
-  const maxLen = labelWidth ?? Math.max(0, ...entries.map(([k]) => k.length))
+  const flatEntries = entries.filter(
+    ([, v]) => !(typeof v === 'object' && v !== null && !Array.isArray(v))
+  )
+  const maxLen = Math.max(0, ...flatEntries.map(([k]) => k.length))
+  const firstObjIdx = entries.findIndex(
+    ([, v]) => typeof v === 'object' && v !== null && !Array.isArray(v)
+  )
 
   return (
-    <Box flexDirection="column" gap={0}>
-      {entries.map(([key, val]) => (
-        <Box key={key} gap={2}>
-          <Text {...dim}>{key.padEnd(maxLen)}</Text>
-          <Text>{formatValue(val)}</Text>
-        </Box>
-      ))}
+    <Box flexDirection="column">
+      {entries.map(([key, val], i) => {
+        const isObj = typeof val === 'object' && val !== null && !Array.isArray(val)
+        if (isObj) {
+          return (
+            <Box
+              key={key}
+              flexDirection="column"
+              marginTop={indent === 0 && i !== firstObjIdx ? 1 : 0}
+            >
+              <Text bold color={colors.secondary}>
+                {key.toUpperCase()}
+              </Text>
+              <Box paddingLeft={2}>
+                <JsonView data={val} indent={indent + 1} />
+              </Box>
+            </Box>
+          )
+        }
+        return (
+          <Box key={key} flexDirection="row" gap={2}>
+            <Text {...dim}>{key.padEnd(maxLen)}</Text>
+            <Text>{formatValue(val)}</Text>
+          </Box>
+        )
+      })}
     </Box>
   )
 }

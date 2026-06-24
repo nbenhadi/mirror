@@ -13,15 +13,11 @@ import { colors, dim } from '../theme.js'
 import { keybindings } from '../utils/keybindings.js'
 import { getSubcommands } from '../utils/schema-to-fields.js'
 import { resolveToolEntry } from '../utils/tool-nav.js'
+import { capitalize } from '../utils/capitalize.js'
 import type { Navigate } from '../navigation.js'
 import pkg from '../../package.json' with { type: 'json' }
 
 const LOGO_WIDTH = 74
-
-const TOOL_DESCRIPTION_KEY: Partial<Record<string, TranslationKey>> = {
-  password: 'cmd.password.description',
-  vault: 'cmd.vault.description',
-}
 
 interface HomeScreenProps {
   navigate: Navigate
@@ -73,7 +69,7 @@ export function HomeScreen({ navigate }: HomeScreenProps) {
         <Box flexDirection="column" width={LOGO_WIDTH}>
           <Logo disableAnimation={disableAnimation} />
           <Box justifyContent="center" marginTop={1}>
-            <Text {...dim}>{t('program.description')}</Text>
+            <Text {...dim}>{capitalize(t('program.description'))}</Text>
           </Box>
           <Box justifyContent="center">
             <Text {...dim}>{process.cwd()}</Text>
@@ -85,7 +81,7 @@ export function HomeScreen({ navigate }: HomeScreenProps) {
       </Box>
 
       <Box marginTop={1}>
-        <Separator label={t('tui.select_tool')} labelColor={colors.info} />
+        <Separator label={capitalize(t('tui.select_tool'))} labelColor={colors.info} />
       </Box>
 
       <Box flexDirection="column">
@@ -95,13 +91,12 @@ export function HomeScreen({ navigate }: HomeScreenProps) {
           onCursorChange={setCursor}
           keyExtractor={(tool) => tool.id}
           renderItem={(tool, selected) => {
-            const descKey = TOOL_DESCRIPTION_KEY[tool.id]
-            const description = descKey ? t(descKey) : tool.description
+            const desc = capitalize(t(`cmd.${tool.id}.description` as TranslationKey))
             const title = tool.id.padEnd(maxTitleLen)
             return (
               <Box gap={3}>
                 <Text {...(selected ? { color: colors.primary } : dim)}>{title}</Text>
-                <Text {...(selected ? { color: colors.primary } : dim)}>{description}</Text>
+                <Text {...(selected ? { color: colors.primary } : dim)}>{desc}</Text>
               </Box>
             )
           }}

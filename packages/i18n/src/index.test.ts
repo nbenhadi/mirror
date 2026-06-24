@@ -25,17 +25,17 @@ describe('getLocale / setLocale', () => {
 
 describe('t()', () => {
   it('returns translation for current locale', () => {
-    expect(t('program.description')).toBe('All your tools in one place')
+    expect(t('program.description')).toBe('all your tools in one place')
   })
 
   it('returns spanish translation', () => {
     setLocale('es')
-    expect(t('program.description')).toBe('Todas tus herramientas en un solo lugar')
+    expect(t('program.description')).toBe('todas tus herramientas en un solo lugar')
   })
 
   it('returns french translation', () => {
     setLocale('fr')
-    expect(t('program.description')).toBe('Tous vos outils au même endroit')
+    expect(t('program.description')).toBe('tous vos outils au même endroit')
   })
 
   it('interpolates params', () => {
@@ -43,7 +43,7 @@ describe('t()', () => {
   })
 
   it('interpolates multiple params', () => {
-    expect(t('clipboard.copied', { seconds: 15 })).toBe('Copied to clipboard (clears in 15s).')
+    expect(t('clipboard.copied', { seconds: 15 })).toBe('copied to clipboard (clears in 15s).')
   })
 
   it('leaves unmatched placeholders intact', () => {
@@ -52,7 +52,7 @@ describe('t()', () => {
 
   it('does not re-substitute param values containing placeholders', () => {
     expect(t('clipboard.copied', { seconds: '{seconds}' })).toBe(
-      'Copied to clipboard (clears in {seconds}s).'
+      'copied to clipboard (clears in {seconds}s).'
     )
   })
 
@@ -69,7 +69,6 @@ describe('locale completeness', () => {
       'cmd.vault.init.success',
       'cmd.password.description',
       'cmd.vault.description',
-      'cmd.lang.description',
       'cmd.help.usage',
       'cmd.help.options',
       'cmd.help.commands',

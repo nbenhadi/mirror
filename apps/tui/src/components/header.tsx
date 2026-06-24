@@ -1,6 +1,7 @@
 import React from 'react'
 import { Box, Text } from 'ink'
 import { colors, dim, symbols } from '../theme.js'
+import { capitalize } from '../utils/capitalize.js'
 
 interface HeaderProps {
   title: string
@@ -22,7 +23,7 @@ export function Header({ title, subtitle, description }: HeaderProps) {
           </Text>
         )}
       </Box>
-      {description && <Text {...dim}>{description}</Text>}
+      {description && <Text {...dim}>{capitalize(description)}</Text>}
     </Box>
   )
 }

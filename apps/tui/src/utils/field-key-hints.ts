@@ -8,6 +8,7 @@ export function fieldKeyHints(spec: FieldSpec): KeyHint[] {
     case 'toggle':
       return [{ key: keybindings.toggle.label, label: t('tui.key.toggle') }]
     case 'number':
+    case 'select':
       return [{ key: keybindings.adjust.label, label: t('tui.key.adjust') }]
     case 'text':
     case 'text-array':

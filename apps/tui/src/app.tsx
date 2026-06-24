@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { registry } from '@nbenhadi/mirror-core'
 import { HomeScreen } from './screens/home-screen.js'
 import { GenericScreen } from './screens/generic-screen.js'
+import { SettingsScreen } from './screens/settings-screen.js'
 import { getToolProps } from './utils/tool-nav.js'
 import { getResultRenderer } from './utils/result-renderers.js'
 import type { Screen, Navigate } from './navigation.js'
@@ -31,6 +32,9 @@ export function App() {
   switch (screen.id) {
     case 'home':
       return <HomeScreen key="home" navigate={navigate} />
+
+    case 'settings':
+      return <SettingsScreen key="settings" navigate={navigate} />
 
     case 'generic': {
       const { toolId, action } = screen

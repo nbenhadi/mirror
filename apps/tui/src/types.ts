@@ -41,4 +41,16 @@ export interface TextArrayField extends BaseField {
   maxLength?: number
 }
 
-export type FieldSpec = FieldGroupHeader | ToggleField | NumberField | TextField | TextArrayField
+export interface SelectField extends BaseField {
+  type: 'select'
+  options: string[]
+  default?: string
+}
+
+export type FieldSpec =
+  | FieldGroupHeader
+  | ToggleField
+  | NumberField
+  | TextField
+  | TextArrayField
+  | SelectField

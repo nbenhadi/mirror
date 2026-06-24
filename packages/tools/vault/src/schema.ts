@@ -28,7 +28,7 @@ const addSchema = z.object({
   password: z.string().optional().describe('cmd.vault.add.opt.password'),
   url: z.string().url().optional().describe('cmd.vault.add.opt.url'),
   notes: z.string().max(2000).optional().describe('cmd.vault.add.opt.notes'),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]).describe('cmd.vault.add.opt.tags'),
 })
 
 const listSchema = z.object({
@@ -51,7 +51,7 @@ const editSchema = z.object({
   password: z.string().optional().describe('cmd.vault.edit.opt.password'),
   url: z.string().url().optional().describe('cmd.vault.edit.opt.url'),
   notes: z.string().max(2000).optional().describe('cmd.vault.edit.opt.notes'),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional().describe('cmd.vault.edit.opt.tags'),
 })
 
 const deleteSchema = z.object({

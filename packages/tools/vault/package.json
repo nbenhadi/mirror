@@ -22,6 +22,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "@nbenhadi/mirror-config": "workspace:*",
     "@nbenhadi/mirror-core": "workspace:*",
     "@nbenhadi/mirror-i18n": "workspace:*",
     "argon2": "^0.43.0",

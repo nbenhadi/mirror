@@ -4,6 +4,7 @@ import type { FieldSpec, FieldValues } from '../types.js'
 import type { Navigate, Screen } from '../navigation.js'
 
 export async function resolveToolEntry(toolId: string): Promise<Screen | null> {
+  if (toolId === 'settings') return { id: 'settings' }
   if (toolId === 'vault') {
     const status = await getVaultStatus()
     if (status === 'unlocked') return { id: 'generic', toolId: 'vault' }

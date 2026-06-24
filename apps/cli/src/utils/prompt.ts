@@ -48,7 +48,7 @@ export function promptPassword(message: string): Promise<string> {
           process.exit()
           break
         case '\u0008': // BS
-        case '\x7f': // DEL, most terminals send this for backspace
+        case '\x7f': // DEL
           if (password.length > 0) password = password.slice(0, -1)
           break
         default:

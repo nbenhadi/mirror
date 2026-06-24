@@ -20,8 +20,7 @@ const asNumber = (v: FieldValue | undefined): number => (typeof v === 'number' ?
 const asString = (v: FieldValue | undefined): string => (typeof v === 'string' ? v : '')
 
 export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldProps) {
-  // Only toggle/number capture keys here; text delegates to ink-text-input.
-  const interactive = spec.type === 'toggle' || spec.type === 'number'
+  const interactive = spec.type === 'toggle' || spec.type === 'number' || spec.type === 'select'
 
   useInput(
     (input, key) => {
@@ -36,6 +35,14 @@ export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldPro
           onChange(Math.max(min, current - step))
         if (matchesCode(input, key, keybindings.adjust.right))
           onChange(Math.min(max, current + step))
+      } else if (spec.type === 'select') {
+        const opts = spec.options
+        const curr = asString(value) || spec.default || opts[0] || ''
+        const idx = opts.indexOf(curr)
+        if (matchesCode(input, key, keybindings.adjust.left))
+          onChange(opts[Math.max(0, idx - 1)] ?? curr)
+        if (matchesCode(input, key, keybindings.adjust.right))
+          onChange(opts[Math.min(opts.length - 1, idx + 1)] ?? curr)
       }
     },
     { isActive: focus && interactive }
@@ -74,6 +81,22 @@ export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldPro
         {...(focus && { right: symbols.arrowRight })}
       >
         <Text {...(focus ? { color: colors.primary, bold: true } : {})}>{num}</Text>
+      </FieldShell>
+    )
+  }
+
+  if (spec.type === 'select') {
+    const opts = spec.options
+    const curr = asString(value) || spec.default || opts[0] || ''
+    return (
+      <FieldShell
+        label={label}
+        focus={focus}
+        labelWidth={labelWidth}
+        left={focus ? symbols.arrowLeft : ' '}
+        {...(focus && { right: symbols.arrowRight })}
+      >
+        <Text {...(focus ? { color: colors.primary, bold: true } : {})}>{curr}</Text>
       </FieldShell>
     )
   }

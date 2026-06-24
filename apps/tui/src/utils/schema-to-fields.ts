@@ -64,6 +64,8 @@ function numberField(
           ? `≤${max}`
           : undefined
   const descKey = outerDesc ?? def.description
+  const params =
+    min !== undefined || max !== undefined ? { min: min ?? 0, max: max ?? Infinity } : undefined
   return {
     type: 'number',
     key,
@@ -73,7 +75,7 @@ function numberField(
     ...(min !== undefined && { min }),
     ...(max !== undefined && { max }),
     ...(descKey !== undefined
-      ? { description: t(descKey as TranslationKey) }
+      ? { description: t(descKey as TranslationKey, params) }
       : autoDesc !== undefined
         ? { description: autoDesc }
         : {}),
@@ -91,10 +93,12 @@ function textField(
   const checks = def.checks ?? []
   const exactLen = checks.find((c) => c.kind === 'length')?.value
   const maxCheck = checks.find((c) => c.kind === 'max')?.value
+  const minCheck = checks.find((c) => c.kind === 'min')?.value
   const maxLength = exactLen ?? maxCheck
   const autoDesc =
     exactLen !== undefined ? `${exactLen} char${exactLen !== 1 ? 's' : ''}` : undefined
   const descKey = outerDesc ?? def.description
+  const params = minCheck !== undefined ? { min: minCheck } : undefined
   return {
     type: 'text',
     key,
@@ -104,7 +108,7 @@ function textField(
     ...(maxLength !== undefined && { maxLength }),
     ...(key.toLowerCase().includes('password') && { mask: true }),
     ...(descKey !== undefined
-      ? { description: t(descKey as TranslationKey) }
+      ? { description: t(descKey as TranslationKey, params) }
       : autoDesc !== undefined
         ? { description: autoDesc }
         : {}),
@@ -145,6 +149,21 @@ function processShape(
       case 'ZodNumber':
         fields.push(numberField(key, label, inner._def, defaultValue, indent, desc))
         break
+
+      case 'ZodEnum': {
+        const opts = (inner._def as { values?: string[] }).values ?? []
+        const def = typeof defaultValue === 'string' ? defaultValue : opts[0]
+        fields.push({
+          type: 'select',
+          key,
+          label,
+          options: opts,
+          ...(def !== undefined && { default: def }),
+          ...(indent && { indent }),
+          ...(desc !== undefined && { description: t(desc as TranslationKey) }),
+        })
+        break
+      }
 
       case 'ZodString':
         fields.push(textField(key, label, inner._def, defaultValue, indent, desc))
@@ -241,7 +260,9 @@ export function initialValues(fields: FieldSpec[]): FieldValues {
   for (const field of fields) {
     if (field.type === 'group-header') continue
     values[field.key] =
-      field.type === 'text' || field.type === 'text-array' ? (field.default ?? '') : field.default
+      field.type === 'text' || field.type === 'text-array' || field.type === 'select'
+        ? (field.default ?? '')
+        : field.default
   }
   return values
 }

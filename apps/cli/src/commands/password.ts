@@ -4,14 +4,18 @@ import { t } from '@nbenhadi/mirror-i18n'
 import { STRENGTH_KEYS, WARNING_KEYS, type CheckResult } from '@nbenhadi/mirror-password'
 import { symbols } from '@nbenhadi/mirror-brand'
 import chalk from 'chalk'
-import { copyToClipboard } from '../clipboard.js'
-import { promptPassword } from '../prompt.js'
-import * as ui from '../ui.js'
+import { copyToClipboard } from '../utils/clipboard.js'
+import { promptPassword } from '../utils/prompt.js'
+import * as ui from '../utils/ui.js'
 
 function createGenerateCommand(): Command {
   return new Command('generate')
     .description(t('cmd.password.generate.description'))
-    .option('-l, --length <number>', t('cmd.password.generate.opt.length'), '16')
+    .option(
+      '-l, --length <number>',
+      t('cmd.password.generate.opt.length', { min: 8, max: 128 }),
+      '16'
+    )
     .option('--no-uppercase', t('cmd.password.generate.opt.no_uppercase'))
     .option('--no-numbers', t('cmd.password.generate.opt.no_numbers'))
     .option('-s, --symbols', t('cmd.password.generate.opt.symbols'), false)
@@ -87,7 +91,9 @@ function createCheckCommand(): Command {
         console.log()
         console.log(`  ${chalk.dim(t('cmd.password.check.label.warnings'))}`)
         for (const w of d.warnings) {
-          console.log(`    ${chalk.dim(symbols.bullet)} ${t(WARNING_KEYS[w])}`)
+          console.log(
+            `    ${chalk.dim(symbols.bullet)} ${t(WARNING_KEYS[w], w === 'too-short' ? { min: 8 } : undefined)}`
+          )
         }
       }
       console.log()
@@ -97,7 +103,11 @@ function createCheckCommand(): Command {
 function createPassphraseCommand(): Command {
   return new Command('passphrase')
     .description(t('cmd.password.passphrase.description'))
-    .option('-w, --words <number>', t('cmd.password.passphrase.opt.words'), '6')
+    .option(
+      '-w, --words <number>',
+      t('cmd.password.passphrase.opt.words', { min: 3, max: 20 }),
+      '6'
+    )
     .option('-s, --separator <char>', t('cmd.password.passphrase.opt.separator'), '-')
     .option('-c, --capitalize', t('cmd.password.passphrase.opt.capitalize'), false)
     .option('-n, --number', t('cmd.password.passphrase.opt.number'), false)

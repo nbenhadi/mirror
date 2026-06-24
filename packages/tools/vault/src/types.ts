@@ -27,6 +27,8 @@ export interface KdfParams {
 
 export interface VaultConfig {
   path: string
+  salt?: string
+  kdf?: KdfParams
 }
 
 export interface MirrorConfig {

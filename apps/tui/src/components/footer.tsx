@@ -5,6 +5,7 @@ import { Key } from './key.js'
 import { Flash } from './flash.js'
 import { Separator } from './separator.js'
 import { useTerminalSize } from '../hooks/use-terminal-size.js'
+import { capitalize } from '../utils/capitalize.js'
 import type { FlashMessage } from '../hooks/use-flash.js'
 
 export interface KeyHint {
@@ -41,7 +42,7 @@ export function Footer({ keys, flash = null, info, infoProps }: FooterProps) {
           </Box>
         )}
       </Box>
-      {info !== undefined && !flash && <Text {...(infoProps ?? dim)}>{info}</Text>}
+      {info !== undefined && !flash && <Text {...(infoProps ?? dim)}>{capitalize(info)}</Text>}
     </Box>
   )
 }

@@ -1,9 +1,8 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
-import { homedir } from 'node:os'
+import { getConfigDir, getConfigPath } from '@nbenhadi/mirror-config'
 
-const CONFIG_DIR = join(homedir(), '.mirror')
-const CONFIG_FILE = join(CONFIG_DIR, 'config.json')
+const CONFIG_DIR = getConfigDir()
+const CONFIG_FILE = getConfigPath()
 
 interface CliConfig {
   locale?: string

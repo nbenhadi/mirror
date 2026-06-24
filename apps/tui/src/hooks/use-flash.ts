@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { capitalize } from '../utils/capitalize.js'
 
 export type FlashVariant = 'success' | 'error' | 'warning' | 'info'
 
@@ -14,7 +15,7 @@ export function useFlash(duration = 1700) {
   const notify = useCallback(
     (text: string, variant: FlashVariant = 'success') => {
       if (timerRef.current) clearTimeout(timerRef.current)
-      setFlash({ text, variant })
+      setFlash({ text: capitalize(text), variant })
       timerRef.current = setTimeout(() => setFlash(null), duration)
     },
     [duration]

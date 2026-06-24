@@ -138,11 +138,34 @@ export type TranslationKey =
   | 'cmd.vault.purge.all_confirm'
   | 'cmd.vault.error.invalid_password'
 
-  // Lang command
-  | 'cmd.lang.description'
-  | 'cmd.lang.arg.locale'
-  | 'cmd.lang.success'
-  | 'cmd.lang.error'
+  // Settings tool
+  | 'cmd.settings.description'
+  | 'cmd.settings.get.description'
+  | 'cmd.settings.get.opt.key'
+  | 'cmd.settings.set.description'
+  | 'cmd.settings.set.opt.key'
+  | 'cmd.settings.set.opt.value'
+  | 'cmd.settings.set.success'
+  | 'cmd.settings.list.description'
+  | 'cmd.settings.reset.description'
+  | 'cmd.settings.reset.opt.key'
+  | 'cmd.settings.reset.confirm'
+  | 'cmd.settings.reset.success'
+  | 'cmd.settings.reset.col.key'
+  | 'cmd.settings.reset.col.before'
+  | 'cmd.settings.reset.col.after'
+  | 'cmd.settings.field.key'
+  | 'cmd.settings.field.value'
+  | 'cmd.settings.opt.general.lang'
+  | 'cmd.settings.opt.tui.keybindings.quit'
+  | 'cmd.settings.opt.tui.keybindings.back'
+  | 'cmd.settings.opt.tui.keybindings.navigateUp'
+  | 'cmd.settings.opt.tui.keybindings.navigateDown'
+  | 'cmd.settings.opt.tui.keybindings.adjustLeft'
+  | 'cmd.settings.opt.tui.keybindings.adjustRight'
+  | 'cmd.settings.opt.tui.keybindings.select'
+  | 'cmd.settings.opt.tui.keybindings.toggle'
+  | 'cmd.settings.opt.tools.vault.path'
 
   // Help command
   | 'cmd.help.usage'
@@ -151,6 +174,7 @@ export type TranslationKey =
   | 'cmd.help.commands'
   | 'cmd.help.version'
   | 'cmd.help.display_help'
+  | 'cmd.help.default'
 
   // Clipboard
   | 'clipboard.copied'

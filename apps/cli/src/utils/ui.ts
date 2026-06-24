@@ -20,11 +20,15 @@ export function fatal(message: string): never {
 }
 
 export function printPassword(value: string): void {
-  console.log(_primary(value))
+  console.log(value)
 }
 
 export function hint(message: string): void {
   console.log(`  ${chalk.dim(message)}`)
+}
+
+export function dimMark(): string {
+  return chalk.dim(symbols.separator)
 }
 
 export function row(label: string, value: string, width = 14): void {
