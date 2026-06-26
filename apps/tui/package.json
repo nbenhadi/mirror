@@ -1,0 +1,38 @@
+{
+  "name": "@nbenhadi/mirror-tui",
+  "version": "1.2.0",
+  "type": "module",
+  "private": true,
+  "bin": {
+    "mir": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsx src/index.tsx",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@nbenhadi/mirror-brand": "workspace:*",
+    "@nbenhadi/mirror-cli": "workspace:*",
+    "@nbenhadi/mirror-config": "workspace:*",
+    "argon2": "^0.43.0",
+    "ink": "^5.0.0",
+    "ink-text-input": "^6.0.0",
+    "pino": "^9.0.0",
+    "react": "^18.0.0"
+  },
+  "devDependencies": {
+    "@nbenhadi/mirror-core": "workspace:*",
+    "@nbenhadi/mirror-i18n": "workspace:*",
+    "@nbenhadi/mirror-password": "workspace:*",
+    "@nbenhadi/mirror-settings": "workspace:*",
+    "@nbenhadi/mirror-vault": "workspace:*",
+    "@types/node": "^22.15.21",
+    "@types/react": "^18.0.0",
+    "tsup": "^8.5.0",
+    "tsx": "^4.19.4"
+  }
+}

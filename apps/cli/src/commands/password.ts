@@ -1,14 +1,21 @@
 import { Command } from 'commander'
 import { execute } from '@nbenhadi/mirror-core'
 import { t } from '@nbenhadi/mirror-i18n'
+import { STRENGTH_KEYS, WARNING_KEYS, type CheckResult } from '@nbenhadi/mirror-password'
+import { symbols } from '@nbenhadi/mirror-brand'
+import chalk from 'chalk'
+import { copyToClipboard } from '../utils/clipboard.js'
+import { promptPassword } from '../utils/prompt.js'
+import * as ui from '../utils/ui.js'
 
-export function createPasswordCommand(): Command {
-  const cmd = new Command('password').description(t('cmd.password.description'))
-
-  cmd
-    .command('generate')
+function createGenerateCommand(): Command {
+  return new Command('generate')
     .description(t('cmd.password.generate.description'))
-    .option('-l, --length <number>', t('cmd.password.generate.opt.length'), '16')
+    .option(
+      '-l, --length <number>',
+      t('cmd.password.generate.opt.length', { min: 8, max: 128 }),
+      '16'
+    )
     .option('--no-uppercase', t('cmd.password.generate.opt.no_uppercase'))
     .option('--no-numbers', t('cmd.password.generate.opt.no_numbers'))
     .option('-s, --symbols', t('cmd.password.generate.opt.symbols'), false)
@@ -47,13 +54,92 @@ export function createPasswordCommand(): Command {
         },
       })
 
-      if (result.success) {
-        console.log(result.data.password)
-      } else {
-        console.error(t('error.validation'))
-        process.exit(1)
-      }
+      if (!result.success) ui.fatal(t('error.validation'))
+      ui.printPassword(result.data.password)
+      copyToClipboard(result.data.password)
     })
+}
 
+function createCheckCommand(): Command {
+  return new Command('check')
+    .description(t('cmd.password.check.description'))
+    .argument('[password]', t('cmd.password.check.opt.password'))
+    .action(async (password?: string) => {
+      const value = password ?? (await promptPassword(t('cmd.password.check.opt.password')))
+
+      const result = await execute<CheckResult>({
+        toolId: 'password',
+        input: { action: 'check', password: value },
+      })
+
+      if (!result.success) ui.fatal(t('error.validation'))
+
+      const d = result.data
+      const scoreColor = ui.strengthColor(d.score)
+
+      const lStrength = t('cmd.password.check.label.strength')
+      const lEntropy = t('cmd.password.check.label.entropy')
+      const lCrack = t('cmd.password.check.label.crack_time')
+      const labelW = Math.max(lStrength.length, lEntropy.length, lCrack.length) + 3
+
+      console.log()
+      ui.row(lStrength, scoreColor(`${t(STRENGTH_KEYS[d.label])} (${d.score}/4)`), labelW)
+      ui.row(lEntropy, `${d.effectiveBits} bits`, labelW)
+      ui.row(lCrack, d.crackTime, labelW)
+
+      if (d.warnings.length > 0) {
+        console.log()
+        console.log(`  ${chalk.dim(t('cmd.password.check.label.warnings'))}`)
+        for (const w of d.warnings) {
+          console.log(
+            `    ${chalk.dim(symbols.bullet)} ${t(WARNING_KEYS[w], w === 'too-short' ? { min: 8 } : undefined)}`
+          )
+        }
+      }
+      console.log()
+    })
+}
+
+function createPassphraseCommand(): Command {
+  return new Command('passphrase')
+    .description(t('cmd.password.passphrase.description'))
+    .option(
+      '-w, --words <number>',
+      t('cmd.password.passphrase.opt.words', { min: 3, max: 20 }),
+      '6'
+    )
+    .option('-s, --separator <char>', t('cmd.password.passphrase.opt.separator'), '-')
+    .option('-c, --capitalize', t('cmd.password.passphrase.opt.capitalize'), false)
+    .option('-n, --number', t('cmd.password.passphrase.opt.number'), false)
+    .action(
+      async (options: {
+        words: string
+        separator: string
+        capitalize: boolean
+        number: boolean
+      }) => {
+        const result = await execute<{ passphrase: string; entropyBits: number }>({
+          toolId: 'password',
+          input: {
+            action: 'passphrase',
+            words: parseInt(options.words, 10),
+            separator: options.separator,
+            capitalize: options.capitalize === true,
+            number: options.number === true,
+          },
+        })
+
+        if (!result.success) ui.fatal(t('error.validation'))
+        ui.printPassword(result.data.passphrase)
+        copyToClipboard(result.data.passphrase)
+      }
+    )
+}
+
+export function createPasswordCommand(): Command {
+  const cmd = new Command('password').description(t('cmd.password.description'))
+  cmd.addCommand(createGenerateCommand())
+  cmd.addCommand(createCheckCommand())
+  cmd.addCommand(createPassphraseCommand())
   return cmd
 }

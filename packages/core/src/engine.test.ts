@@ -18,11 +18,9 @@ async function runEngine(
   toolId: string,
   input: unknown
 ): Promise<ToolResult<unknown>> {
-  let tool
-  try {
-    tool = registry.get(toolId)
-  } catch {
-    return { success: false, error: { code: 'NOT_FOUND', message: `Tool "${toolId}" not found` } }
+  const tool = registry.get(toolId)
+  if (!tool) {
+    return { success: false, error: { code: 'NOT_FOUND', message: 'error.not_found' } }
   }
 
   const parsed = tool.schema.safeParse(input)
@@ -31,7 +29,7 @@ async function runEngine(
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: parsed.error.message,
+        message: 'error.validation',
         details: parsed.error.flatten(),
       },
     }
@@ -44,7 +42,8 @@ async function runEngine(
       success: false,
       error: {
         code: 'EXECUTION_ERROR',
-        message: err instanceof Error ? err.message : 'Unknown error',
+        message: 'error.execution',
+        details: err instanceof Error ? err.message : String(err),
       },
     }
   }
@@ -91,7 +90,8 @@ describe('engine', () => {
     expect(result.success).toBe(false)
     if (!result.success) {
       expect(result.error.code).toBe('EXECUTION_ERROR')
-      expect(result.error.message).toBe('boom')
+      expect(result.error.message).toBe('error.execution')
+      expect(result.error.details).toBe('boom')
     }
   })
 })

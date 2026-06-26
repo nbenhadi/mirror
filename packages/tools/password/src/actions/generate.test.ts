@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { buildContext } from '@nbenhadi/mirror-core'
-import { passwordTool } from './index.js'
+import { generate } from './generate.js'
+import type { GenerateInput } from '../schema.js'
 
 const ctx = buildContext()
 
-const gen = (opts: Partial<Parameters<typeof passwordTool.execute>[0]> = {}) =>
-  passwordTool.execute(
+const gen = (opts: Partial<GenerateInput> = {}) =>
+  generate(
     {
       action: 'generate',
       length: 16,

@@ -1,8 +1,9 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { deriveKey } from '../crypto.js'
 import { loadConfig } from '../config.js'
-import { readVault } from '../vault-file.js'
+import { readVault, getVaultSaltAndKdf } from '../vault-file.js'
 import { saveSession } from '../session.js'
+import type { KdfParams } from '../types.js'
 
 type UnlockInput = { action: 'unlock'; masterPassword: string; minutes: number }
 
@@ -15,19 +16,32 @@ export async function unlock(
   if (!config.vault) {
     return {
       success: false,
-      error: { code: 'NOT_FOUND', message: 'No vault initialized. Run `mirror vault init` first.' },
+      error: { code: 'NOT_FOUND', message: 'tool.vault.error.not_initialized' },
     }
   }
 
-  const salt = Buffer.from(config.vault.salt, 'base64')
-  let key: Buffer
+  let salt: Buffer
+  let kdf: KdfParams
 
   try {
-    key = await deriveKey(input.masterPassword, salt, config.vault.kdf)
+    const vaultSaltAndKdf = await getVaultSaltAndKdf(config.vault.path)
+    salt = vaultSaltAndKdf.salt
+    kdf = vaultSaltAndKdf.kdf
   } catch {
     return {
       success: false,
-      error: { code: 'EXECUTION_ERROR', message: 'Failed to derive key' },
+      error: { code: 'NOT_FOUND', message: 'tool.vault.error.vault_not_found' },
+    }
+  }
+
+  let key: Buffer
+
+  try {
+    key = await deriveKey(input.masterPassword, salt, kdf)
+  } catch {
+    return {
+      success: false,
+      error: { code: 'EXECUTION_ERROR', message: 'tool.vault.error.derive_failed' },
     }
   }
 
@@ -36,7 +50,7 @@ export async function unlock(
   } catch {
     return {
       success: false,
-      error: { code: 'UNAUTHORIZED', message: 'Invalid master password' },
+      error: { code: 'UNAUTHORIZED', message: 'tool.vault.error.invalid_password' },
     }
   }
 

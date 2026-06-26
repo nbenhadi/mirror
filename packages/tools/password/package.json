@@ -1,6 +1,6 @@
 {
   "name": "@nbenhadi/mirror-password",
-  "version": "1.0.1",
+  "version": "1.2.0",
   "type": "module",
   "exports": {
     ".": {
@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@nbenhadi/mirror-core": "workspace:*",
+    "@nbenhadi/mirror-i18n": "workspace:*",
     "zod": "^3.25.28"
   },
   "devDependencies": {

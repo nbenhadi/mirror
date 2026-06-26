@@ -1,4 +1,5 @@
 import { spawn, spawnSync } from 'node:child_process'
+import chalk from 'chalk'
 import { t } from '@nbenhadi/mirror-i18n'
 
 const CLEAR_SECONDS = 15
@@ -62,9 +63,11 @@ function available(cmd: string): boolean {
 function writeToClipboard(tool: ClipboardTool, text: string): void {
   const child = spawn(tool.cmd, tool.args, { detached: true, stdio: ['pipe', 'ignore', 'ignore'] })
   child.on('error', () => {})
-  child.stdin!.on('error', () => {})
-  child.stdin!.write(text)
-  child.stdin!.end()
+  if (child.stdin) {
+    child.stdin.on('error', () => {})
+    child.stdin.write(text)
+    child.stdin.end()
+  }
   child.unref()
 }
 
@@ -78,10 +81,10 @@ function scheduleClear(tool: ClipboardTool, seconds: number): void {
 export function copyToClipboard(text: string): void {
   const tool = detectTool()
   if (!tool) {
-    console.log(t('clipboard.unavailable'))
+    console.log(chalk.dim(t('clipboard.unavailable')))
     return
   }
   writeToClipboard(tool, text)
   scheduleClear(tool, CLEAR_SECONDS)
-  console.log(t('clipboard.copied', { seconds: CLEAR_SECONDS }))
+  console.log(chalk.dim(t('clipboard.copied', { seconds: CLEAR_SECONDS })))
 }

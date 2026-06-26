@@ -12,13 +12,11 @@ export async function execute<T = unknown>(options: ExecuteOptions): Promise<Too
   const { toolId, input, contextOverrides } = options
   const ctx = buildContext(contextOverrides)
 
-  let tool
-  try {
-    tool = registry.get(toolId)
-  } catch {
+  const tool = registry.get(toolId)
+  if (!tool) {
     return {
       success: false,
-      error: { code: 'NOT_FOUND', message: `Tool "${toolId}" not found` },
+      error: { code: 'NOT_FOUND', message: 'error.not_found' },
     }
   }
 
@@ -28,7 +26,7 @@ export async function execute<T = unknown>(options: ExecuteOptions): Promise<Too
       success: false,
       error: {
         code: 'VALIDATION_ERROR',
-        message: parsed.error.message,
+        message: 'error.validation',
         details: parsed.error.flatten(),
       },
     }
@@ -42,7 +40,8 @@ export async function execute<T = unknown>(options: ExecuteOptions): Promise<Too
       success: false,
       error: {
         code: 'EXECUTION_ERROR',
-        message: err instanceof Error ? err.message : 'Unknown error',
+        message: 'error.execution',
+        details: err instanceof Error ? err.message : String(err),
       },
     }
   }
