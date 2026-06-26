@@ -2,13 +2,16 @@
   "name": "@nbenhadi/mirror-tui",
   "version": "1.2.0",
   "type": "module",
-  "private": true,
   "bin": {
     "mir": "./dist/index.js"
   },
   "files": [
     "dist"
   ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.tsx",
