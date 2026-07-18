@@ -38,6 +38,10 @@ jobs:
       - name: Check branch name convention
         run: |
           BRANCH="${{ github.head_ref }}"
+          if echo "$BRANCH" | grep -qE '^(main|staging|develop)$'; then
+            echo "Branch '$BRANCH' is a protected integration branch, skipping check."
+            exit 0
+          fi
           if ! echo "$BRANCH" | grep -qE '^(feat|fix|hotfix|chore|docs|release)/.+'; then
             echo "Branch '$BRANCH' must follow: feat/ fix/ hotfix/ chore/ docs/ release/"
             exit 1
