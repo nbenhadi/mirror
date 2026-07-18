@@ -86,15 +86,6 @@ importers:
 
   apps/tui:
     dependencies:
-      '@nbenhadi/mirror-brand':
-        specifier: workspace:*
-        version: link:../../packages/brand
-      '@nbenhadi/mirror-cli':
-        specifier: workspace:*
-        version: link:../cli
-      '@nbenhadi/mirror-config':
-        specifier: workspace:*
-        version: link:../../packages/config
       argon2:
         specifier: ^0.43.0
         version: 0.43.1
@@ -111,6 +102,15 @@ importers:
         specifier: ^18.0.0
         version: 18.3.1
     devDependencies:
+      '@nbenhadi/mirror-brand':
+        specifier: workspace:*
+        version: link:../../packages/brand
+      '@nbenhadi/mirror-cli':
+        specifier: workspace:*
+        version: link:../cli
+      '@nbenhadi/mirror-config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@nbenhadi/mirror-core':
         specifier: workspace:*
         version: link:../../packages/core

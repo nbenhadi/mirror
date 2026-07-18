@@ -1,6 +1,6 @@
 {
   "name": "@nbenhadi/mirror-tui",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "bin": {
     "mir": "./dist/index.js"
@@ -22,9 +22,6 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@nbenhadi/mirror-brand": "workspace:*",
-    "@nbenhadi/mirror-cli": "workspace:*",
-    "@nbenhadi/mirror-config": "workspace:*",
     "argon2": "^0.43.0",
     "ink": "^5.0.0",
     "ink-text-input": "^6.0.0",
@@ -32,6 +29,9 @@
     "react": "^18.0.0"
   },
   "devDependencies": {
+    "@nbenhadi/mirror-brand": "workspace:*",
+    "@nbenhadi/mirror-cli": "workspace:*",
+    "@nbenhadi/mirror-config": "workspace:*",
     "@nbenhadi/mirror-core": "workspace:*",
     "@nbenhadi/mirror-i18n": "workspace:*",
     "@nbenhadi/mirror-password": "workspace:*",
