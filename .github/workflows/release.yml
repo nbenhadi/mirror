@@ -39,6 +39,7 @@ jobs:
           publish: pnpm --filter "./apps/cli" --filter "./apps/tui" publish --no-git-checks --access restricted
           version: pnpm changeset version
           createGithubReleases: true
-        env:
+       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN }}
+
