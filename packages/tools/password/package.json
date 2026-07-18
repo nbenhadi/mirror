@@ -1,6 +1,7 @@
 {
   "name": "@nbenhadi/mirror-password",
   "version": "1.2.0",
+  "private": true,
   "type": "module",
   "exports": {
     ".": {
@@ -11,10 +12,6 @@
   "files": [
     "dist"
   ],
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
-  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
