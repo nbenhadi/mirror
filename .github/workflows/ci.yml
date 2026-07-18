@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, staging, develop]
   pull_request:
-    branches: [main]
+    branches: [main, staging, develop]
 
 jobs:
   ci:
@@ -31,32 +31,18 @@ jobs:
       - name: Test
         run: pnpm test
 
-  publish:
-    needs: ci
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  branch-name:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
-      id-token: write
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: pnpm
-          registry-url: https://npm.pkg.github.com
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
-
-      - name: Publish packages
-        run: pnpm --filter "./packages/**" --filter "./apps/cli" --filter "./apps/tui" publish --no-git-checks --access restricted
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check branch name convention
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          if echo "$BRANCH" | grep -qE '^(main|staging|develop)$'; then
+            echo "Branch '$BRANCH' is a protected integration branch, skipping check."
+            exit 0
+          fi
+          if ! echo "$BRANCH" | grep -qE '^(feat|fix|hotfix|chore|docs|release)/.+'; then
+            echo "Branch '$BRANCH' must follow: feat/ fix/ hotfix/ chore/ docs/ release/"
+            exit 1
+          fi
