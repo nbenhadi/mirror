@@ -91,12 +91,16 @@ function generateWithRepeat(charset: string, length: number): string[] {
 function applyRequireEach(chars: string[], charset: string, input: GenerateInput): string[] {
   const result = [...chars]
   const types = getActiveTypeChars(charset, input)
+  const usedPositions = new Set<number>()
 
   for (const typeChars of types) {
     const hasType = result.some((c) => typeChars.includes(c))
     if (!hasType) {
-      const pos = randomInt(result.length)
+      const available = result.map((_, i) => i).filter((i) => !usedPositions.has(i))
+      if (available.length === 0) continue
+      const pos = available[randomInt(available.length)]!
       result[pos] = pickRandom(typeChars)
+      usedPositions.add(pos)
     }
   }
 
