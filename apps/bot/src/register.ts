@@ -1,4 +1,4 @@
-import { botEnv } from '@nbenhadi/mirror-config'
+import { botEnv } from '@nbenhadi/mirror-config/bot-env'
 import { REST, Routes } from 'discord.js'
 import type { RESTPostAPIApplicationCommandsJSONBody } from 'discord.js'
 import { commands } from './lib/commands.js'

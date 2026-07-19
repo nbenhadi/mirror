@@ -7,7 +7,7 @@ import {
   SlashCommandBuilder,
 } from 'discord.js'
 import type { ChatInputCommandInteraction, LocalizationMap } from 'discord.js'
-import { botEnv } from '@nbenhadi/mirror-config'
+import { botEnv } from '@nbenhadi/mirror-config/bot-env'
 import type { Command } from '../types/command.js'
 import { cap, en, getT, localize } from '../i18n.js'
 import { ACCEPT_BUTTON_ID } from '../lib/constants.js'

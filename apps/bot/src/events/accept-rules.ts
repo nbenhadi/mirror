@@ -1,5 +1,5 @@
 import type { ButtonInteraction, GuildMemberRoleManager } from 'discord.js'
-import { botEnv } from '@nbenhadi/mirror-config'
+import { botEnv } from '@nbenhadi/mirror-config/bot-env'
 import { cap, getT } from '../i18n.js'
 import { createTranslator } from '@nbenhadi/mirror-i18n'
 

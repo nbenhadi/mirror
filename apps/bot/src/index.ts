@@ -1,4 +1,4 @@
-import { botEnv } from '@nbenhadi/mirror-config'
+import { botEnv } from '@nbenhadi/mirror-config/bot-env'
 import { registry } from '@nbenhadi/mirror-core'
 import { passwordTool } from '@nbenhadi/mirror-password'
 import { Client, Events, GatewayIntentBits } from 'discord.js'
