@@ -73,6 +73,12 @@ describe('get', () => {
     if (!r.success) expect(r.error.code).toBe('FORBIDDEN')
   })
 
+  it('returns NOT_FOUND for unknown key', async () => {
+    const r = await get({ action: 'get', key: 'does.not.exist' })
+    expect(r.success).toBe(false)
+    if (!r.success) expect(r.error.code).toBe('NOT_FOUND')
+  })
+
   it('returns the full editable view without a key', async () => {
     const r = await get({ action: 'get' })
     expect(r.success).toBe(true)
@@ -95,6 +101,14 @@ describe('list', () => {
         expect(general?.['lang']).toBe('en')
       }
     }
+  })
+})
+
+describe('reset (by key)', () => {
+  it('returns NOT_FOUND for unknown key', async () => {
+    const r = await reset({ action: 'reset', key: 'does.not.exist', apply: false })
+    expect(r.success).toBe(false)
+    if (!r.success) expect(r.error.code).toBe('NOT_FOUND')
   })
 })
 

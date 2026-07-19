@@ -89,18 +89,12 @@ function generateWithRepeat(charset: string, length: number): string[] {
 }
 
 function applyRequireEach(chars: string[], charset: string, input: GenerateInput): string[] {
-  const result = [...chars]
   const types = getActiveTypeChars(charset, input)
-
-  for (const typeChars of types) {
-    const hasType = result.some((c) => typeChars.includes(c))
-    if (!hasType) {
-      const pos = randomInt(result.length)
-      result[pos] = pickRandom(typeChars)
-    }
-  }
-
-  return shuffle(result)
+  const guaranteed = types.map((typeChars) => pickRandom(typeChars))
+  const fill = Array.from({ length: Math.max(0, chars.length - guaranteed.length) }, () =>
+    pickRandom(charset)
+  )
+  return shuffle([...guaranteed, ...fill])
 }
 
 function generateNoRepeat(charset: string, input: GenerateInput): string[] {

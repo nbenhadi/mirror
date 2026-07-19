@@ -20,11 +20,5 @@ logs/
 # test coverage
 coverage/
 
-# Editor
-.vscode/
-
 # misc
 .DS_Store
-
-# Claude
-CLAUDE.md

@@ -3,6 +3,7 @@ import { mkdtemp, rm, writeFile, mkdir, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { readConfig, patchConfig } from './io.js'
+import { readConfigSync } from './sync.js'
 import { getConfigPath } from './paths.js'
 
 let home: string
@@ -68,5 +69,30 @@ describe('patchConfig', () => {
     await patchConfig({ general: { lang: 'en' } })
     const mode = (await stat(getConfigPath())).mode & 0o777
     expect(mode).toBe(0o600)
+  })
+})
+
+describe('readConfigSync', () => {
+  it('returns {} when no file exists', () => {
+    expect(readConfigSync()).toEqual({})
+  })
+
+  it('reads existing config synchronously', async () => {
+    await patchConfig({ general: { lang: 'fr' } })
+    const cfg = readConfigSync()
+    expect(cfg.general?.lang).toBe('fr')
+  })
+
+  it('returns best-effort on invalid schema', async () => {
+    await writeConfigFile({ version: 1, general: { lang: 'es' } })
+    const cfg = readConfigSync()
+    expect(cfg.general?.lang).toBe('es')
+  })
+
+  it('returns {} when file contains corrupt JSON', async () => {
+    const path = getConfigPath()
+    await mkdir(join(home, '.config', 'mirror'), { recursive: true })
+    await writeFile(path, '{corrupt json:::')
+    expect(readConfigSync()).toEqual({})
   })
 })
