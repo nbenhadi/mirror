@@ -45,6 +45,10 @@ jobs:
             echo "Branch '$BRANCH' is a protected integration branch, skipping check."
             exit 0
           fi
+          if echo "$BRANCH" | grep -qE '^dependabot/'; then
+            echo "Branch '$BRANCH' is a dependabot branch, skipping check."
+            exit 0
+          fi
           if ! echo "$BRANCH" | grep -qE '^(feat|fix|hotfix|chore|docs|release)/.+'; then
             echo "Branch '$BRANCH' must follow: feat/ fix/ hotfix/ chore/ docs/ release/"
             exit 1
