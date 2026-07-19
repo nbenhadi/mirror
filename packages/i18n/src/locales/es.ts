@@ -209,6 +209,26 @@ export const es: Record<TranslationKey, string> = {
   'prompt.new_password': 'nueva contraseña maestra: ',
   'prompt.confirm_new_password': 'confirmar nueva contraseña maestra: ',
 
+  // Bot
+  'bot.welcome.title': 'bienvenido al servidor!',
+  'bot.welcome.intro': 'nos alegra tenerte aqui. pulsa el boton para obtener acceso.',
+  'bot.welcome.accept_button': 'obtener acceso',
+  'bot.welcome.accepted': 'bienvenido! ya tienes acceso al servidor.',
+  'bot.welcome.cmd.description': 'publica el mensaje de bienvenida en el canal de bienvenida',
+  'bot.welcome.cmd.no_channel':
+    'canal de bienvenida no configurado. define DISCORD_WELCOME_CHANNEL_ID.',
+  'bot.welcome.cmd.sent': 'mensaje de bienvenida enviado.',
+  'bot.help.description': 'muestra ayuda para un comando',
+  'bot.help.opt.command': 'nombre del comando',
+  'bot.help.title': 'comandos disponibles',
+  'bot.help.not_found': 'comando desconocido: {command}',
+  'bot.clear.description': 'elimina mensajes de este canal',
+  'bot.clear.opt.amount': 'numero de mensajes a eliminar',
+  'bot.clear.opt.user': 'eliminar solo mensajes de este usuario',
+  'bot.clear.not_in_guild': 'este comando solo funciona en un servidor',
+  'bot.clear.no_permission': 'permiso de gestionar mensajes requerido',
+  'bot.clear.success': '{count} mensaje(s) eliminado(s)',
+
   // Generic
   title: 'título',
   username: 'usuario',

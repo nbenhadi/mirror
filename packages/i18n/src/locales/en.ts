@@ -207,6 +207,25 @@ export const en: Record<TranslationKey, string> = {
   'prompt.new_password': 'new master password: ',
   'prompt.confirm_new_password': 'confirm new password: ',
 
+  // Bot
+  'bot.welcome.title': 'welcome to the server!',
+  'bot.welcome.intro': 'glad you are here. click the button below to get access.',
+  'bot.welcome.accept_button': 'get access',
+  'bot.welcome.accepted': 'welcome! you now have access to the server.',
+  'bot.welcome.cmd.description': 'post the welcome message in the welcome channel',
+  'bot.welcome.cmd.no_channel': 'welcome channel not configured. set DISCORD_WELCOME_CHANNEL_ID.',
+  'bot.welcome.cmd.sent': 'welcome message sent.',
+  'bot.help.description': 'show help for a command',
+  'bot.help.opt.command': 'command name',
+  'bot.help.title': 'available commands',
+  'bot.help.not_found': 'unknown command: {command}',
+  'bot.clear.description': 'delete messages from this channel',
+  'bot.clear.opt.amount': 'number of messages to delete',
+  'bot.clear.opt.user': 'only delete messages from this user',
+  'bot.clear.not_in_guild': 'this command can only be used in a server',
+  'bot.clear.no_permission': 'missing manage messages permission',
+  'bot.clear.success': 'deleted {count} message(s)',
+
   // Generic
   title: 'title',
   username: 'username',

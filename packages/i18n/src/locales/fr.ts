@@ -210,6 +210,26 @@ export const fr: Record<TranslationKey, string> = {
   'prompt.new_password': 'nouveau mot de passe maître : ',
   'prompt.confirm_new_password': 'confirmer le nouveau mot de passe maître : ',
 
+  // Bot
+  'bot.welcome.title': 'bienvenue sur le serveur !',
+  'bot.welcome.intro': "content de t'avoir ici. clique sur le bouton pour obtenir l'acces.",
+  'bot.welcome.accept_button': "obtenir l'acces",
+  'bot.welcome.accepted': 'bienvenue ! tu as maintenant acces au serveur.',
+  'bot.welcome.cmd.description': 'publie le message de bienvenue dans le canal de bienvenue',
+  'bot.welcome.cmd.no_channel':
+    'canal de bienvenue non configure. definis DISCORD_WELCOME_CHANNEL_ID.',
+  'bot.welcome.cmd.sent': 'message de bienvenue envoye.',
+  'bot.help.description': "affiche l'aide pour une commande",
+  'bot.help.opt.command': 'nom de la commande',
+  'bot.help.title': 'commandes disponibles',
+  'bot.help.not_found': 'commande inconnue : {command}',
+  'bot.clear.description': 'supprime des messages de ce canal',
+  'bot.clear.opt.amount': 'nombre de messages a supprimer',
+  'bot.clear.opt.user': 'supprimer uniquement les messages de cet utilisateur',
+  'bot.clear.not_in_guild': 'cette commande ne fonctionne que dans un serveur',
+  'bot.clear.no_permission': 'permission de gerer les messages requise',
+  'bot.clear.success': '{count} message(s) supprime(s)',
+
   // Generic
   title: 'titre',
   username: "nom d'utilisateur",
