@@ -1,0 +1,33 @@
+name: Sync
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync main into staging
+        run: |
+          git checkout staging
+          git merge origin/main --no-edit
+          git push origin staging
+
+      - name: Sync staging into develop
+        run: |
+          git checkout develop
+          git merge origin/staging --no-edit
+          git push origin develop
