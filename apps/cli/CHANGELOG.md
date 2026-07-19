@@ -1,5 +1,11 @@
 # @nbenhadi/mirror-cli
 
+## 1.5.1
+
+### Patch Changes
+
+- bd6431d: Prevent requireEach from overwriting reserved character positions
+
 ## 1.5.0
 
 ### Minor Changes
