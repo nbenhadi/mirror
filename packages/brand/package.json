@@ -16,7 +16,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:types": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/node": "^22.15.21"

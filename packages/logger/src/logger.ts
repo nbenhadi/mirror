@@ -1,11 +1,12 @@
 import pino from 'pino'
+import { isDev } from '@nbenhadi/mirror-config'
 
 export function createLogger(context?: Record<string, unknown>) {
-  const isDev = process.env['NODE_ENV'] === 'development'
+  const dev = isDev()
 
   const base = pino({
     level: process.env['LOG_LEVEL'] ?? 'info',
-    ...(isDev && { transport: { target: 'pino-pretty' } }),
+    ...(dev && { transport: { target: 'pino-pretty' } }),
   })
 
   return context ? base.child(context) : base

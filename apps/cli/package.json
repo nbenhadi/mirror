@@ -19,7 +19,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsx src/index.ts",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:types": "tsc --noEmit"
   },
   "dependencies": {
     "argon2": "^0.43.0",

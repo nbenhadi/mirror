@@ -9,6 +9,8 @@
     "dev": "turbo run dev",
     "test": "turbo run test",
     "lint": "turbo run lint",
+    "lint:types": "turbo run lint:types",
+    "test:coverage": "turbo run test:coverage",
     "clean": "turbo run clean",
     "prepare": "husky"
   },
