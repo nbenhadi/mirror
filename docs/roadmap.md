@@ -23,7 +23,7 @@ Key files currently at 0% coverage that need tests:
 
 ## Future
 
-- [ ] Add `apps/bot`
+- [x] Add `apps/bot` (Discord, local dev)
+- [ ] Host `apps/bot` (Raspberry Pi / old PC with PM2)
+- [ ] Add `deploy-staging.yml` and `deploy-prod.yml` workflows once hosted
 - [ ] Add `apps/web`
-- [ ] Add `deploy-staging.yml` and `deploy-prod.yml` workflows
-- [ ] Add `staging` and `production` env secrets to GitHub Actions
