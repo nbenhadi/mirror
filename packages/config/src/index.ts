@@ -1,3 +1,4 @@
+export type { BotEnv } from './bot-env.js'
 export { readConfig, patchConfig } from './io.js'
 export { getNodeEnv, isDev, isProd, isTest } from './env.js'
 export type { NodeEnv } from './env.js'

@@ -28,3 +28,16 @@ export function t(key: TranslationKey, params?: Record<string, string | number>)
     return val !== undefined ? String(val) : match
   })
 }
+
+export function createTranslator(
+  locale: Locale
+): (key: TranslationKey, params?: Record<string, string | number>) => string {
+  return (key, params) => {
+    const str = locales[locale][key] || locales[DEFAULT_LOCALE][key] || key
+    if (!params) return str
+    return str.replace(/\{(\w+)\}/g, (match, k) => {
+      const val = params[k]
+      return val !== undefined ? String(val) : match
+    })
+  }
+}

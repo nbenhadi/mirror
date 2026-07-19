@@ -11,6 +11,11 @@ Responses in Spanish.
 
 All code in English: variables, functions, types, constants, file names, comments.
 
+## i18n
+
+All locale strings in `packages/i18n/src/locales/` must be lowercase.
+Capitalization is handled by apps via `cap()`. Never capitalize in the locale files.
+
 ## Formatting
 
 No alignment padding. `const x = 0` not `const x       = 0`.
