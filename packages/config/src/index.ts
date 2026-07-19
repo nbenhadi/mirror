@@ -1,4 +1,6 @@
 export { readConfig, patchConfig } from './io.js'
+export { getNodeEnv, isDev, isProd, isTest } from './env.js'
+export type { NodeEnv } from './env.js'
 export { getConfigDir, getUserDataDir, getConfigPath } from './paths.js'
 export { readConfigSync } from './sync.js'
 export { deepMerge, isPlainObject } from './merge.js'

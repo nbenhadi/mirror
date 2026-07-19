@@ -16,14 +16,18 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "lint:types": "tsc --noEmit",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@nbenhadi/mirror-config": "workspace:*",
     "pino": "^9.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
     "pino-pretty": "^13.0.0",
-    "vitest": "^3.2.3"
+    "vitest": "^3.2.3",
+    "@vitest/coverage-v8": "^3.2.3"
   }
 }
