@@ -211,6 +211,25 @@ export type TranslationKey =
   | 'prompt.new_password'
   | 'prompt.confirm_new_password'
 
+  // Bot
+  | 'bot.welcome.title'
+  | 'bot.welcome.intro'
+  | 'bot.welcome.accept_button'
+  | 'bot.welcome.accepted'
+  | 'bot.welcome.cmd.description'
+  | 'bot.welcome.cmd.no_channel'
+  | 'bot.welcome.cmd.sent'
+  | 'bot.help.description'
+  | 'bot.help.opt.command'
+  | 'bot.help.title'
+  | 'bot.help.not_found'
+  | 'bot.clear.description'
+  | 'bot.clear.opt.amount'
+  | 'bot.clear.opt.user'
+  | 'bot.clear.not_in_guild'
+  | 'bot.clear.no_permission'
+  | 'bot.clear.success'
+
   // Generic
   | 'title'
   | 'username'
