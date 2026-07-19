@@ -1,6 +1,6 @@
 {
   "name": "@nbenhadi/mirror-tui",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "type": "module",
   "bin": {
     "mir": "./dist/index.js"
