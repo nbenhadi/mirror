@@ -5,6 +5,7 @@ import { Client, Events, GatewayIntentBits } from 'discord.js'
 import { handleAutocomplete, handleCommand } from './lib/handler.js'
 import { ACCEPT_BUTTON_ID } from './lib/constants.js'
 import { handleAcceptRules } from './events/accept-rules.js'
+import { handleModalSend } from './events/modal-send.js'
 
 registry.register(passwordTool)
 
@@ -17,6 +18,10 @@ client.once(Events.ClientReady, (c) => {
 client.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isButton() && interaction.customId === ACCEPT_BUTTON_ID) {
     void handleAcceptRules(interaction)
+    return
+  }
+  if (interaction.isModalSubmit()) {
+    void handleModalSend(interaction)
     return
   }
   if (interaction.isAutocomplete()) {

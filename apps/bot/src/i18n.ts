@@ -22,7 +22,7 @@ export function localize(
   const result: Partial<Record<string, string>> = {}
   for (const [discordLocale, mirrorLocale] of Object.entries(LOCALE_MAP)) {
     if (mirrorLocale !== undefined) {
-      result[discordLocale] = createTranslator(mirrorLocale)(key, params)
+      result[discordLocale] = cap(createTranslator(mirrorLocale)(key, params))
     }
   }
   return result
