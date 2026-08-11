@@ -10,5 +10,5 @@ export default defineConfig({
   splitting: false,
   clean: true,
   noExternal: [/@nbenhadi\//],
-  external: ['argon2', 'playwright', 'playwright-core', 'chromium-bidi'],
+  external: ['argon2', 'playwright', 'playwright-core', 'chromium-bidi', 'gray-matter'],
 })

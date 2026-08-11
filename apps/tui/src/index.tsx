@@ -51,12 +51,10 @@ async function start() {
   const { passwordTool } = await import('@nbenhadi/mirror-password')
   const { vaultTool } = await import('@nbenhadi/mirror-vault')
   const { settingsTool } = await import('@nbenhadi/mirror-settings')
-  const { mdTool } = await import('@nbenhadi/mirror-md')
 
   registry.register(settingsTool)
   registry.register(passwordTool)
   registry.register(vaultTool)
-  registry.register(mdTool)
 
   render(
     <TerminalSizeProvider>
