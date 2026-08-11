@@ -32,7 +32,7 @@ jobs:
         run: pnpm build
 
       - name: Install Playwright browsers
-        run: pnpm --filter @nbenhadi/mirror-md exec playwright install
+        run: pnpm -C packages/tools/md exec playwright install
 
       - name: Test
         run: pnpm test
