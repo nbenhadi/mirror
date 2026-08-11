@@ -39,7 +39,7 @@
     "turndown": "^7.2.4",
     "unified": "^11.0.5",
     "unist-util-visit": "^5.1.0",
-    "zod": "^3.25.28"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/mdast": "^4.0.4",
