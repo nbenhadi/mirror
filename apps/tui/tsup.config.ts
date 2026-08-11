@@ -11,5 +11,5 @@ export default defineConfig({
   clean: true,
   shims: true,
   noExternal: [/@nbenhadi\//],
-  external: ['argon2', 'pino', 'pino-pretty'],
+  external: ['argon2', 'pino', 'pino-pretty', 'playwright', 'playwright-core'],
 })

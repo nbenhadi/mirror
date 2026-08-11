@@ -40,9 +40,7 @@ function createGetCommand(): Command {
 
       const key = String(result.data.key ?? '')
       const value = String(result.data.value ?? '')
-      const keyW = Math.max('KEY'.length, key.length)
-      ui.tableHeader(['KEY', 'VALUE'], [keyW, 0])
-      ui.tableRow([key, value], [keyW, 0])
+      ui.table([t('key').toUpperCase(), t('value').toUpperCase()], [[key, value]])
       console.log()
     })
 }
@@ -88,15 +86,13 @@ function createResetCommand(): Command {
       const colKey = t('cmd.settings.reset.col.key')
       const colBefore = t('cmd.settings.reset.col.before')
       const colAfter = t('cmd.settings.reset.col.after')
-      const keyW = Math.max(colKey.length, ...changes.map((c) => c.key.length))
-      const beforeW = Math.max(colBefore.length, ...changes.map((c) => String(c.before).length))
 
-      ui.tableHeader([colKey, colBefore, colAfter], [keyW, beforeW, 0])
-      for (const c of changes) {
-        console.log(
-          `  ${c.key.padEnd(keyW)}  ${chalk.red(String(c.before).padEnd(beforeW))}  ${chalk.green(String(c.after))}`
-        )
-      }
+      const rows = changes.map((c) => [
+        c.key,
+        chalk.red(String(c.before)),
+        chalk.green(String(c.after)),
+      ])
+      ui.table([colKey, colBefore, colAfter], rows)
       console.log()
 
       const confirmed = await promptConfirm(t('cmd.settings.reset.confirm'))
@@ -119,11 +115,8 @@ function createListCommand(): Command {
     if (!result.success) fatalFromError(result.error)
 
     const entries = flattenSettings(result.data.settings)
-    const keyW = Math.max('KEY'.length, ...entries.map((e) => e.key.length))
-    ui.tableHeader(['KEY', 'VALUE'], [keyW, 0])
-    for (const e of entries) {
-      ui.tableRow([e.key, e.value], [keyW, 0])
-    }
+    const rows = entries.map((e) => [e.key, e.value])
+    ui.table([t('key').toUpperCase(), t('value').toUpperCase()], rows)
     console.log()
   })
 }

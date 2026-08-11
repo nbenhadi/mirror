@@ -34,6 +34,12 @@ export interface TextField extends BaseField {
   maxLength?: number
 }
 
+export interface PathField extends BaseField {
+  type: 'path'
+  default?: string
+  placeholder?: string
+}
+
 export interface TextArrayField extends BaseField {
   type: 'text-array'
   default?: string
@@ -52,5 +58,6 @@ export type FieldSpec =
   | ToggleField
   | NumberField
   | TextField
+  | PathField
   | TextArrayField
   | SelectField

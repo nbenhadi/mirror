@@ -1,5 +1,11 @@
 # @nbenhadi/mirror-tui
 
+## 1.5.0
+
+### Minor Changes
+
+- 023df41: Integrate markdown tool with export, preview, and theme editing in TUI
+
 ## 1.4.1
 
 ### Patch Changes

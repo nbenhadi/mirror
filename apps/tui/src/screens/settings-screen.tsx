@@ -162,15 +162,20 @@ export function SettingsScreen({ navigate }: { navigate: Navigate }) {
     clearError()
 
     if (phase.id === 'menu') {
-      const action = MENU_ACTIONS[phase.cursor]!
+      const action = MENU_ACTIONS[phase.cursor]
+      if (!action) return
       if (action === 'list') {
         const data = await run({ action: 'list' })
         if (data !== null)
           goTo({ id: 'list.result', data: (data as { settings: unknown }).settings })
       } else if (action === 'get') {
-        goTo({ id: 'get', key: FIELD_KEYS[0]!, result: null })
+        const firstKey = FIELD_KEYS[0]
+        if (!firstKey) return
+        goTo({ id: 'get', key: firstKey, result: null })
       } else if (action === 'set') {
-        goTo({ id: 'set', key: FIELD_KEYS[0]!, value: '', cursor: 0 })
+        const firstKey = FIELD_KEYS[0]
+        if (!firstKey) return
+        goTo({ id: 'set', key: firstKey, value: '', cursor: 0 })
       } else if (action === 'reset') {
         const data = await run({ action: 'list' })
         if (data !== null)

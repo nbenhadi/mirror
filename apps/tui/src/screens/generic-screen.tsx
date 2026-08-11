@@ -14,12 +14,13 @@ import { keybindings } from '../utils/keybindings.js'
 import { matchesCode } from '../utils/key-match.js'
 import { fieldKeyHints } from '../utils/field-key-hints.js'
 import {
-  getSubcommands,
+  getSubcommandsAt,
   getVariantSchema,
+  isLeafAction,
   schemaToFields,
   initialValues,
   unflattenValues,
-  type Subcommand,
+  type SubcommandNode,
 } from '../utils/schema-to-fields.js'
 import { capitalize } from '@nbenhadi/mirror-brand'
 import { pickString } from '../utils/result.js'
@@ -35,12 +36,15 @@ export interface GenericScreenProps {
   onSelect: (action: string) => void
   onBack: () => void
   onSuccess?: () => void
+  handleResult?: ((data: unknown) => boolean) | undefined
   renderResult?: ((result: unknown) => ReactNode) | undefined
   extraFields?: FieldSpec[] | undefined
   validateExtra?: ((values: FieldValues) => string | null) | undefined
+  fieldSuggestions?: Record<string, (value: string) => Promise<string[]>> | undefined
+  fieldVisible?: ((key: string, values: FieldValues) => boolean) | undefined
 }
 
-type Item = { kind: 'sub'; sub: Subcommand } | { kind: 'field'; field: FieldSpec }
+type Item = { kind: 'sub'; node: SubcommandNode } | { kind: 'field'; field: FieldSpec }
 
 export function GenericScreen({
   tool,
@@ -48,40 +52,60 @@ export function GenericScreen({
   onSelect,
   onBack,
   onSuccess,
+  handleResult,
   renderResult,
   extraFields,
   validateExtra,
+  fieldSuggestions,
+  fieldVisible,
 }: GenericScreenProps) {
-  const subcommands = useMemo(() => getSubcommands(tool.schema), [tool])
-  const variantSchema = useMemo(
-    () => (action ? getVariantSchema(tool.schema, action) : null),
+  const isLeaf = useMemo(
+    () => action !== undefined && isLeafAction(tool.schema, action),
     [tool, action]
+  )
+  const children = useMemo(
+    () => (isLeaf ? [] : getSubcommandsAt(tool.schema, action ?? '')),
+    [tool, action, isLeaf]
+  )
+  const variantSchema = useMemo(
+    () => (isLeaf && action ? getVariantSchema(tool.schema, action) : null),
+    [tool, action, isLeaf]
   )
   const { fields, constants } = useMemo(
     () => (variantSchema ? schemaToFields(variantSchema) : { fields: [], constants: {} }),
     [variantSchema]
   )
 
-  const items = useMemo<Item[]>(() => {
-    const base = action
-      ? fields.map((field) => ({ kind: 'field' as const, field }))
-      : subcommands.map((sub) => ({ kind: 'sub' as const, sub }))
-    const extra = extraFields?.map((f) => ({ kind: 'field' as const, field: f })) ?? []
-    return [...base, ...extra]
-  }, [action, fields, subcommands, extraFields])
-
   const makeInitialValues = () => ({
     ...initialValues(fields),
     ...initialValues(extraFields ?? []),
   })
 
+  const [values, setValues] = useState<FieldValues>(makeInitialValues)
+
+  const items = useMemo<Item[]>(() => {
+    const isVisible = (f: FieldSpec) => !fieldVisible || fieldVisible(f.key, values)
+    const base = isLeaf
+      ? fields.filter(isVisible).map((field) => ({ kind: 'field' as const, field }))
+      : children.map((node) => ({ kind: 'sub' as const, node }))
+    const extra = (extraFields ?? [])
+      .filter(isVisible)
+      .map((f) => ({ kind: 'field' as const, field: f }))
+    return [...base, ...extra]
+  }, [isLeaf, fields, children, extraFields, fieldVisible, values])
+
   const firstSelectable = items.findIndex((item) =>
     item.kind === 'sub' ? true : item.field.type !== 'group-header'
   )
   const [cursor, setCursor] = useState(Math.max(0, firstSelectable))
-  const [values, setValues] = useState<FieldValues>(makeInitialValues)
+
+  useEffect(() => {
+    if (cursor >= items.length) setCursor(Math.max(0, items.length - 1))
+  }, [items.length, cursor])
+
   const [result, setResult] = useState<unknown>(null)
   const [localError, setLocalError] = useState<string | null>(null)
+  const [fieldInfo, setFieldInfo] = useState<string | undefined>()
 
   const { run, loading, error: execError, clearError } = useExecute(tool.id)
   const { flash, notify } = useFlash()
@@ -89,11 +113,11 @@ export function GenericScreen({
 
   const currentItem = items[cursor]
   const focused = currentItem?.kind === 'field' ? currentItem.field : undefined
-  const editingText = focused?.type === 'text'
+  const editingText = focused?.type === 'text' || focused?.type === 'path'
 
   const subWidth = useMemo(
-    () => Math.max(0, ...subcommands.map((s) => s.action.length)),
-    [subcommands]
+    () => Math.max(0, ...children.map((node) => node.segment.length)),
+    [children]
   )
 
   const labelWidth = useMemo(
@@ -150,7 +174,9 @@ export function GenericScreen({
 
     const data = await run({ ...constants, ...unflattenValues(plainValues), ...arrayData })
     if (data !== null) {
-      if (onSuccess) {
+      if (handleResult?.(data)) {
+        // side effect handled navigation/rendering itself
+      } else if (onSuccess) {
         onSuccess()
       } else if (renderResult || shouldAutoRender(data)) {
         setResult(data)
@@ -162,7 +188,7 @@ export function GenericScreen({
 
   const autoExecuted = useRef(false)
   useEffect(() => {
-    if (action !== undefined && items.length === 0 && !autoExecuted.current) {
+    if (isLeaf && items.length === 0 && !autoExecuted.current) {
       autoExecuted.current = true
       void run({ ...constants }).then((data) => {
         if (data !== null) {
@@ -186,8 +212,8 @@ export function GenericScreen({
       return
     }
     if (matchesCode(input, key, keybindings.select.code)) {
-      if (action) void onSubmit()
-      else if (currentItem?.kind === 'sub') onSelect(currentItem.sub.action)
+      if (isLeaf) void onSubmit()
+      else if (currentItem?.kind === 'sub') onSelect(currentItem.node.path)
       return
     }
     if (focused?.type === 'toggle' && matchesCode(input, key, keybindings.toggle.code)) {
@@ -203,30 +229,35 @@ export function GenericScreen({
 
   const footerKeys: KeyHint[] = [
     { key: keybindings.navigate.label, label: t('tui.key.navigate') },
-    ...(focused ? fieldKeyHints(focused) : []),
-    { key: keybindings.select.label, label: action ? t('tui.key.submit') : t('tui.key.select') },
+    ...(focused ? fieldKeyHints(focused, Boolean(fieldSuggestions?.[focused.key])) : []),
+    { key: keybindings.select.label, label: isLeaf ? t('tui.key.submit') : t('tui.key.select') },
     { key: editingText ? 'esc' : `esc/${keybindings.back.label}`, label: t('tui.key.back') },
   ]
 
   const displayError = localError ?? execError
+  const footerInfo = fieldInfo ?? focused?.description
 
   return (
     <Box flexDirection="column">
-      <Header title={tool.id} subtitle={action} description={headerDescription} />
+      <Header
+        title={tool.id}
+        subtitle={action?.split('.').join(' › ')}
+        description={headerDescription}
+      />
 
       <Selector
         items={items}
         cursor={cursor}
         onCursorChange={setCursor}
         isSelectable={(item) => item.kind === 'sub' || item.field.type !== 'group-header'}
-        keyExtractor={(item) => (item.kind === 'sub' ? item.sub.action : item.field.key)}
+        keyExtractor={(item) => (item.kind === 'sub' ? item.node.path : item.field.key)}
         renderItem={(item, selected) => {
           if (item.kind === 'sub') {
-            const desc = t(`cmd.${tool.id}.${item.sub.action}.description` as TranslationKey)
+            const desc = t(`cmd.${tool.id}.${item.node.path}.description` as TranslationKey)
             return (
               <Box gap={3} paddingLeft={2}>
                 <Box minWidth={subWidth}>
-                  <Text {...(selected ? { color: colors.primary } : dim)}>{item.sub.action}</Text>
+                  <Text {...(selected ? { color: colors.primary } : dim)}>{item.node.segment}</Text>
                 </Box>
                 {desc && (
                   <Text {...(selected ? { color: colors.primary } : dim)}>{capitalize(desc)}</Text>
@@ -241,6 +272,10 @@ export function GenericScreen({
               onChange={(v) => onChange(item.field.key, v)}
               focus={selected}
               labelWidth={labelWidth}
+              onInfo={setFieldInfo}
+              {...(fieldSuggestions?.[item.field.key] && {
+                suggestOptions: fieldSuggestions[item.field.key],
+              })}
             />
           )
         }}
@@ -268,8 +303,8 @@ export function GenericScreen({
         <Footer
           keys={footerKeys}
           flash={flash}
-          {...(focused?.description && {
-            info: focused.description,
+          {...(footerInfo !== undefined && {
+            info: footerInfo,
             infoProps: { color: colors.info, italic: true },
           })}
         />

@@ -59,6 +59,36 @@ export function tableRow(cols: string[], widths: number[]): void {
   console.log(`  ${parts.join('  ')}`)
 }
 
+function printTableRow(cols: string[]): void {
+  console.log(`  ${cols.join('  ')}`)
+}
+
+function stripAnsiLength(str: string): number {
+  // eslint-disable-next-line no-control-regex
+  const ansiRegex = /\x1b\[[0-9;]*m/g
+  return str.replace(ansiRegex, '').length
+}
+
+export function table(headers: string[], rows: string[][], widths?: number[]): void {
+  const calculatedWidths =
+    widths ||
+    headers.map((h, i) => {
+      const maxInCol = Math.max(h.length, ...rows.map((r) => stripAnsiLength(r[i] || '')))
+      return maxInCol
+    })
+
+  tableHeader(headers, calculatedWidths)
+  rows.forEach((row) => {
+    const paddedRow = row.map((col, i) => {
+      const w = calculatedWidths[i] ?? 0
+      const currentLen = stripAnsiLength(col)
+      const padding = Math.max(0, w - currentLen)
+      return col + ' '.repeat(padding)
+    })
+    printTableRow(paddedRow)
+  })
+}
+
 export function strengthColor(score: number): (text: string) => string {
   if (score <= 1) return _danger
   if (score === 2) return _warning
