@@ -20,14 +20,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Sync main into staging
-        run: |
-          git checkout staging
-          git merge origin/main --no-edit
-          git push origin staging
-
-      - name: Sync staging into develop
+      - name: Sync main into develop
         run: |
           git checkout develop
-          git merge origin/staging --no-edit
+          git merge origin/main --no-edit
           git push origin develop
