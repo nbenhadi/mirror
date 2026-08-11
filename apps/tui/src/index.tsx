@@ -3,7 +3,6 @@ import { spawnSync } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
-import React from 'react'
 import { render } from 'ink'
 import { registry } from '@nbenhadi/mirror-core'
 import { setLocale, SUPPORTED_LOCALES, type Locale } from '@nbenhadi/mirror-i18n'
@@ -52,10 +51,12 @@ async function start() {
   const { passwordTool } = await import('@nbenhadi/mirror-password')
   const { vaultTool } = await import('@nbenhadi/mirror-vault')
   const { settingsTool } = await import('@nbenhadi/mirror-settings')
+  const { mdTool } = await import('@nbenhadi/mirror-md')
 
+  registry.register(settingsTool)
   registry.register(passwordTool)
   registry.register(vaultTool)
-  registry.register(settingsTool)
+  registry.register(mdTool)
 
   render(
     <TerminalSizeProvider>

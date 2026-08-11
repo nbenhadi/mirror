@@ -5,11 +5,13 @@ import { setLocale, SUPPORTED_LOCALES, t, type Locale } from '@nbenhadi/mirror-i
 import { passwordTool } from '@nbenhadi/mirror-password'
 import { vaultTool } from '@nbenhadi/mirror-vault'
 import { settingsTool } from '@nbenhadi/mirror-settings'
+import { mdTool } from '@nbenhadi/mirror-md'
 import { readConfigSync } from '@nbenhadi/mirror-config'
 import { installHelp } from './utils/help.js'
 import { createPasswordCommand } from './commands/password.js'
 import { createVaultCommand } from './commands/vault.js'
 import { createSettingsCommand } from './commands/settings.js'
+import { createMdCommand } from './commands/md.js'
 import pkg from '../package.json' with { type: 'json' }
 
 const { version } = pkg
@@ -22,6 +24,7 @@ if (lang && (SUPPORTED_LOCALES as readonly string[]).includes(lang)) {
 registry.register(passwordTool)
 registry.register(vaultTool)
 registry.register(settingsTool)
+registry.register(mdTool)
 
 const program = new Command()
   .name('mir')
@@ -33,6 +36,7 @@ const program = new Command()
 program.addCommand(createPasswordCommand())
 program.addCommand(createVaultCommand())
 program.addCommand(createSettingsCommand())
+program.addCommand(createMdCommand())
 
 installHelp(program)
 

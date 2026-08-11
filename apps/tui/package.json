@@ -1,6 +1,6 @@
 {
   "name": "@nbenhadi/mirror-tui",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "type": "module",
   "bin": {
     "mir": "./dist/index.js"
@@ -27,6 +27,7 @@
     "ink": "^5.0.0",
     "ink-text-input": "^6.0.0",
     "pino": "^9.0.0",
+    "playwright": "^1.62.1",
     "react": "^18.0.0"
   },
   "devDependencies": {
@@ -35,6 +36,7 @@
     "@nbenhadi/mirror-config": "workspace:*",
     "@nbenhadi/mirror-core": "workspace:*",
     "@nbenhadi/mirror-i18n": "workspace:*",
+    "@nbenhadi/mirror-md": "workspace:*",
     "@nbenhadi/mirror-password": "workspace:*",
     "@nbenhadi/mirror-settings": "workspace:*",
     "@nbenhadi/mirror-vault": "workspace:*",

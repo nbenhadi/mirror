@@ -32,6 +32,7 @@
     "@nbenhadi/mirror-config": "workspace:*",
     "@nbenhadi/mirror-core": "workspace:*",
     "@nbenhadi/mirror-i18n": "workspace:*",
+    "@nbenhadi/mirror-md": "workspace:*",
     "@nbenhadi/mirror-password": "workspace:*",
     "@nbenhadi/mirror-settings": "workspace:*",
     "@nbenhadi/mirror-vault": "workspace:*",
