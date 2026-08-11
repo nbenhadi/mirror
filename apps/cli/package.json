@@ -25,7 +25,8 @@
   "dependencies": {
     "argon2": "^0.43.0",
     "chalk": "^4.1.2",
-    "commander": "^13.1.0"
+    "commander": "^13.1.0",
+    "playwright": "^1.48.0"
   },
   "devDependencies": {
     "@nbenhadi/mirror-brand": "workspace:*",

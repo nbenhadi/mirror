@@ -86,6 +86,9 @@ importers:
       commander:
         specifier: ^13.1.0
         version: 13.1.0
+      playwright:
+        specifier: ^1.48.0
+        version: 1.62.1
     devDependencies:
       '@nbenhadi/mirror-brand':
         specifier: workspace:*
