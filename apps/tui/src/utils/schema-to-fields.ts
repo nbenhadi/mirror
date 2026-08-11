@@ -99,6 +99,24 @@ function textField(
     exactLen !== undefined ? `${exactLen} char${exactLen !== 1 ? 's' : ''}` : undefined
   const descKey = outerDesc ?? def.description
   const params = minCheck !== undefined ? { min: minCheck } : undefined
+  const description =
+    descKey !== undefined
+      ? t(descKey as TranslationKey, params)
+      : autoDesc !== undefined
+        ? autoDesc
+        : undefined
+
+  if (label === 'path' || label === 'output') {
+    return {
+      type: 'path',
+      key,
+      label,
+      default: typeof defaultValue === 'string' ? defaultValue : '',
+      ...(indent && { indent }),
+      ...(description !== undefined && { description }),
+    }
+  }
+
   return {
     type: 'text',
     key,
@@ -107,11 +125,7 @@ function textField(
     ...(indent && { indent }),
     ...(maxLength !== undefined && { maxLength }),
     ...(key.toLowerCase().includes('password') && { mask: true }),
-    ...(descKey !== undefined
-      ? { description: t(descKey as TranslationKey, params) }
-      : autoDesc !== undefined
-        ? { description: autoDesc }
-        : {}),
+    ...(description !== undefined && { description }),
   }
 }
 
@@ -152,7 +166,7 @@ function processShape(
 
       case 'ZodEnum': {
         const opts = (inner._def as { values?: string[] }).values ?? []
-        const def = typeof defaultValue === 'string' ? defaultValue : opts[0]
+        const def = typeof defaultValue === 'string' ? defaultValue : undefined
         fields.push({
           type: 'select',
           key,
@@ -242,6 +256,37 @@ export function getVariantSchema(schema: unknown, action: string): unknown {
   return getSubcommands(schema).find((s) => s.action === action)?.schema ?? schema
 }
 
+export function isLeafAction(schema: unknown, action: string): boolean {
+  return getSubcommands(schema).some((s) => s.action === action)
+}
+
+export interface SubcommandNode {
+  segment: string
+  path: string
+  isLeaf: boolean
+  schema?: unknown
+}
+
+export function getSubcommandsAt(schema: unknown, prefix: string): SubcommandNode[] {
+  const depth = prefix ? prefix.split('.').length : 0
+  const prefixParts = prefix ? prefix.split('.') : []
+
+  const nodes = new Map<string, SubcommandNode>()
+  for (const sub of getSubcommands(schema)) {
+    const parts = sub.action.split('.')
+    if (parts.length <= depth) continue
+    if (prefixParts.some((p, i) => p !== parts[i])) continue
+
+    const segment = parts[depth] as string
+    const path = parts.slice(0, depth + 1).join('.')
+    const isLeaf = path === sub.action
+    if (isLeaf || !nodes.has(path)) {
+      nodes.set(path, { segment, path, isLeaf, ...(isLeaf && { schema: sub.schema }) })
+    }
+  }
+  return Array.from(nodes.values())
+}
+
 export function schemaToFields(schema: unknown): SchemaFields {
   const fields: FieldSpec[] = []
   const constants: Record<string, unknown> = {}
@@ -260,7 +305,10 @@ export function initialValues(fields: FieldSpec[]): FieldValues {
   for (const field of fields) {
     if (field.type === 'group-header') continue
     values[field.key] =
-      field.type === 'text' || field.type === 'text-array' || field.type === 'select'
+      field.type === 'text' ||
+      field.type === 'path' ||
+      field.type === 'text-array' ||
+      field.type === 'select'
         ? (field.default ?? '')
         : field.default
   }

@@ -3,6 +3,8 @@ import { Box, Text, useInput } from 'ink'
 import TextInput from 'ink-text-input'
 import { colors, dim, symbols } from '../theme.js'
 import { FieldShell } from './field-shell.js'
+import { SuggestInput } from './suggest-input.js'
+import { completePath, formatPathEntry } from '../utils/path-complete.js'
 import { matchesCode } from '../utils/key-match.js'
 import { keybindings } from '../utils/keybindings.js'
 import type { FieldSpec, FieldValue } from '../types.js'
@@ -13,13 +15,23 @@ interface FieldProps {
   onChange: (value: FieldValue) => void
   focus: boolean
   labelWidth?: number
+  onInfo?: (text: string | undefined) => void
+  suggestOptions?: (value: string) => Promise<string[]>
 }
 
 const asBool = (v: FieldValue | undefined): boolean => (typeof v === 'boolean' ? v : false)
 const asNumber = (v: FieldValue | undefined): number => (typeof v === 'number' ? v : 0)
 const asString = (v: FieldValue | undefined): string => (typeof v === 'string' ? v : '')
 
-export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldProps) {
+export function Field({
+  spec,
+  value,
+  onChange,
+  focus,
+  labelWidth = 0,
+  onInfo,
+  suggestOptions,
+}: FieldProps) {
   const interactive = spec.type === 'toggle' || spec.type === 'number' || spec.type === 'select'
 
   useInput(
@@ -101,11 +113,42 @@ export function Field({ spec, value, onChange, focus, labelWidth = 0 }: FieldPro
     )
   }
 
+  if (spec.type === 'path') {
+    return (
+      <FieldShell label={label} focus={focus} labelWidth={labelWidth}>
+        <SuggestInput
+          value={asString(value)}
+          onChange={onChange}
+          focus={focus}
+          fetchSuggestions={completePath}
+          formatEntry={formatPathEntry}
+          {...(spec.placeholder !== undefined && { placeholder: spec.placeholder })}
+          {...(onInfo && { onListing: onInfo })}
+        />
+      </FieldShell>
+    )
+  }
+
   const maxLength = 'maxLength' in spec ? spec.maxLength : undefined
   const mask = spec.type === 'text' && spec.mask
   const placeholder = 'placeholder' in spec ? spec.placeholder : undefined
   const handleChange =
     maxLength !== undefined ? (v: string) => onChange(v.slice(0, maxLength)) : onChange
+
+  if (spec.type === 'text' && suggestOptions) {
+    return (
+      <FieldShell label={label} focus={focus} labelWidth={labelWidth}>
+        <SuggestInput
+          value={asString(value)}
+          onChange={handleChange}
+          focus={focus}
+          fetchSuggestions={suggestOptions}
+          {...(placeholder !== undefined && { placeholder })}
+          {...(onInfo && { onListing: onInfo })}
+        />
+      </FieldShell>
+    )
+  }
 
   return (
     <FieldShell label={label} focus={focus} labelWidth={labelWidth}>

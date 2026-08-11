@@ -18,8 +18,6 @@ const FONT_WEIGHT_REGULAR = '400'
 const FONT_WEIGHT_BOLD = '700'
 
 const PAGE_WIDTH = '595pt'
-const PAGE_PADDING_Y = '34pt'
-const PAGE_PADDING_X = '32pt'
 const COLUMN_GAP = '54pt'
 const SIDE_RATIO = '172 1 0px'
 const MAIN_RATIO = '305 1 0px'
@@ -55,7 +53,6 @@ body {
   color: ${TEXT_COLOR};
   max-width: ${PAGE_WIDTH};
   margin: 0 auto;
-  padding: ${PAGE_PADDING_Y} ${PAGE_PADDING_X};
 }
 
 .container {
@@ -245,4 +242,5 @@ hr {
   margin: 2em 0;
 }
   `,
+  margins: { x: 43, y: 45 },
 }
