@@ -1,5 +1,11 @@
 # @nbenhadi/mirror-cli
 
+## 1.6.0
+
+### Minor Changes
+
+- b4c5c5d: Add markdown tool command with export, import, preview, edit, and theme management
+
 ## 1.5.1
 
 ### Patch Changes
