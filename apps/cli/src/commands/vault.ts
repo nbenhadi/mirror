@@ -155,17 +155,8 @@ function createListCommand(): Command {
         return
       }
 
-      const titleW = Math.max(5, ...entries.map((e) => e.title.length))
-      const userW = Math.max(8, ...entries.map((e) => (e.username ?? '').length))
-      const urlW = Math.max(3, ...entries.map((e) => (e.url ?? '').length))
-
-      ui.tableHeader([t('title'), t('username'), t('url'), t('tags')], [titleW, userW, urlW, 0])
-      for (const e of entries) {
-        ui.tableRow(
-          [e.title, e.username ?? '', e.url ?? '', e.tags.join(', ')],
-          [titleW, userW, urlW, 0]
-        )
-      }
+      const rows = entries.map((e) => [e.title, e.username ?? '', e.url ?? '', e.tags.join(', ')])
+      ui.table([t('title'), t('username'), t('url'), t('tags')], rows)
       console.log()
       ui.hint(
         count === 1 ? t('cmd.vault.list.count_one') : t('cmd.vault.list.count_many', { n: count })
@@ -289,9 +280,8 @@ function createTrashCommand(): Command {
       return
     }
 
-    const titleW = Math.max(5, ...entries.map((e) => e.title.length))
-    ui.tableHeader([t('title'), t('deleted_at')], [titleW, 0])
-    for (const e of entries) ui.tableRow([e.title, e.deleted_at], [titleW, 0])
+    const rows = entries.map((e) => [e.title, e.deleted_at])
+    ui.table([t('title'), t('deleted_at')], rows)
     console.log()
     ui.hint(
       count === 1 ? t('cmd.vault.trash.count_one') : t('cmd.vault.trash.count_many', { n: count })

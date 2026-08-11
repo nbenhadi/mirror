@@ -99,6 +99,9 @@ importers:
       '@nbenhadi/mirror-i18n':
         specifier: workspace:*
         version: link:../../packages/i18n
+      '@nbenhadi/mirror-md':
+        specifier: workspace:*
+        version: link:../../packages/tools/md
       '@nbenhadi/mirror-password':
         specifier: workspace:*
         version: link:../../packages/tools/password

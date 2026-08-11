@@ -4,13 +4,13 @@ const PAGE_RANGE_PATTERN = /^\d+(-\d+)?(,\d+(-\d+)?)*$/
 
 export const editSchema = z.object({
   action: z.literal('edit'),
-  path: z.string().min(1).describe('cmd.md.edit.opt.path'),
+  path: z.string().min(1).endsWith('.md').describe('cmd.md.edit.opt.path'),
   port: z.number().int().min(0).max(65535).default(0).describe('cmd.md.edit.opt.port'),
 })
 
 export const exportSchema = z.object({
   action: z.literal('export'),
-  path: z.string().min(1).describe('cmd.md.export.opt.path'),
+  path: z.string().min(1).endsWith('.md').describe('cmd.md.export.opt.path'),
   output: z.string().optional().describe('cmd.md.export.opt.output'),
   format: z.enum(['pdf', 'html', 'png']).default('pdf').describe('cmd.md.export.opt.format'),
   theme: z.string().optional().describe('cmd.md.export.opt.theme'),
@@ -25,7 +25,7 @@ export const importSchema = z.object({
 
 export const previewSchema = z.object({
   action: z.literal('preview'),
-  path: z.string().min(1).describe('cmd.md.preview.opt.path'),
+  path: z.string().min(1).endsWith('.md').describe('cmd.md.preview.opt.path'),
   port: z.number().int().min(0).max(65535).default(0).describe('cmd.md.preview.opt.port'),
 })
 
