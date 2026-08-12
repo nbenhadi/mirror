@@ -7,6 +7,14 @@ import * as ui from '../utils/ui.js'
 import { openInBrowser } from '../utils/open-browser.js'
 import { spawnEditor } from '../utils/spawn-editor.js'
 
+function failFromError(error: {
+  code: string
+  message: string
+  params?: Record<string, string | number>
+}): never {
+  ui.fatal(t(error.message as Parameters<typeof t>[0], error.params))
+}
+
 function createExportCommand(): Command {
   return new Command('export')
     .description(t('cmd.md.export.description'))
@@ -40,8 +48,7 @@ function createExportCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       ui.printSuccess(t('cmd.md.export.success', { path: chalk.blue(result.data.path) }))
@@ -69,8 +76,7 @@ function createImportCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       ui.printSuccess(t('cmd.md.import.success', { path: chalk.blue(result.data.path) }))
@@ -100,8 +106,7 @@ function createPreviewCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       ui.printSuccess(t('cmd.md.preview.success', { url: chalk.cyan(result.data.url) }))
@@ -128,8 +133,7 @@ function createEditCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       await spawnEditor(result.data.path)
@@ -145,8 +149,7 @@ function createThemeListCommand(): Command {
     })
 
     if (!result.success) {
-      ui.printError(result.error.message)
-      return
+      failFromError(result.error)
     }
 
     const { themes } = result.data
@@ -185,8 +188,7 @@ function createThemeCreateCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       ui.printSuccess(t('cmd.md.theme.create.success'))
@@ -213,8 +215,7 @@ function createThemeEditCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       await spawnEditor(result.data.cssPath)
@@ -241,8 +242,7 @@ function createThemeDeleteCommand(): Command {
       })
 
       if (!result.success) {
-        ui.printError(result.error.message)
-        return
+        failFromError(result.error)
       }
 
       ui.printSuccess(t('cmd.md.theme.delete.success'))

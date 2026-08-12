@@ -268,6 +268,7 @@ export const en: Record<TranslationKey, string> = {
   'cmd.md.theme.delete.description': 'delete a custom theme',
   'cmd.md.theme.delete.opt.name': 'theme id',
   'cmd.md.export.success': 'exported to {path}',
+  'cmd.md.export.error.invalid_page_range': 'page range {pages} is out of bounds for this document',
   'cmd.md.import.success': 'imported to {path}',
   'cmd.md.preview.success': 'running at {url}',
   'cmd.md.edit.success': 'saved',

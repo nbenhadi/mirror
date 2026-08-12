@@ -272,6 +272,8 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.md.theme.delete.description': 'supprime un theme personnalise',
   'cmd.md.theme.delete.opt.name': 'id theme',
   'cmd.md.export.success': 'exporte vers {path}',
+  'cmd.md.export.error.invalid_page_range':
+    'la plage de pages {pages} est hors limites pour ce document',
   'cmd.md.import.success': 'importe vers {path}',
   'cmd.md.preview.success': 'en cours sur {url}',
   'cmd.md.edit.success': 'enregistre',

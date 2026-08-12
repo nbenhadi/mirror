@@ -10,5 +10,15 @@ export default defineConfig({
   splitting: false,
   clean: true,
   noExternal: [/@nbenhadi\//],
-  external: ['argon2', 'playwright', 'playwright-core', 'chromium-bidi', 'gray-matter'],
+  external: [
+    'argon2',
+    'pino',
+    'pino-pretty',
+    'playwright',
+    'playwright-core',
+    'chromium-bidi',
+    'gray-matter',
+    'pdfjs-dist',
+    'pdfjs-dist/*',
+  ],
 })

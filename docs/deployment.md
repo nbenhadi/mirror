@@ -29,6 +29,22 @@ Select the affected apps (`@nbenhadi/mirror-cli`, `@nbenhadi/mirror-tui`), choos
    - If pending changesets exist: creates a "Version Packages" PR that bumps versions and updates `CHANGELOG.md`.
    - If the "Version Packages" PR is merged: publishes both apps to GitHub Packages and creates GitHub Releases.
 
+### Writing changesets
+
+The changeset summary becomes a line in `CHANGELOG.md` and in the GitHub Release notes. Users read it with zero context from the PR or the conversation that produced it.
+
+- One changeset, one change. If a fix touches two unrelated things, write two changesets.
+- Describe the symptom or the benefit, never the implementation. No library names, file names, function names, or words like "bundler", "external", "try/catch".
+- Imperative, present tense, like a commit subject: `Fix X`, `Add Y`. No `Fixed X was...`, no paragraphs.
+- One short sentence.
+- Correct bump: `patch` for a bug fix that does not change the API, `minor` for a backward-compatible feature, `major` for a breaking change.
+- No PR or issue numbers in the text. Git already tracks that.
+- Must stand alone. Someone reading only `CHANGELOG.md` must understand it.
+
+Bad: `Fix TUI build crashing on gray-matter and mammoth dynamic requires by keeping them external`
+
+Good: `Fix md tool crashing when used from the published TUI binary`
+
 ### Sync
 
 After every merge to `main`, the `sync.yml` workflow automatically merges `main` into `develop`. No manual sync needed.
