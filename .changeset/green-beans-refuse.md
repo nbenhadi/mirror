@@ -2,4 +2,4 @@
 '@nbenhadi/mirror-tui': patch
 ---
 
-Fix TUI build to remove incompatible mirror-md dependency
+Fix md tool crashing when used from the published TUI binary
