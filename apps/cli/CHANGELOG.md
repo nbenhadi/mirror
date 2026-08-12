@@ -1,5 +1,13 @@
 # @nbenhadi/mirror-cli
 
+## 1.6.1
+
+### Patch Changes
+
+- 8ad9a79: Fix CLI crashing on install with "Cannot find module" errors
+- 8ad9a79: Fix md export failing with an unreadable error when the page range does not exist in the document
+- 8ad9a79: Fix md commands showing untranslated error messages on failure
+
 ## 1.6.0
 
 ### Minor Changes

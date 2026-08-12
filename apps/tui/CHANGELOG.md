@@ -1,5 +1,11 @@
 # @nbenhadi/mirror-tui
 
+## 1.5.2
+
+### Patch Changes
+
+- 40d69c5: Fix md tool crashing when used from the published TUI binary
+
 ## 1.5.1
 
 ### Patch Changes
