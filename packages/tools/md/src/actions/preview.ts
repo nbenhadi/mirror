@@ -2,6 +2,7 @@ import { access } from 'node:fs/promises'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { PreviewInput } from '../schema.js'
 import { startPreviewServer } from '../engine/preview.js'
+import { normalizePath } from '../engine/fs-paths.js'
 
 export interface PreviewResult {
   url: string
@@ -11,7 +12,7 @@ export async function preview(
   input: PreviewInput,
   _ctx: ToolContext
 ): Promise<ToolResult<PreviewResult>> {
-  const normalizedInput = { ...input, path: input.path.trim() }
+  const normalizedInput = normalizePath(input)
   try {
     await access(normalizedInput.path)
   } catch {

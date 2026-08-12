@@ -1,11 +1,11 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
-import { dirname, resolve, join, basename, extname } from 'node:path'
+import { dirname, extname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ImportInput } from '../schema.js'
 import { convertHtmlToMarkdown } from '../engine/import/from-html.js'
 import { convertDocxToMarkdown } from '../engine/import/from-docx.js'
 import { convertPdfToMarkdown } from '../engine/import/from-pdf.js'
-import { isDirectoryLike } from '../engine/fs-paths.js'
+import { resolveOutputPath, normalizePath } from '../engine/fs-paths.js'
 
 export interface ImportResult {
   path: string
@@ -24,25 +24,6 @@ function resolveConverter(input: ImportInput): Converter | undefined {
   return CONVERTER_BY_EXTENSION[extname(input.path).toLowerCase()]
 }
 
-function defaultOutputPath(sourcePath: string): string {
-  const dir = dirname(sourcePath)
-  const name = basename(sourcePath, extname(sourcePath))
-  return resolve(dir, `${name}.md`)
-}
-
-async function resolveOutputPath(input: ImportInput): Promise<string> {
-  if (!input.output) return defaultOutputPath(input.path)
-
-  const resolved = resolve(input.output)
-
-  if (await isDirectoryLike(input.output)) {
-    const name = basename(input.path, extname(input.path))
-    return join(resolved, `${name}.md`)
-  }
-
-  return resolved
-}
-
 function isNotFoundError(err: unknown): boolean {
   return err instanceof Error && 'code' in err && (err as NodeJS.ErrnoException).code === 'ENOENT'
 }
@@ -51,12 +32,16 @@ export async function importDocument(
   input: ImportInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ImportResult>> {
-  const normalizedInput = { ...input, path: input.path.trim() }
+  const normalizedInput = normalizePath(input)
   const converter = resolveConverter(normalizedInput)
   if (!converter) {
     return {
       success: false,
-      error: { code: 'VALIDATION_ERROR', message: 'cmd.md.error.unknown_format' },
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'cmd.md.import.error.unknown_format',
+        params: { path: normalizedInput.path },
+      },
     }
   }
 
@@ -76,11 +61,15 @@ export async function importDocument(
     }
     return {
       success: false,
-      error: { code: 'EXECUTION_ERROR', message: 'cmd.md.error.convert_failed' },
+      error: {
+        code: 'EXECUTION_ERROR',
+        message: 'cmd.md.import.error.convert_failed',
+        params: { path: normalizedInput.path },
+      },
     }
   }
 
-  const outputPath = await resolveOutputPath(normalizedInput)
+  const outputPath = await resolveOutputPath(normalizedInput.path, normalizedInput.output, '.md')
   await mkdir(dirname(outputPath), { recursive: true })
   await writeFile(outputPath, markdown, 'utf-8')
 
