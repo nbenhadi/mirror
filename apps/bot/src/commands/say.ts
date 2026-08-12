@@ -6,7 +6,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js'
-import type { ChatInputCommandInteraction, LocalizationMap } from 'discord.js'
+import type { ChatInputCommandInteraction } from 'discord.js'
 import type { Command } from '../types/command.js'
 import { cap, en, localize } from '../i18n.js'
 import { SAY_CONTENT_ID, SAY_MODAL_PREFIX } from '../lib/constants.js'
@@ -15,7 +15,7 @@ export const say: Command = {
   data: new SlashCommandBuilder()
     .setName('say')
     .setDescription(cap(en('bot.say.description')))
-    .setDescriptionLocalizations(localize('bot.say.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('bot.say.description'))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction: ChatInputCommandInteraction) {

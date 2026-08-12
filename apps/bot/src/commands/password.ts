@@ -1,6 +1,5 @@
 import { SlashCommandBuilder } from 'discord.js'
-import type { ChatInputCommandInteraction, LocalizationMap } from 'discord.js'
-import type { TranslationKey } from '@nbenhadi/mirror-i18n'
+import type { ChatInputCommandInteraction } from 'discord.js'
 import { execute } from '@nbenhadi/mirror-core'
 import { STRENGTH_KEYS, WARNING_KEYS } from '@nbenhadi/mirror-password'
 import type { CheckResult, PassphraseResult } from '@nbenhadi/mirror-password'
@@ -16,14 +15,12 @@ export const password: Command = {
   data: new SlashCommandBuilder()
     .setName('password')
     .setDescription(cap(en('cmd.password.description')))
-    .setDescriptionLocalizations(localize('cmd.password.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('cmd.password.description'))
     .addSubcommand((sub) =>
       sub
         .setName('generate')
         .setDescription(cap(en('cmd.password.generate.description')))
-        .setDescriptionLocalizations(
-          localize('cmd.password.generate.description') as LocalizationMap
-        )
+        .setDescriptionLocalizations(localize('cmd.password.generate.description'))
         .addIntegerOption((o) =>
           o
             .setName('length')
@@ -34,7 +31,7 @@ export const password: Command = {
               localize('cmd.password.generate.opt.length', {
                 min: MIN_LENGTH,
                 max: MAX_LENGTH,
-              }) as LocalizationMap
+              })
             )
             .setMinValue(MIN_LENGTH)
             .setMaxValue(MAX_LENGTH)
@@ -43,82 +40,62 @@ export const password: Command = {
           o
             .setName('uppercase')
             .setDescription(cap(en('cmd.password.generate.opt.no_uppercase')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.no_uppercase') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.no_uppercase'))
         )
         .addBooleanOption((o) =>
           o
             .setName('numbers')
             .setDescription(cap(en('cmd.password.generate.opt.no_numbers')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.no_numbers') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.no_numbers'))
         )
         .addBooleanOption((o) =>
           o
             .setName('symbols')
             .setDescription(cap(en('cmd.password.generate.opt.symbols')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.symbols') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.symbols'))
         )
         .addBooleanOption((o) =>
           o
             .setName('exclude_ambiguous')
             .setDescription(cap(en('cmd.password.generate.opt.exclude_ambiguous')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.exclude_ambiguous') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.exclude_ambiguous'))
         )
         .addBooleanOption((o) =>
           o
             .setName('require_each')
             .setDescription(cap(en('cmd.password.generate.opt.require_each')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.require_each') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.require_each'))
         )
         .addBooleanOption((o) =>
           o
             .setName('no_repeat')
             .setDescription(cap(en('cmd.password.generate.opt.no_repeat')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.no_repeat') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.no_repeat'))
         )
         .addStringOption((o) =>
           o
             .setName('exclude')
             .setDescription(cap(en('cmd.password.generate.opt.exclude')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.exclude') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.exclude'))
         )
         .addStringOption((o) =>
           o
             .setName('include')
             .setDescription(cap(en('cmd.password.generate.opt.include')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.include') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.include'))
         )
         .addStringOption((o) =>
           o
             .setName('separator')
             .setDescription(cap(en('cmd.password.generate.opt.separator')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.separator') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.separator'))
             .setMaxLength(1)
         )
         .addIntegerOption((o) =>
           o
             .setName('every')
             .setDescription(cap(en('cmd.password.generate.opt.every')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.every') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.every'))
             .setMinValue(1)
             .setMaxValue(128)
         )
@@ -126,31 +103,25 @@ export const password: Command = {
           o
             .setName('prefix')
             .setDescription(cap(en('cmd.password.generate.opt.prefix')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.prefix') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.prefix'))
         )
         .addStringOption((o) =>
           o
             .setName('suffix')
             .setDescription(cap(en('cmd.password.generate.opt.suffix')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.generate.opt.suffix') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.generate.opt.suffix'))
         )
     )
     .addSubcommand((sub) =>
       sub
         .setName('check')
         .setDescription(cap(en('cmd.password.check.description')))
-        .setDescriptionLocalizations(localize('cmd.password.check.description') as LocalizationMap)
+        .setDescriptionLocalizations(localize('cmd.password.check.description'))
         .addStringOption((o) =>
           o
             .setName('password')
             .setDescription(cap(en('cmd.password.check.opt.password')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.check.opt.password') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.check.opt.password'))
             .setRequired(true)
         )
     )
@@ -158,9 +129,7 @@ export const password: Command = {
       sub
         .setName('passphrase')
         .setDescription(cap(en('cmd.password.passphrase.description')))
-        .setDescriptionLocalizations(
-          localize('cmd.password.passphrase.description') as LocalizationMap
-        )
+        .setDescriptionLocalizations(localize('cmd.password.passphrase.description'))
         .addIntegerOption((o) =>
           o
             .setName('words')
@@ -171,7 +140,7 @@ export const password: Command = {
               localize('cmd.password.passphrase.opt.words', {
                 min: MIN_WORDS,
                 max: MAX_WORDS,
-              }) as LocalizationMap
+              })
             )
             .setMinValue(MIN_WORDS)
             .setMaxValue(MAX_WORDS)
@@ -180,25 +149,19 @@ export const password: Command = {
           o
             .setName('separator')
             .setDescription(cap(en('cmd.password.passphrase.opt.separator')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.passphrase.opt.separator') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.passphrase.opt.separator'))
         )
         .addBooleanOption((o) =>
           o
             .setName('capitalize')
             .setDescription(cap(en('cmd.password.passphrase.opt.capitalize')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.passphrase.opt.capitalize') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.passphrase.opt.capitalize'))
         )
         .addBooleanOption((o) =>
           o
             .setName('number')
             .setDescription(cap(en('cmd.password.passphrase.opt.number')))
-            .setDescriptionLocalizations(
-              localize('cmd.password.passphrase.opt.number') as LocalizationMap
-            )
+            .setDescriptionLocalizations(localize('cmd.password.passphrase.opt.number'))
         )
     ),
 
@@ -237,7 +200,7 @@ export const password: Command = {
 
       if (!result.success) {
         await interaction.reply({
-          content: cap(t(result.error.message as TranslationKey, result.error.params)),
+          content: cap(t(result.error.message, result.error.params)),
           ephemeral: true,
         })
         return
@@ -258,7 +221,7 @@ export const password: Command = {
 
       if (!result.success) {
         await interaction.reply({
-          content: cap(t(result.error.message as TranslationKey, result.error.params)),
+          content: cap(t(result.error.message, result.error.params)),
           ephemeral: true,
         })
         return
@@ -299,7 +262,7 @@ export const password: Command = {
 
       if (!result.success) {
         await interaction.reply({
-          content: cap(t(result.error.message as TranslationKey, result.error.params)),
+          content: cap(t(result.error.message, result.error.params)),
           ephemeral: true,
         })
         return

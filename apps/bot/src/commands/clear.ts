@@ -3,7 +3,6 @@ import type {
   ChatInputCommandInteraction,
   Collection,
   GuildTextBasedChannel,
-  LocalizationMap,
   Message,
 } from 'discord.js'
 import type { Command } from '../types/command.js'
@@ -15,20 +14,20 @@ export const clear: Command = {
   data: new SlashCommandBuilder()
     .setName('clear')
     .setDescription(cap(en('bot.clear.description')))
-    .setDescriptionLocalizations(localize('bot.clear.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('bot.clear.description'))
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
     .addIntegerOption((o) =>
       o
         .setName('amount')
         .setDescription(cap(en('bot.clear.opt.amount')))
-        .setDescriptionLocalizations(localize('bot.clear.opt.amount') as LocalizationMap)
+        .setDescriptionLocalizations(localize('bot.clear.opt.amount'))
         .setMinValue(1)
     )
     .addUserOption((o) =>
       o
         .setName('user')
         .setDescription(cap(en('bot.clear.opt.user')))
-        .setDescriptionLocalizations(localize('bot.clear.opt.user') as LocalizationMap)
+        .setDescriptionLocalizations(localize('bot.clear.opt.user'))
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {

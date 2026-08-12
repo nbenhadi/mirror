@@ -6,7 +6,7 @@ import {
   PermissionFlagsBits,
   SlashCommandBuilder,
 } from 'discord.js'
-import type { ChatInputCommandInteraction, LocalizationMap } from 'discord.js'
+import type { ChatInputCommandInteraction } from 'discord.js'
 import { botEnv } from '@nbenhadi/mirror-config/bot-env'
 import type { Command } from '../types/command.js'
 import { cap, en, getT, localize } from '../i18n.js'
@@ -16,7 +16,7 @@ export const welcome: Command = {
   data: new SlashCommandBuilder()
     .setName('welcome')
     .setDescription(cap(en('bot.welcome.cmd.description')))
-    .setDescriptionLocalizations(localize('bot.welcome.cmd.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('bot.welcome.cmd.description'))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction: ChatInputCommandInteraction) {
