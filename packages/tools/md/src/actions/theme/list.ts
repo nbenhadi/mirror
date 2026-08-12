@@ -8,9 +8,9 @@ export interface ThemeListResult {
 }
 
 export async function themeList(
-  _input: ThemeListInput,
+  input: ThemeListInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeListResult>> {
-  const themes = await listThemes()
+  const themes = await listThemes(input.kind)
   return { success: true, data: { themes, count: themes.length } }
 }

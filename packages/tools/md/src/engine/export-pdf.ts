@@ -2,7 +2,7 @@ import { writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { randomUUID } from 'node:crypto'
-import { chromium } from 'playwright'
+import { chromium, type Page } from 'playwright'
 import type { Margins } from '../themes/types.js'
 
 export interface ExportOptions {
@@ -21,6 +21,47 @@ export function isPageRangeError(err: unknown): boolean {
   return err instanceof Error && PAGE_RANGE_ERROR_PATTERN.test(err.message)
 }
 
+async function loadHtml(page: Page, html: string, baseDir?: string): Promise<void> {
+  if (!baseDir) {
+    await page.setContent(html, { waitUntil: 'networkidle' })
+    return
+  }
+
+  const tempHtmlPath = join(baseDir, `.mirror-render-${randomUUID()}.html`)
+  await writeFile(tempHtmlPath, html, 'utf-8')
+  try {
+    await page.goto(pathToFileURL(tempHtmlPath).href, { waitUntil: 'networkidle' })
+  } finally {
+    await rm(tempHtmlPath, { force: true })
+  }
+}
+
+export interface SlidesExportOptions {
+  format: 'pdf' | 'html'
+  outputPath: string
+  baseDir?: string
+}
+
+export async function exportSlides(html: string, options: SlidesExportOptions): Promise<void> {
+  if (options.format === 'html') {
+    await writeFile(options.outputPath, html, 'utf-8')
+    return
+  }
+
+  const browser = await chromium.launch()
+  try {
+    const page = await browser.newPage()
+    await loadHtml(page, html, options.baseDir)
+    await page.pdf({
+      path: options.outputPath,
+      printBackground: true,
+      preferCSSPageSize: true,
+    })
+  } finally {
+    await browser.close()
+  }
+}
+
 export async function exportDocument(html: string, options: ExportOptions): Promise<void> {
   if (options.format === 'html') {
     await writeFile(options.outputPath, html, 'utf-8')
@@ -31,17 +72,7 @@ export async function exportDocument(html: string, options: ExportOptions): Prom
   try {
     const page = await browser.newPage()
 
-    if (options.baseDir) {
-      const tempHtmlPath = join(options.baseDir, `.mirror-render-${randomUUID()}.html`)
-      await writeFile(tempHtmlPath, html, 'utf-8')
-      try {
-        await page.goto(pathToFileURL(tempHtmlPath).href, { waitUntil: 'networkidle' })
-      } finally {
-        await rm(tempHtmlPath, { force: true })
-      }
-    } else {
-      await page.setContent(html, { waitUntil: 'networkidle' })
-    }
+    await loadHtml(page, html, options.baseDir)
 
     if (options.format === 'pdf') {
       const hasHeaderFooter = options.header !== undefined || options.footer !== undefined

@@ -11,7 +11,7 @@ export async function themeCreate(
   input: ThemeCreateInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeCreateResult>> {
-  const created = await createTheme(input.name, input.description ?? '')
+  const created = await createTheme(input.kind, input.name, input.description ?? '')
   if (!created) {
     return {
       success: false,

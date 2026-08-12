@@ -20,5 +20,6 @@ export default defineConfig({
     'gray-matter',
     'pdfjs-dist',
     'pdfjs-dist/*',
+    '@marp-team/marp-core',
   ],
 })

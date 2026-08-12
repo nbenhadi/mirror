@@ -57,7 +57,7 @@ function createInitCommand(): Command {
 
 function createUnlockCommand(): Command {
   return new Command('unlock [minutes]')
-    .description(t('cmd.vault.unlock.description', { minutes: 30 }))
+    .description(t('cmd.vault.unlock.description'))
     .action(async (minutes?: string) => {
       const masterPassword = await promptPassword(t('prompt.master_password'))
       const result = await execute({

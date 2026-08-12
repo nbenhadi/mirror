@@ -2,7 +2,7 @@ import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { EditInput } from '../schema.js'
-import { startPreviewServer } from '../engine/preview.js'
+import { startPreviewServerSafe } from '../engine/preview.js'
 import { isDirectoryLike } from '../engine/fs-paths.js'
 
 export interface EditResult {
@@ -37,6 +37,7 @@ export async function edit(input: EditInput, _ctx: ToolContext): Promise<ToolRes
     await writeFile(path, NEW_DOCUMENT_TEMPLATE, 'utf-8')
   }
 
-  const server = await startPreviewServer(path, input.port)
-  return { success: true, data: { path, url: server.url, created } }
+  const started = await startPreviewServerSafe(path, input.port)
+  if (!started.success) return started
+  return { success: true, data: { path, url: started.server.url, created } }
 }

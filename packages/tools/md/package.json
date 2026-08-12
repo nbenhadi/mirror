@@ -24,6 +24,7 @@
     "@nbenhadi/mirror-config": "workspace:*",
     "@nbenhadi/mirror-core": "workspace:*",
     "@nbenhadi/mirror-i18n": "workspace:*",
+    "@marp-team/marp-core": "^4.1.1",
     "chokidar": "^5.0.0",
     "gray-matter": "^4.0.3",
     "mammoth": "^1.12.0",

@@ -8,6 +8,10 @@ import rehypeStringify from 'rehype-stringify'
 import { directivesToHast } from './directives.js'
 import type { Root } from 'mdast'
 
+export function isInvalidFrontMatterError(err: unknown): err is Error {
+  return err instanceof Error && err.name === 'YAMLException'
+}
+
 export type PluginEntry = string | ({ id: string } & Record<string, unknown>)
 
 export type HeaderFooterItem = string | { text: string } | { image: string }

@@ -2,7 +2,14 @@ import { createServer, type Server, type IncomingMessage, type ServerResponse } 
 import { readFile } from 'node:fs/promises'
 import { dirname, extname, resolve } from 'node:path'
 import { watch, type FSWatcher } from 'chokidar'
+import type { ToolError } from '@nbenhadi/mirror-core'
 import { preparePipeline, renderHtml } from './pipeline.js'
+
+export function isListenError(err: unknown): err is NodeJS.ErrnoException {
+  if (!(err instanceof Error) || !('code' in err)) return false
+  const code = (err as NodeJS.ErrnoException).code
+  return code === 'EACCES' || code === 'EADDRINUSE'
+}
 
 const EVENTS_PATH = '/__md-preview-events'
 const RELOAD_SNIPPET = `<script>new EventSource('${EVENTS_PATH}').onmessage=()=>location.reload()</script>`
@@ -123,5 +130,27 @@ export async function startPreviewServer(sourcePath: string, port: number): Prom
         server.close((err) => (err ? rejectClose(err) : resolveClose()))
       })
     },
+  }
+}
+
+export async function startPreviewServerSafe(
+  sourcePath: string,
+  port: number
+): Promise<{ success: true; server: PreviewServer } | { success: false; error: ToolError }> {
+  try {
+    const server = await startPreviewServer(sourcePath, port)
+    return { success: true, server }
+  } catch (err) {
+    if (isListenError(err)) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'cmd.md.error.invalid_port',
+          params: { port },
+        },
+      }
+    }
+    throw err
   }
 }

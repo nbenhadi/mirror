@@ -4,6 +4,7 @@ import { exportMarkdown } from './actions/export.js'
 import { preview } from './actions/preview.js'
 import { importDocument } from './actions/import.js'
 import { edit } from './actions/edit.js'
+import { slides } from './actions/slides.js'
 import { themeCreate } from './actions/theme/create.js'
 import { themeList } from './actions/theme/list.js'
 import { themeEdit } from './actions/theme/edit.js'
@@ -19,6 +20,8 @@ export async function execute(input: MdInput, ctx: ToolContext): Promise<ToolRes
       return importDocument(input, ctx)
     case 'edit':
       return edit(input, ctx)
+    case 'slides':
+      return slides(input, ctx)
     case 'theme.create':
       return themeCreate(input, ctx)
     case 'theme.list':

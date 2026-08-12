@@ -1,11 +1,12 @@
-import { readFile, mkdir } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ExportInput } from '../schema.js'
 import { preparePipeline, renderHtml, type PreparedPipeline } from '../engine/pipeline.js'
 import { exportDocument, isPageRangeError } from '../engine/export-pdf.js'
 import { isInvalidPluginError } from '../plugins/registry.js'
-import { resolveOutputPath, normalizePath } from '../engine/fs-paths.js'
+import { isInvalidFrontMatterError } from '../engine/parse.js'
+import { resolveOutputPath, normalizePath, readSourceFile } from '../engine/fs-paths.js'
 import { buildHeaderFooterTemplate, type HeaderFooterStyle } from '../engine/header-footer.js'
 import { resolveThemeMargins } from '../engine/themes.js'
 import { resolvePaperColor, resolveAccentTokens, FONT_SANS } from '../themes/default.js'
@@ -27,19 +28,9 @@ export async function exportMarkdown(
   _ctx: ToolContext
 ): Promise<ToolResult<ExportResult>> {
   const normalizedInput = normalizePath(input)
-  let source: string
-  try {
-    source = await readFile(normalizedInput.path, 'utf-8')
-  } catch {
-    return {
-      success: false,
-      error: {
-        code: 'NOT_FOUND',
-        message: 'error.not_found',
-        params: { path: normalizedInput.path },
-      },
-    }
-  }
+  const read = await readSourceFile(normalizedInput.path)
+  if (!read.success) return read
+  const source = read.content
 
   let prepared: PreparedPipeline
   try {
@@ -52,6 +43,16 @@ export async function exportMarkdown(
           code: 'VALIDATION_ERROR',
           message: 'cmd.md.export.error.invalid_plugin',
           params: { plugin: err.message.replace('invalid md plugin: ', '') },
+        },
+      }
+    }
+    if (isInvalidFrontMatterError(err)) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'cmd.md.error.invalid_frontmatter',
+          params: { path: normalizedInput.path },
         },
       }
     }

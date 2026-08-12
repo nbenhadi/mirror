@@ -23,6 +23,7 @@
     "lint:types": "tsc --noEmit"
   },
   "dependencies": {
+    "@marp-team/marp-core": "^4.1.1",
     "argon2": "^0.43.0",
     "chalk": "^4.1.2",
     "commander": "^13.1.0",
