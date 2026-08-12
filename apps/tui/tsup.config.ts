@@ -11,5 +11,15 @@ export default defineConfig({
   clean: true,
   shims: true,
   noExternal: [/@nbenhadi\//],
-  external: ['argon2', 'pino', 'pino-pretty', 'playwright', 'playwright-core'],
+  external: [
+    'argon2',
+    'pino',
+    'pino-pretty',
+    'playwright',
+    'playwright-core',
+    'gray-matter',
+    'mammoth',
+    'pdfjs-dist',
+    'pdfjs-dist/*',
+  ],
 })
