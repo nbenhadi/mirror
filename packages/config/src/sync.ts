@@ -11,7 +11,7 @@ export function readConfigSync(): AppConfig {
       const parsed = configSchema.safeParse(raw)
       return parsed.success ? parsed.data : (raw as AppConfig)
     } catch {
-      // nothing
+      // corrupt config file must not crash startup, fall back to defaults below
     }
   }
 

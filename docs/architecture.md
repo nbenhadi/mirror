@@ -58,7 +58,7 @@ Tools never throw. Every tool returns either `{ success: true, data }` or `{ suc
 
 ## Packages
 
-```
+```text
 packages/
   core/           Tool registry and execute() engine
   errors/         Shared typed error classes
@@ -70,6 +70,7 @@ packages/
     password/     Password generator, strength checker, passphrase
     vault/        Encrypted local credential store
     settings/     App config read/write via tool interface
+    md/           Markdown editing, export to PDF/HTML/PNG, import, themes
 ```
 
 ## Tool contract

@@ -61,10 +61,10 @@ Starts local HTTP server to preview markdown with live reload.
 
 #### Input
 
-| Field  | Type     | Default | Description      |
-| ------ | -------- | ------- | ---------------- |
-| `path` | `string` | -       | Path to .md file |
-| `port` | `number` | `3000`  | HTTP server port |
+| Field  | Type     | Default | Description                              |
+| ------ | -------- | ------- | ---------------------------------------- |
+| `path` | `string` | -       | Path to .md file                         |
+| `port` | `number` | `0`     | HTTP server port (`0` picks a free port) |
 
 #### Output
 
@@ -79,19 +79,22 @@ Starts local HTTP server to preview markdown with live reload.
 
 ### edit
 
-Opens markdown document in the system default editor.
+Opens markdown document in the system default editor, with a live preview server running alongside.
 
 #### Input
 
-| Field  | Type     | Description                                    |
-| ------ | -------- | ---------------------------------------------- |
-| `path` | `string` | Path to .md file (creates new file if missing) |
+| Field  | Type     | Default | Description                                    |
+| ------ | -------- | ------- | ---------------------------------------------- |
+| `path` | `string` | -       | Path to .md file (creates new file if missing) |
+| `port` | `number` | `0`     | Preview server port (`0` picks a free port)    |
 
 #### Output
 
-| Field  | Type     | Description         |
-| ------ | -------- | ------------------- |
-| `path` | `string` | Path to edited file |
+| Field     | Type      | Description                             |
+| --------- | --------- | --------------------------------------- |
+| `path`    | `string`  | Path to edited file                     |
+| `url`     | `string`  | Preview URL for the same document       |
+| `created` | `boolean` | `true` if the file did not exist before |
 
 ### theme.list
 
@@ -187,7 +190,7 @@ Syntax levels:
 
 To use a directive, the theme must define its CSS class. Example:
 
-```
+```markdown
 :::justify
 Justified paragraph text here.
 :::
