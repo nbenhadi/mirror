@@ -10,7 +10,7 @@ export async function themeDelete(
   input: ThemeDeleteInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeDeleteResult>> {
-  const deleted = await deleteTheme(input.name)
+  const deleted = await deleteTheme(input.kind, input.name)
   if (!deleted) {
     return {
       success: false,

@@ -11,7 +11,7 @@ export async function themeEdit(
   input: ThemeEditInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeEditResult>> {
-  const cssPath = await editableThemeCssPath(input.name)
+  const cssPath = await editableThemeCssPath(input.kind, input.name)
   if (!cssPath) {
     return {
       success: false,

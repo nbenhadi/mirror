@@ -27,8 +27,11 @@ afterEach(async () => {
 
 describe('themeDelete action', () => {
   it('deletes an existing user theme', async () => {
-    await themeCreate({ action: 'theme.create', name: 'sidebar' }, ctx)
-    const result = await themeDelete({ action: 'theme.delete', name: 'sidebar' }, ctx)
+    await themeCreate({ action: 'theme.create', name: 'sidebar', kind: 'document' }, ctx)
+    const result = await themeDelete(
+      { action: 'theme.delete', name: 'sidebar', kind: 'document' },
+      ctx
+    )
     expect(result.success).toBe(true)
 
     const themes = await listThemes()
@@ -36,13 +39,19 @@ describe('themeDelete action', () => {
   })
 
   it('fails for a theme that does not exist', async () => {
-    const result = await themeDelete({ action: 'theme.delete', name: 'does-not-exist' }, ctx)
+    const result = await themeDelete(
+      { action: 'theme.delete', name: 'does-not-exist', kind: 'document' },
+      ctx
+    )
     expect(result.success).toBe(false)
     if (!result.success) expect(result.error.code).toBe('NOT_FOUND')
   })
 
   it('refuses to delete a bundled theme', async () => {
-    const result = await themeDelete({ action: 'theme.delete', name: 'default' }, ctx)
+    const result = await themeDelete(
+      { action: 'theme.delete', name: 'default', kind: 'document' },
+      ctx
+    )
     expect(result.success).toBe(false)
   })
 })

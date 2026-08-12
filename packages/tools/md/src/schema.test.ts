@@ -83,4 +83,44 @@ describe('schema validation', () => {
     const r = schema.safeParse({ action: 'theme.list' })
     expect(r.success).toBe(true)
   })
+
+  it('defaults theme.list kind to document', () => {
+    const r = schema.safeParse({ action: 'theme.list' })
+    expect(r.success).toBe(true)
+    if (r.success && r.data.action === 'theme.list') {
+      expect(r.data.kind).toBe('document')
+    }
+  })
+
+  it('accepts theme.create with an explicit slide kind', () => {
+    const r = schema.safeParse({ action: 'theme.create', name: 'gaia-custom', kind: 'slide' })
+    expect(r.success).toBe(true)
+    if (r.success && r.data.action === 'theme.create') {
+      expect(r.data.kind).toBe('slide')
+    }
+  })
+
+  it('rejects an invalid theme kind', () => {
+    const r = schema.safeParse({ action: 'theme.create', name: 'x', kind: 'presentation' })
+    expect(r.success).toBe(false)
+  })
+
+  it('accepts slides with only path and defaults format to pdf', () => {
+    const r = schema.safeParse({ action: 'slides', path: 'deck.md' })
+    expect(r.success).toBe(true)
+    if (r.success && r.data.action === 'slides') {
+      expect(r.data.format).toBe('pdf')
+      expect(r.data.theme).toBeUndefined()
+    }
+  })
+
+  it('rejects slides without path', () => {
+    const r = schema.safeParse({ action: 'slides' })
+    expect(r.success).toBe(false)
+  })
+
+  it('rejects an invalid slides format', () => {
+    const r = schema.safeParse({ action: 'slides', path: 'deck.md', format: 'png' })
+    expect(r.success).toBe(false)
+  })
 })

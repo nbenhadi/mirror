@@ -46,7 +46,7 @@ export async function renderHtml(
     if (plugin.transformHtml) bodyHtml = await plugin.transformHtml(bodyHtml, renderContext)
   }
 
-  const themeCss = await resolveThemeCss(renderContext.frontMatter.theme ?? 'default')
+  const themeCss = await resolveThemeCss('document', renderContext.frontMatter.theme ?? 'default')
   const margins = await resolveThemeMargins(renderContext.frontMatter.theme ?? 'default')
 
   return buildHtmlDocument(
