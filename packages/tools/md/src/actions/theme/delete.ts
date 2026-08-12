@@ -16,7 +16,7 @@ export async function themeDelete(
       success: false,
       error: {
         code: 'NOT_FOUND',
-        message: 'cmd.md.error.theme_not_found',
+        message: 'cmd.md.theme.error.not_found',
         params: { name: input.name },
       },
     }

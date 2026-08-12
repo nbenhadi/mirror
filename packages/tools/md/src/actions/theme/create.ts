@@ -17,7 +17,7 @@ export async function themeCreate(
       success: false,
       error: {
         code: 'EXECUTION_ERROR',
-        message: 'cmd.md.error.theme_exists',
+        message: 'cmd.md.theme.create.error.exists',
         params: { name: input.name },
       },
     }

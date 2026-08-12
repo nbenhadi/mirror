@@ -233,6 +233,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@nbenhadi/mirror-i18n':
+        specifier: workspace:*
+        version: link:../i18n
       '@nbenhadi/mirror-logger':
         specifier: workspace:*
         version: link:../logger

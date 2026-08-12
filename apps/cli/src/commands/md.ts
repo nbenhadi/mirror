@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { execute } from '@nbenhadi/mirror-core'
+import { execute, type ToolError } from '@nbenhadi/mirror-core'
 import { t } from '@nbenhadi/mirror-i18n'
 import { MD_TOOL_ID, type ThemeListResult } from '@nbenhadi/mirror-md'
 import chalk from 'chalk'
@@ -7,12 +7,8 @@ import * as ui from '../utils/ui.js'
 import { openInBrowser } from '../utils/open-browser.js'
 import { spawnEditor } from '../utils/spawn-editor.js'
 
-function failFromError(error: {
-  code: string
-  message: string
-  params?: Record<string, string | number>
-}): never {
-  ui.fatal(t(error.message as Parameters<typeof t>[0], error.params))
+function failFromError(error: ToolError): never {
+  ui.fatal(t(error.message, error.params))
 }
 
 function createExportCommand(): Command {
@@ -29,18 +25,12 @@ function createExportCommand(): Command {
         return
       }
 
-      const format = (options.format || 'pdf').toLowerCase()
-      if (!['pdf', 'html', 'png'].includes(format)) {
-        ui.fatal(t('error.validation'))
-        return
-      }
-
       const result = await execute<{ path: string }>({
         toolId: MD_TOOL_ID,
         input: {
           action: 'export',
           path: options.path.trim(),
-          format: format as 'pdf' | 'html' | 'png',
+          format: (options.format || 'pdf').toLowerCase(),
           ...(options.output && { output: options.output.trim() }),
           ...(options.theme && { theme: options.theme }),
           ...(options.pages && { pages: options.pages }),
