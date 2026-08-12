@@ -24,9 +24,11 @@ export function Table({ columns, rows, selectedIndex }: TableProps) {
     <Box flexDirection="column">
       <Box gap={GAP}>
         {columns.map((col, i) => (
-          <Text key={col.key} {...dim}>
-            {col.label.toUpperCase().padEnd(colWidths[i] ?? col.label.length)}
-          </Text>
+          <Box key={col.key} width={colWidths[i]}>
+            <Text {...dim} wrap="truncate-end">
+              {col.label.toUpperCase()}
+            </Text>
+          </Box>
         ))}
       </Box>
       {rows.map((row, rowIdx) => {
@@ -36,20 +38,17 @@ export function Table({ columns, rows, selectedIndex }: TableProps) {
             {columns.map((col, colIdx) => {
               const raw = row[col.key] ?? ''
               const colW = colWidths[colIdx] ?? 10
+              const isEmpty = raw === ''
 
-              if (raw === '') {
-                return (
-                  <Text key={col.key} {...dim}>
-                    {symbols.separator.padEnd(colW)}
-                  </Text>
-                )
-              }
-
-              const val = truncate(raw, colW).padEnd(colW)
               return (
-                <Text key={col.key} {...(selected && { color: colors.primary })}>
-                  {val}
-                </Text>
+                <Box key={col.key} width={colW}>
+                  <Text
+                    {...(isEmpty ? dim : selected ? { color: colors.primary } : {})}
+                    wrap="truncate-end"
+                  >
+                    {isEmpty ? symbols.separator : raw}
+                  </Text>
+                </Box>
               )
             })}
           </Box>
@@ -57,10 +56,6 @@ export function Table({ columns, rows, selectedIndex }: TableProps) {
       })}
     </Box>
   )
-}
-
-function truncate(str: string, maxLen: number): string {
-  return str.length > maxLen ? str.slice(0, maxLen - 1) + symbols.ellipsis : str
 }
 
 function resolveWidths(
