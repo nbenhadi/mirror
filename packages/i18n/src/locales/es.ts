@@ -271,6 +271,8 @@ export const es: Record<TranslationKey, string> = {
   'cmd.md.theme.delete.description': 'elimina un tema personalizado',
   'cmd.md.theme.delete.opt.name': 'id tema',
   'cmd.md.export.success': 'exportado a {path}',
+  'cmd.md.export.error.invalid_page_range':
+    'el rango de páginas {pages} no existe en este documento',
   'cmd.md.import.success': 'importado a {path}',
   'cmd.md.preview.success': 'ejecutándose en {url}',
   'cmd.md.edit.success': 'guardado',

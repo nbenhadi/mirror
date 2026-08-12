@@ -15,6 +15,12 @@ export interface ExportOptions {
   margins?: Margins
 }
 
+const PAGE_RANGE_ERROR_PATTERN = /page range exceeds page count/i
+
+export function isPageRangeError(err: unknown): boolean {
+  return err instanceof Error && PAGE_RANGE_ERROR_PATTERN.test(err.message)
+}
+
 export async function exportDocument(html: string, options: ExportOptions): Promise<void> {
   if (options.format === 'html') {
     await writeFile(options.outputPath, html, 'utf-8')

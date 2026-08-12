@@ -37,4 +37,21 @@ describe('export action', () => {
       expect(html).toContain('<h1 id="hello">Hello</h1>')
     }
   })
+
+  it('returns VALIDATION_ERROR when pages requests a page the document does not have', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(source, '# Hello\n\nworld')
+
+    const result = await exportMarkdown(
+      { action: 'export', path: source, format: 'pdf', pages: '5' },
+      ctx
+    )
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_ERROR')
+      expect(result.error.message).toBe('cmd.md.export.error.invalid_page_range')
+    }
+  }, 15000)
 })
