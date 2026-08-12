@@ -1,5 +1,15 @@
 # @nbenhadi/mirror-cli
 
+## 1.7.0
+
+### Minor Changes
+
+- 9fde7da: Add slide deck export (`md slides`) with PDF and HTML output, and a separate theme system for slides
+
+### Patch Changes
+
+- 37e8670: Fix md export crashing with a raw error when a plugin file does not export a valid plugin
+
 ## 1.6.1
 
 ### Patch Changes
