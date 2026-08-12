@@ -131,30 +131,65 @@ function createEditCommand(): Command {
     })
 }
 
+function createSlidesCommand(): Command {
+  return new Command('slides')
+    .description(t('cmd.md.slides.description'))
+    .option('-p, --path <file>', t('cmd.md.slides.opt.path'))
+    .option('-o, --output <path>', t('cmd.md.slides.opt.output'))
+    .option('-f, --format <format>', t('cmd.md.slides.opt.format'), 'pdf')
+    .option('-t, --theme <name>', t('cmd.md.slides.opt.theme'))
+    .action(async (options: Record<string, string | undefined>) => {
+      if (!options.path) {
+        ui.fatal(t('error.validation'))
+        return
+      }
+
+      const result = await execute<{ path: string }>({
+        toolId: MD_TOOL_ID,
+        input: {
+          action: 'slides',
+          path: options.path.trim(),
+          format: (options.format || 'pdf').toLowerCase(),
+          ...(options.output && { output: options.output.trim() }),
+          ...(options.theme && { theme: options.theme }),
+        },
+      })
+
+      if (!result.success) {
+        failFromError(result.error)
+      }
+
+      ui.printSuccess(t('cmd.md.slides.success', { path: chalk.blue(result.data.path) }))
+    })
+}
+
 function createThemeListCommand(): Command {
-  return new Command('list').description(t('cmd.md.theme.list.description')).action(async () => {
-    const result = await execute<ThemeListResult>({
-      toolId: MD_TOOL_ID,
-      input: { action: 'theme.list' },
+  return new Command('list')
+    .description(t('cmd.md.theme.list.description'))
+    .option('-k, --kind <kind>', t('cmd.md.theme.list.opt.kind'), 'document')
+    .action(async (options: Record<string, string | undefined>) => {
+      const result = await execute<ThemeListResult>({
+        toolId: MD_TOOL_ID,
+        input: { action: 'theme.list', kind: options.kind },
+      })
+
+      if (!result.success) {
+        failFromError(result.error)
+      }
+
+      const { themes } = result.data
+      if (themes.length === 0) {
+        ui.hint(t('cmd.md.theme.list.empty'))
+        return
+      }
+
+      const rows = themes.map((theme) => {
+        const source = theme.source === 'user' ? 'user' : 'bundled'
+        return [theme.id, theme.description, chalk.dim(source)]
+      })
+
+      ui.table([t('id'), t('description'), t('source')], rows)
     })
-
-    if (!result.success) {
-      failFromError(result.error)
-    }
-
-    const { themes } = result.data
-    if (themes.length === 0) {
-      ui.hint(t('cmd.md.theme.list.empty'))
-      return
-    }
-
-    const rows = themes.map((theme) => {
-      const source = theme.source === 'user' ? 'user' : 'bundled'
-      return [theme.id, theme.description, chalk.dim(source)]
-    })
-
-    ui.table([t('id'), t('description'), t('source')], rows)
-  })
 }
 
 function createThemeCreateCommand(): Command {
@@ -162,6 +197,7 @@ function createThemeCreateCommand(): Command {
     .description(t('cmd.md.theme.create.description'))
     .option('-n, --name <id>', t('cmd.md.theme.create.opt.name'))
     .option('-d, --description <text>', t('cmd.md.theme.create.opt.description'))
+    .option('-k, --kind <kind>', t('cmd.md.theme.create.opt.kind'), 'document')
     .action(async (options: Record<string, string | undefined>) => {
       if (!options.name) {
         ui.fatal(t('error.validation'))
@@ -173,6 +209,7 @@ function createThemeCreateCommand(): Command {
         input: {
           action: 'theme.create',
           name: options.name,
+          kind: options.kind,
           ...(options.description && { description: options.description }),
         },
       })
@@ -190,6 +227,7 @@ function createThemeEditCommand(): Command {
   return new Command('edit')
     .description(t('cmd.md.theme.edit.description'))
     .option('-n, --name <id>', t('cmd.md.theme.edit.opt.name'))
+    .option('-k, --kind <kind>', t('cmd.md.theme.edit.opt.kind'), 'document')
     .action(async (options: Record<string, string | undefined>) => {
       if (!options.name) {
         ui.fatal(t('error.validation'))
@@ -201,6 +239,7 @@ function createThemeEditCommand(): Command {
         input: {
           action: 'theme.edit',
           name: options.name,
+          kind: options.kind,
         },
       })
 
@@ -217,6 +256,7 @@ function createThemeDeleteCommand(): Command {
   return new Command('delete')
     .description(t('cmd.md.theme.delete.description'))
     .option('-n, --name <id>', t('cmd.md.theme.delete.opt.name'))
+    .option('-k, --kind <kind>', t('cmd.md.theme.delete.opt.kind'), 'document')
     .action(async (options: Record<string, string | undefined>) => {
       if (!options.name) {
         ui.fatal(t('error.validation'))
@@ -228,6 +268,7 @@ function createThemeDeleteCommand(): Command {
         input: {
           action: 'theme.delete',
           name: options.name,
+          kind: options.kind,
         },
       })
 
@@ -255,5 +296,6 @@ export function createMdCommand(): Command {
     .addCommand(createImportCommand())
     .addCommand(createPreviewCommand())
     .addCommand(createEditCommand())
+    .addCommand(createSlidesCommand())
     .addCommand(createThemeCommand())
 }
