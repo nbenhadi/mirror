@@ -1,5 +1,19 @@
-import { stat } from 'node:fs/promises'
+import { stat, readFile } from 'node:fs/promises'
 import { basename, dirname, extname, resolve, sep } from 'node:path'
+import type { ToolError } from '@nbenhadi/mirror-core'
+
+export async function readSourceFile(
+  path: string
+): Promise<{ success: true; content: string } | { success: false; error: ToolError }> {
+  try {
+    return { success: true, content: await readFile(path, 'utf-8') }
+  } catch {
+    return {
+      success: false,
+      error: { code: 'NOT_FOUND', message: 'error.not_found', params: { path } },
+    }
+  }
+}
 
 export async function isDirectoryLike(path: string): Promise<boolean> {
   if (path.endsWith('/') || path.endsWith(sep)) return true

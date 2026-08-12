@@ -38,6 +38,20 @@ describe('export action', () => {
     }
   })
 
+  it('returns VALIDATION_ERROR for malformed frontmatter YAML', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(source, '---\ntheme: [unclosed\n---\n\n# Hello\n')
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'html' }, ctx)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_ERROR')
+      expect(result.error.message).toBe('cmd.md.error.invalid_frontmatter')
+    }
+  })
+
   it('returns VALIDATION_ERROR when a plugin path does not export a valid plugin', async () => {
     dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
     const badPlugin = join(dir, 'bad-plugin.mjs')
