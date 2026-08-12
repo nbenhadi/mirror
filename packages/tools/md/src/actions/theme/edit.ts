@@ -11,13 +11,13 @@ export async function themeEdit(
   input: ThemeEditInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeEditResult>> {
-  const cssPath = await editableThemeCssPath(input.name)
+  const cssPath = await editableThemeCssPath(input.kind, input.name)
   if (!cssPath) {
     return {
       success: false,
       error: {
         code: 'NOT_FOUND',
-        message: 'cmd.md.error.theme_not_found',
+        message: 'cmd.md.theme.error.not_found',
         params: { name: input.name },
       },
     }

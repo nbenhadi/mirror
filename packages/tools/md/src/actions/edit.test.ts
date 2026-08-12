@@ -39,6 +39,21 @@ describe('edit action', () => {
     }
   })
 
+  it('returns VALIDATION_ERROR for a privileged port', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    try {
+      const path = join(dir, 'new.md')
+      const result = await edit({ action: 'edit', path, port: 1 }, ctx)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.code).toBe('VALIDATION_ERROR')
+        expect(result.error.message).toBe('cmd.md.error.invalid_port')
+      }
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
   it('does not overwrite an existing file', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
     try {

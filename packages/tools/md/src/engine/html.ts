@@ -22,7 +22,7 @@ function resolveAccent(value: string | undefined): string {
   return value && ACCENT_IDS.includes(value) ? value : DEFAULT_ACCENT
 }
 
-function buildBaseTag(baseDir: string | undefined): string {
+export function buildBaseTag(baseDir: string | undefined): string {
   if (!baseDir) return ''
   const href = pathToFileURL(baseDir).href
   return `<base href="${href.endsWith('/') ? href : `${href}/`}">`

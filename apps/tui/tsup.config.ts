@@ -21,5 +21,6 @@ export default defineConfig({
     'mammoth',
     'pdfjs-dist',
     'pdfjs-dist/*',
+    '@marp-team/marp-core',
   ],
 })

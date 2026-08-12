@@ -25,7 +25,10 @@ afterEach(async () => {
 
 describe('themeCreate action', () => {
   it('creates a new theme and returns its id and css path', async () => {
-    const result = await themeCreate({ action: 'theme.create', name: 'sidebar' }, ctx)
+    const result = await themeCreate(
+      { action: 'theme.create', name: 'sidebar', kind: 'document' },
+      ctx
+    )
     expect(result.success).toBe(true)
     if (result.success) {
       expect(result.data.id).toBe('sidebar')
@@ -34,8 +37,11 @@ describe('themeCreate action', () => {
   })
 
   it('fails with EXECUTION_ERROR when the theme already exists', async () => {
-    await themeCreate({ action: 'theme.create', name: 'sidebar' }, ctx)
-    const result = await themeCreate({ action: 'theme.create', name: 'sidebar' }, ctx)
+    await themeCreate({ action: 'theme.create', name: 'sidebar', kind: 'document' }, ctx)
+    const result = await themeCreate(
+      { action: 'theme.create', name: 'sidebar', kind: 'document' },
+      ctx
+    )
     expect(result.success).toBe(false)
     if (!result.success) expect(result.error.code).toBe('EXECUTION_ERROR')
   })

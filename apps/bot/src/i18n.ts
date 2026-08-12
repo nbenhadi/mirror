@@ -1,8 +1,8 @@
 import { createTranslator } from '@nbenhadi/mirror-i18n'
 import type { Locale, TranslationKey } from '@nbenhadi/mirror-i18n'
-import { Locale as DiscordLocale } from 'discord.js'
+import { Locale as DiscordLocale, type LocalizationMap } from 'discord.js'
 
-const LOCALE_MAP: Partial<Record<string, Locale>> = {
+const LOCALE_MAP: Partial<Record<DiscordLocale, Locale>> = {
   [DiscordLocale.EnglishUS]: 'en',
   [DiscordLocale.EnglishGB]: 'en',
   [DiscordLocale.SpanishES]: 'es',
@@ -10,7 +10,7 @@ const LOCALE_MAP: Partial<Record<string, Locale>> = {
 }
 
 export function getT(
-  discordLocale: string
+  discordLocale: DiscordLocale
 ): (key: TranslationKey, params?: Record<string, string | number>) => string {
   return createTranslator(LOCALE_MAP[discordLocale] ?? 'en')
 }
@@ -18,12 +18,13 @@ export function getT(
 export function localize(
   key: TranslationKey,
   params?: Record<string, string | number>
-): Partial<Record<string, string>> {
-  const result: Partial<Record<string, string>> = {}
-  for (const [discordLocale, mirrorLocale] of Object.entries(LOCALE_MAP)) {
-    if (mirrorLocale !== undefined) {
-      result[discordLocale] = cap(createTranslator(mirrorLocale)(key, params))
-    }
+): LocalizationMap {
+  const result: LocalizationMap = {}
+  for (const [discordLocale, mirrorLocale] of Object.entries(LOCALE_MAP) as [
+    DiscordLocale,
+    Locale,
+  ][]) {
+    result[discordLocale] = cap(createTranslator(mirrorLocale)(key, params))
   }
   return result
 }

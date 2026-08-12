@@ -17,6 +17,7 @@ export type { ExportResult } from './actions/export.js'
 export type { PreviewResult } from './actions/preview.js'
 export type { ImportResult } from './actions/import.js'
 export type { EditResult } from './actions/edit.js'
+export type { SlidesResult } from './actions/slides.js'
 export type { ThemeCreateResult } from './actions/theme/create.js'
 export type { ThemeListResult } from './actions/theme/list.js'
 export type { ThemeEditResult } from './actions/theme/edit.js'
@@ -27,6 +28,7 @@ export type {
   ExportInput,
   ImportInput,
   PreviewInput,
+  SlidesInput,
   ThemeCreateInput,
   ThemeListInput,
   ThemeEditInput,
@@ -34,3 +36,4 @@ export type {
 } from './schema.js'
 export type { MdPlugin, RenderContext, AfterExportResult } from './plugins/types.js'
 export type { ThemeInfo } from './engine/themes.js'
+export type { ThemeKind } from './themes/types.js'

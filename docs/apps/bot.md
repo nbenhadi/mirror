@@ -10,7 +10,7 @@ Discord bot. Exposes tools as slash commands. All replies are ephemeral.
 4. Enable Developer Mode in Discord (Settings > Advanced) and right-click your server to copy the guild ID.
 5. Fill in `.env`:
 
-```
+```env
 DISCORD_TOKEN=
 DISCORD_CLIENT_ID=
 DISCORD_GUILD_ID=

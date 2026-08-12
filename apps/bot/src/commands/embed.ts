@@ -6,7 +6,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js'
-import type { ChatInputCommandInteraction, LocalizationMap } from 'discord.js'
+import type { ChatInputCommandInteraction } from 'discord.js'
 import type { Command } from '../types/command.js'
 import { cap, en, localize } from '../i18n.js'
 import {
@@ -22,7 +22,7 @@ export const embed: Command = {
   data: new SlashCommandBuilder()
     .setName('embed')
     .setDescription(cap(en('bot.embed.description')))
-    .setDescriptionLocalizations(localize('bot.embed.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('bot.embed.description'))
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
   async execute(interaction: ChatInputCommandInteraction) {

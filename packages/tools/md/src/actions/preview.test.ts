@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { buildContext } from '@nbenhadi/mirror-core'
@@ -17,6 +17,22 @@ describe('preview action', () => {
       )
       expect(result.success).toBe(false)
       if (!result.success) expect(result.error.code).toBe('NOT_FOUND')
+    } finally {
+      await rm(dir, { recursive: true, force: true })
+    }
+  })
+
+  it('returns VALIDATION_ERROR for a privileged port', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    try {
+      const path = join(dir, 'doc.md')
+      await writeFile(path, '# Hello\n')
+      const result = await preview({ action: 'preview', path, port: 1 }, ctx)
+      expect(result.success).toBe(false)
+      if (!result.success) {
+        expect(result.error.code).toBe('VALIDATION_ERROR')
+        expect(result.error.message).toBe('cmd.md.error.invalid_port')
+      }
     } finally {
       await rm(dir, { recursive: true, force: true })
     }

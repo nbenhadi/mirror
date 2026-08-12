@@ -7,6 +7,12 @@ type PluginFactory = (config: Record<string, unknown>) => MdPlugin
 
 const BUNDLED: Record<string, PluginFactory> = {}
 
+const INVALID_PLUGIN_PREFIX = 'invalid md plugin: '
+
+export function isInvalidPluginError(err: unknown): err is Error {
+  return err instanceof Error && err.message.startsWith(INVALID_PLUGIN_PREFIX)
+}
+
 function isMdPlugin(value: unknown): value is MdPlugin {
   return (
     typeof value === 'object' &&
@@ -39,7 +45,7 @@ export async function loadPlugins(entries: PluginEntry[], baseDir: string): Prom
       typeof exported === 'function' ? (exported as PluginFactory)(config) : exported
 
     if (!isMdPlugin(candidate)) {
-      throw new Error(`invalid md plugin: ${id}`)
+      throw new Error(`${INVALID_PLUGIN_PREFIX}${id}`)
     }
     plugins.push(candidate)
   }

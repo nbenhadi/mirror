@@ -10,13 +10,13 @@ export async function themeDelete(
   input: ThemeDeleteInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ThemeDeleteResult>> {
-  const deleted = await deleteTheme(input.name)
+  const deleted = await deleteTheme(input.kind, input.name)
   if (!deleted) {
     return {
       success: false,
       error: {
         code: 'NOT_FOUND',
-        message: 'cmd.md.error.theme_not_found',
+        message: 'cmd.md.theme.error.not_found',
         params: { name: input.name },
       },
     }

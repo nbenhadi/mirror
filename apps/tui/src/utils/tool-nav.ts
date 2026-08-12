@@ -7,6 +7,7 @@ import {
   type ThemeListResult,
   type ThemeCreateResult,
   type ThemeEditResult,
+  type ThemeKind,
 } from '@nbenhadi/mirror-md'
 import { execute } from '@nbenhadi/mirror-core'
 import { t } from '@nbenhadi/mirror-i18n'
@@ -15,8 +16,12 @@ import { spawnEditor } from './spawn-editor.js'
 import type { FieldSpec, FieldValues } from '../types.js'
 import type { Navigate, Screen } from '../navigation.js'
 
-async function themeSuggestions(prefix: string, userOnly = false): Promise<string[]> {
-  const result = await execute({ toolId: MD_TOOL_ID, input: { action: 'theme.list' } })
+async function themeSuggestions(
+  prefix: string,
+  kind: ThemeKind = 'document',
+  userOnly = false
+): Promise<string[]> {
+  const result = await execute({ toolId: MD_TOOL_ID, input: { action: 'theme.list', kind } })
   if (!result.success) return []
   const { themes } = result.data as ThemeListResult
   const filtered = userOnly ? themes.filter((theme) => theme.source === 'user') : themes
@@ -24,7 +29,11 @@ async function themeSuggestions(prefix: string, userOnly = false): Promise<strin
 }
 
 async function userThemeSuggestions(prefix: string): Promise<string[]> {
-  return themeSuggestions(prefix, true)
+  return themeSuggestions(prefix, 'document', true)
+}
+
+async function slideThemeSuggestions(prefix: string): Promise<string[]> {
+  return themeSuggestions(prefix, 'slide')
 }
 
 export async function resolveToolEntry(toolId: string): Promise<Screen | null> {
@@ -101,6 +110,13 @@ export function getToolProps(
       onBack,
       fieldSuggestions: { theme: themeSuggestions },
       fieldVisible: exportFieldVisible,
+    }
+  }
+
+  if (toolId === MD_TOOL_ID && action === 'slides') {
+    return {
+      onBack,
+      fieldSuggestions: { theme: slideThemeSuggestions },
     }
   }
 

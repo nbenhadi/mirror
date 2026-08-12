@@ -21,6 +21,7 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
+    "@nbenhadi/mirror-i18n": "workspace:*",
     "@nbenhadi/mirror-logger": "workspace:*",
     "zod": "^3.25.28"
   },

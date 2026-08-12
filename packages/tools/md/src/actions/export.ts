@@ -1,10 +1,12 @@
-import { readFile, mkdir } from 'node:fs/promises'
-import { dirname, resolve, basename, extname } from 'node:path'
+import { mkdir } from 'node:fs/promises'
+import { dirname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ExportInput } from '../schema.js'
-import { preparePipeline, renderHtml } from '../engine/pipeline.js'
+import { preparePipeline, renderHtml, type PreparedPipeline } from '../engine/pipeline.js'
 import { exportDocument, isPageRangeError } from '../engine/export-pdf.js'
-import { isDirectoryLike } from '../engine/fs-paths.js'
+import { isInvalidPluginError } from '../plugins/registry.js'
+import { isInvalidFrontMatterError } from '../engine/parse.js'
+import { resolveOutputPath, normalizePath, readSourceFile } from '../engine/fs-paths.js'
 import { buildHeaderFooterTemplate, type HeaderFooterStyle } from '../engine/header-footer.js'
 import { resolveThemeMargins } from '../engine/themes.js'
 import { resolvePaperColor, resolveAccentTokens, FONT_SANS } from '../themes/default.js'
@@ -21,58 +23,52 @@ const EXTENSION_BY_FORMAT: Record<ExportInput['format'], string> = {
   png: '.png',
 }
 
-function defaultFileName(sourcePath: string, format: ExportInput['format']): string {
-  const name = basename(sourcePath, extname(sourcePath))
-  return `${name}${EXTENSION_BY_FORMAT[format]}`
-}
-
-function defaultOutputPath(sourcePath: string, format: ExportInput['format']): string {
-  const dir = dirname(sourcePath)
-  return resolve(dir, defaultFileName(sourcePath, format))
-}
-
-async function resolveOutputPath(input: ExportInput): Promise<string> {
-  if (!input.output) return defaultOutputPath(input.path, input.format)
-
-  const resolved = resolve(input.output)
-
-  if (await isDirectoryLike(input.output)) {
-    return resolve(resolved, defaultFileName(input.path, input.format))
-  }
-
-  return resolved
-}
-
 export async function exportMarkdown(
   input: ExportInput,
   _ctx: ToolContext
 ): Promise<ToolResult<ExportResult>> {
-  const normalizedInput = { ...input, path: input.path.trim() }
-  let source: string
-  try {
-    source = await readFile(normalizedInput.path, 'utf-8')
-  } catch {
-    return {
-      success: false,
-      error: {
-        code: 'NOT_FOUND',
-        message: 'error.not_found',
-        params: { path: normalizedInput.path },
-      },
-    }
-  }
+  const normalizedInput = normalizePath(input)
+  const read = await readSourceFile(normalizedInput.path)
+  if (!read.success) return read
+  const source = read.content
 
-  const { content, plugins, renderContext } = await preparePipeline(
-    normalizedInput.path,
-    source,
-    normalizedInput.format
-  )
+  let prepared: PreparedPipeline
+  try {
+    prepared = await preparePipeline(normalizedInput.path, source, normalizedInput.format)
+  } catch (err) {
+    if (isInvalidPluginError(err)) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'cmd.md.export.error.invalid_plugin',
+          params: { plugin: err.message.replace('invalid md plugin: ', '') },
+        },
+      }
+    }
+    if (isInvalidFrontMatterError(err)) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'cmd.md.error.invalid_frontmatter',
+          params: { path: normalizedInput.path },
+        },
+      }
+    }
+    throw err
+  }
+  const { content, plugins, renderContext } = prepared
 
   if (normalizedInput.theme) {
     renderContext.frontMatter = { ...renderContext.frontMatter, theme: normalizedInput.theme }
   }
 
-  const outputPath = await resolveOutputPath(normalizedInput)
+  const outputPath = await resolveOutputPath(
+    normalizedInput.path,
+    normalizedInput.output,
+    EXTENSION_BY_FORMAT[normalizedInput.format]
+  )
 
   await mkdir(dirname(outputPath), { recursive: true })
 

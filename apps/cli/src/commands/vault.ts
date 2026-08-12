@@ -1,16 +1,12 @@
 import { Command } from 'commander'
-import { execute } from '@nbenhadi/mirror-core'
+import { execute, type ToolError } from '@nbenhadi/mirror-core'
 import { t } from '@nbenhadi/mirror-i18n'
 import { copyToClipboard } from '../utils/clipboard.js'
 import { promptPassword, promptConfirm } from '../utils/prompt.js'
 import * as ui from '../utils/ui.js'
 
-function failWithCode(error: {
-  code: string
-  message: string
-  params?: Record<string, string | number>
-}): never {
-  ui.fatal(t(error.message as Parameters<typeof t>[0], error.params))
+function failWithCode(error: ToolError): never {
+  ui.fatal(t(error.message, error.params))
 }
 
 async function autoUnlock(): Promise<void> {
@@ -61,7 +57,7 @@ function createInitCommand(): Command {
 
 function createUnlockCommand(): Command {
   return new Command('unlock [minutes]')
-    .description(t('cmd.vault.unlock.description', { minutes: 30 }))
+    .description(t('cmd.vault.unlock.description'))
     .action(async (minutes?: string) => {
       const masterPassword = await promptPassword(t('prompt.master_password'))
       const result = await execute({

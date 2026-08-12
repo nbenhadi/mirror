@@ -1,6 +1,9 @@
 import { z } from 'zod'
+import { THEME_KINDS } from './themes/types.js'
 
 const PAGE_RANGE_PATTERN = /^\d+(-\d+)?(,\d+(-\d+)?)*$/
+
+const themeKindSchema = z.enum(THEME_KINDS).default('document')
 
 export const editSchema = z.object({
   action: z.literal('edit'),
@@ -33,20 +36,32 @@ export const themeCreateSchema = z.object({
   action: z.literal('theme.create'),
   name: z.string().min(1).describe('cmd.md.theme.create.opt.name'),
   description: z.string().optional().describe('cmd.md.theme.create.opt.description'),
+  kind: themeKindSchema.describe('cmd.md.theme.create.opt.kind'),
 })
 
 export const themeListSchema = z.object({
   action: z.literal('theme.list'),
+  kind: themeKindSchema.describe('cmd.md.theme.list.opt.kind'),
 })
 
 export const themeEditSchema = z.object({
   action: z.literal('theme.edit'),
   name: z.string().min(1).describe('cmd.md.theme.edit.opt.name'),
+  kind: themeKindSchema.describe('cmd.md.theme.edit.opt.kind'),
 })
 
 export const themeDeleteSchema = z.object({
   action: z.literal('theme.delete'),
   name: z.string().min(1).describe('cmd.md.theme.delete.opt.name'),
+  kind: themeKindSchema.describe('cmd.md.theme.delete.opt.kind'),
+})
+
+export const slidesSchema = z.object({
+  action: z.literal('slides'),
+  path: z.string().min(1).endsWith('.md').describe('cmd.md.slides.opt.path'),
+  output: z.string().optional().describe('cmd.md.slides.opt.output'),
+  format: z.enum(['pdf', 'html']).default('pdf').describe('cmd.md.slides.opt.format'),
+  theme: z.string().optional().describe('cmd.md.slides.opt.theme'),
 })
 
 export const schema = z.discriminatedUnion('action', [
@@ -54,6 +69,7 @@ export const schema = z.discriminatedUnion('action', [
   exportSchema,
   importSchema,
   previewSchema,
+  slidesSchema,
   themeCreateSchema,
   themeDeleteSchema,
   themeEditSchema,
@@ -64,6 +80,7 @@ export type EditInput = z.infer<typeof editSchema>
 export type ExportInput = z.infer<typeof exportSchema>
 export type ImportInput = z.infer<typeof importSchema>
 export type PreviewInput = z.infer<typeof previewSchema>
+export type SlidesInput = z.infer<typeof slidesSchema>
 export type ThemeCreateInput = z.infer<typeof themeCreateSchema>
 export type ThemeListInput = z.infer<typeof themeListSchema>
 export type ThemeEditInput = z.infer<typeof themeEditSchema>
