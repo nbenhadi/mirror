@@ -3,7 +3,7 @@ import { dirname, resolve, basename, extname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ExportInput } from '../schema.js'
 import { preparePipeline, renderHtml } from '../engine/pipeline.js'
-import { exportDocument } from '../engine/export-pdf.js'
+import { exportDocument, isPageRangeError } from '../engine/export-pdf.js'
 import { isDirectoryLike } from '../engine/fs-paths.js'
 import { buildHeaderFooterTemplate, type HeaderFooterStyle } from '../engine/header-footer.js'
 import { resolveThemeMargins } from '../engine/themes.js'
@@ -117,19 +117,33 @@ export async function exportMarkdown(
     ...(footer !== undefined && { footer }),
   }
 
-  const html = await renderHtml(content, plugins, renderContext)
-  await exportDocument(html, exportOptions)
+  try {
+    const html = await renderHtml(content, plugins, renderContext)
+    await exportDocument(html, exportOptions)
 
-  let needsRerender = false
-  for (const plugin of plugins) {
-    if (!plugin.afterExport) continue
-    const result = await plugin.afterExport(outputPath, renderContext)
-    if (result?.rerender) needsRerender = true
-  }
+    let needsRerender = false
+    for (const plugin of plugins) {
+      if (!plugin.afterExport) continue
+      const result = await plugin.afterExport(outputPath, renderContext)
+      if (result?.rerender) needsRerender = true
+    }
 
-  if (needsRerender) {
-    const finalHtml = await renderHtml(content, plugins, renderContext)
-    await exportDocument(finalHtml, exportOptions)
+    if (needsRerender) {
+      const finalHtml = await renderHtml(content, plugins, renderContext)
+      await exportDocument(finalHtml, exportOptions)
+    }
+  } catch (err) {
+    if (isPageRangeError(err)) {
+      return {
+        success: false,
+        error: {
+          code: 'VALIDATION_ERROR',
+          message: 'cmd.md.export.error.invalid_page_range',
+          params: { pages: input.pages ?? '' },
+        },
+      }
+    }
+    throw err
   }
 
   return { success: true, data: { path: outputPath } }
