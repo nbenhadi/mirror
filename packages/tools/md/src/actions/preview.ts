@@ -1,7 +1,7 @@
 import { access } from 'node:fs/promises'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { PreviewInput } from '../schema.js'
-import { startPreviewServer } from '../engine/preview.js'
+import { startPreviewServerSafe } from '../engine/preview.js'
 import { normalizePath } from '../engine/fs-paths.js'
 
 export interface PreviewResult {
@@ -26,6 +26,7 @@ export async function preview(
     }
   }
 
-  const server = await startPreviewServer(normalizedInput.path, normalizedInput.port)
-  return { success: true, data: { url: server.url } }
+  const started = await startPreviewServerSafe(normalizedInput.path, normalizedInput.port)
+  if (!started.success) return started
+  return { success: true, data: { url: started.server.url } }
 }
