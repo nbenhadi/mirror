@@ -1,9 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from 'discord.js'
-import type {
-  AutocompleteInteraction,
-  ChatInputCommandInteraction,
-  LocalizationMap,
-} from 'discord.js'
+import type { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js'
 import type { Command } from '../types/command.js'
 import { cap, en, getT, localize } from '../i18n.js'
 import { commands } from '../lib/commands.js'
@@ -21,12 +17,12 @@ export const help: Command = {
   data: new SlashCommandBuilder()
     .setName('help')
     .setDescription(cap(en('bot.help.description')))
-    .setDescriptionLocalizations(localize('bot.help.description') as LocalizationMap)
+    .setDescriptionLocalizations(localize('bot.help.description'))
     .addStringOption((o) =>
       o
         .setName('command')
         .setDescription(cap(en('bot.help.opt.command')))
-        .setDescriptionLocalizations(localize('bot.help.opt.command') as LocalizationMap)
+        .setDescriptionLocalizations(localize('bot.help.opt.command'))
         .setAutocomplete(true)
         .setRequired(false)
     ),

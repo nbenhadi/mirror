@@ -57,11 +57,11 @@ function numberField(
   const max = checks.find((c) => c.kind === 'max')?.value
   const autoDesc =
     min !== undefined && max !== undefined
-      ? `${min}–${max}`
+      ? `${min}-${max}`
       : min !== undefined
-        ? `≥${min}`
+        ? `>=${min}`
         : max !== undefined
-          ? `≤${max}`
+          ? `<=${max}`
           : undefined
   const descKey = outerDesc ?? def.description
   const params =

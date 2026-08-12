@@ -1,5 +1,6 @@
 import type { ZodType, ZodTypeDef } from 'zod'
 import type { Logger } from '@nbenhadi/mirror-logger'
+import type { TranslationKey } from '@nbenhadi/mirror-i18n'
 
 export interface ToolContext {
   requestId: string
@@ -12,7 +13,7 @@ export type ToolResult<T> = { success: true; data: T } | { success: false; error
 
 export interface ToolError {
   code: ToolErrorCode
-  message: string
+  message: TranslationKey
   params?: Record<string, string | number>
   details?: unknown
 }

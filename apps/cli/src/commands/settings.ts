@@ -1,21 +1,18 @@
 import { Command } from 'commander'
-import { execute } from '@nbenhadi/mirror-core'
+import { execute, type ToolError } from '@nbenhadi/mirror-core'
 import {
   type GetOutput,
   type SetOutput,
   type ResetOutput,
   type ListOutput,
 } from '@nbenhadi/mirror-settings'
-import { t, type TranslationKey } from '@nbenhadi/mirror-i18n'
+import { t } from '@nbenhadi/mirror-i18n'
 import chalk from 'chalk'
 import { promptConfirm } from '../utils/prompt.js'
 import * as ui from '../utils/ui.js'
 
-function fatalFromError(error: {
-  message: string
-  params?: Record<string, string | number>
-}): never {
-  ui.fatal(t(error.message as TranslationKey, error.params))
+function fatalFromError(error: ToolError): never {
+  ui.fatal(t(error.message, error.params))
 }
 
 function flattenSettings(obj: unknown, prefix = ''): Array<{ key: string; value: string }> {
