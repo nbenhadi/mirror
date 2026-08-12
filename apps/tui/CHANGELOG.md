@@ -1,5 +1,11 @@
 # @nbenhadi/mirror-tui
 
+## 1.5.1
+
+### Patch Changes
+
+- 49b919d: Fix TUI build to remove incompatible mirror-md dependency
+
 ## 1.5.0
 
 ### Minor Changes
