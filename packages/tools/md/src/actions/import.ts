@@ -1,11 +1,11 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { dirname, extname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ImportInput } from '../schema.js'
 import { convertHtmlToMarkdown } from '../engine/import/from-html.js'
 import { convertDocxToMarkdown } from '../engine/import/from-docx.js'
 import { convertPdfToMarkdown } from '../engine/import/from-pdf.js'
-import { resolveOutputPath, normalizePath } from '../engine/fs-paths.js'
+import { resolveOutputPath, normalizePath, ensureDir } from '../engine/fs-paths.js'
 
 export interface ImportResult {
   path: string
@@ -70,7 +70,7 @@ export async function importDocument(
   }
 
   const outputPath = await resolveOutputPath(normalizedInput.path, normalizedInput.output, '.md')
-  await mkdir(dirname(outputPath), { recursive: true })
+  await ensureDir(dirname(outputPath))
   await writeFile(outputPath, markdown, 'utf-8')
 
   return { success: true, data: { path: outputPath } }

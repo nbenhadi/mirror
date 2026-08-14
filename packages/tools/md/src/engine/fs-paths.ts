@@ -1,4 +1,4 @@
-import { stat, readFile } from 'node:fs/promises'
+import { access, mkdir, stat, readFile } from 'node:fs/promises'
 import { basename, dirname, extname, resolve, sep } from 'node:path'
 import type { ToolError } from '@nbenhadi/mirror-core'
 
@@ -21,6 +21,16 @@ export async function isDirectoryLike(path: string): Promise<boolean> {
     return (await stat(path)).isDirectory()
   } catch {
     return false
+  }
+}
+
+export async function ensureDir(path: string): Promise<void> {
+  // recursive mkdir throws EPERM on an existing Windows drive root, so only create if missing
+  try {
+    await access(path)
+    return
+  } catch {
+    await mkdir(path, { recursive: true })
   }
 }
 

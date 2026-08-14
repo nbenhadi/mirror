@@ -2,7 +2,8 @@ import { writeFile, rm } from 'node:fs/promises'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { randomUUID } from 'node:crypto'
-import { chromium, type Page } from 'playwright'
+import type { BrowserType, Page } from 'playwright'
+import type { ToolError } from '@nbenhadi/mirror-core'
 import type { Margins } from '../themes/types.js'
 
 export interface ExportOptions {
@@ -19,6 +20,46 @@ const PAGE_RANGE_ERROR_PATTERN = /page range exceeds page count/i
 
 export function isPageRangeError(err: unknown): boolean {
   return err instanceof Error && PAGE_RANGE_ERROR_PATTERN.test(err.message)
+}
+
+export class PlaywrightUnavailableError extends Error {
+  constructor() {
+    super('playwright is not installed')
+    this.name = 'PlaywrightUnavailableError'
+  }
+}
+
+export function isPlaywrightUnavailableError(err: unknown): boolean {
+  return err instanceof PlaywrightUnavailableError
+}
+
+const BROWSER_MISSING_PATTERN = /executable doesn't exist/i
+
+export function isPlaywrightBrowserMissingError(err: unknown): boolean {
+  return err instanceof Error && BROWSER_MISSING_PATTERN.test(err.message)
+}
+
+export function toPlaywrightToolError(err: unknown): ToolError | undefined {
+  if (isPlaywrightUnavailableError(err)) {
+    return { code: 'EXECUTION_ERROR', message: 'cmd.md.error.playwright_unavailable' }
+  }
+  if (isPlaywrightBrowserMissingError(err)) {
+    return { code: 'EXECUTION_ERROR', message: 'cmd.md.error.playwright_browser_missing' }
+  }
+  return undefined
+}
+
+let cachedChromium: BrowserType | undefined
+
+async function loadChromium(): Promise<BrowserType> {
+  if (cachedChromium) return cachedChromium
+  try {
+    const playwright = await import('playwright')
+    cachedChromium = playwright.chromium
+    return cachedChromium
+  } catch {
+    throw new PlaywrightUnavailableError()
+  }
 }
 
 async function loadHtml(page: Page, html: string, baseDir?: string): Promise<void> {
@@ -48,15 +89,15 @@ export async function exportSlides(html: string, options: SlidesExportOptions): 
     return
   }
 
-  const browser = await chromium.launch()
+  const browser = await (await loadChromium()).launch()
   try {
     const page = await browser.newPage()
     await loadHtml(page, html, options.baseDir)
-    await page.pdf({
-      path: options.outputPath,
+    const pdf = await page.pdf({
       printBackground: true,
       preferCSSPageSize: true,
     })
+    await writeFile(options.outputPath, pdf)
   } finally {
     await browser.close()
   }
@@ -68,7 +109,7 @@ export async function exportDocument(html: string, options: ExportOptions): Prom
     return
   }
 
-  const browser = await chromium.launch()
+  const browser = await (await loadChromium()).launch()
   try {
     const page = await browser.newPage()
 
@@ -85,8 +126,7 @@ export async function exportDocument(html: string, options: ExportOptions): Prom
           }
         : { top: 0, left: 0, right: 0, bottom: 0 }
 
-      await page.pdf({
-        path: options.outputPath,
+      const pdf = await page.pdf({
         format: 'A4',
         printBackground: true,
         preferCSSPageSize: true,
@@ -98,10 +138,12 @@ export async function exportDocument(html: string, options: ExportOptions): Prom
           footerTemplate: options.footer ?? `<div></div>`,
         }),
       })
+      await writeFile(options.outputPath, pdf)
       return
     }
 
-    await page.screenshot({ path: options.outputPath, fullPage: true })
+    const png = await page.screenshot({ fullPage: true })
+    await writeFile(options.outputPath, png)
   } finally {
     await browser.close()
   }

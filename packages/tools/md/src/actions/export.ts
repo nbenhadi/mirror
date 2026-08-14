@@ -1,12 +1,11 @@
-import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { ExportInput } from '../schema.js'
 import { preparePipeline, renderHtml, type PreparedPipeline } from '../engine/pipeline.js'
-import { exportDocument, isPageRangeError } from '../engine/export-pdf.js'
+import { exportDocument, isPageRangeError, toPlaywrightToolError } from '../engine/export-pdf.js'
 import { isInvalidPluginError } from '../plugins/registry.js'
 import { isInvalidFrontMatterError } from '../engine/parse.js'
-import { resolveOutputPath, normalizePath, readSourceFile } from '../engine/fs-paths.js'
+import { resolveOutputPath, normalizePath, readSourceFile, ensureDir } from '../engine/fs-paths.js'
 import { buildHeaderFooterTemplate, type HeaderFooterStyle } from '../engine/header-footer.js'
 import { resolveThemeMargins } from '../engine/themes.js'
 import { resolvePaperColor, resolveAccentTokens, FONT_SANS } from '../themes/default.js'
@@ -70,7 +69,7 @@ export async function exportMarkdown(
     EXTENSION_BY_FORMAT[normalizedInput.format]
   )
 
-  await mkdir(dirname(outputPath), { recursive: true })
+  await ensureDir(dirname(outputPath))
 
   const baseDir = dirname(normalizedInput.path)
 
@@ -139,6 +138,8 @@ export async function exportMarkdown(
         },
       }
     }
+    const playwrightError = toPlaywrightToolError(err)
+    if (playwrightError) return { success: false, error: playwrightError }
     throw err
   }
 
