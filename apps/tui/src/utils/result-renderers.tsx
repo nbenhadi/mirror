@@ -43,10 +43,32 @@ const renderPassword: ResultRenderer = (action, data) => {
   return <Block text={pickString(data) ?? String(data)} />
 }
 
+function isUrlResult(data: unknown): data is { url: string } {
+  return (
+    data !== null && typeof data === 'object' && typeof (data as { url?: unknown }).url === 'string'
+  )
+}
+
+const renderMdPreview: ResultRenderer = (_action, data) => {
+  const text = isUrlResult(data) ? data.url : (pickString(data) ?? String(data))
+  return <Block text={text} color={colors.success} />
+}
+
 const renderers: Record<string, ResultRenderer> = {
   password: renderPassword,
 }
 
-export function getResultRenderer(toolId: string): ResultRenderer | undefined {
+const actionRenderers: Record<string, ResultRenderer> = {
+  'md:preview': renderMdPreview,
+}
+
+export function getResultRenderer(
+  toolId: string,
+  action: string | undefined
+): ResultRenderer | undefined {
+  if (action) {
+    const scoped = actionRenderers[`${toolId}:${action}`]
+    if (scoped) return scoped
+  }
   return renderers[toolId]
 }

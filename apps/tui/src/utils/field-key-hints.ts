@@ -7,6 +7,7 @@ function suggestHints(): KeyHint[] {
   return [
     { key: 'tab', label: t('tui.key.complete') },
     { key: 'shift+tab', label: t('tui.key.list') },
+    { key: 'ctrl+u', label: t('tui.key.clear') },
   ]
 }
 
