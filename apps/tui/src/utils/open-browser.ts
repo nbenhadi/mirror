@@ -4,18 +4,24 @@ function available(cmd: string): boolean {
   return spawnSync('which', [cmd], { stdio: 'ignore' }).status === 0
 }
 
-function detectCommand(): string | null {
-  if (process.platform === 'darwin') return 'open'
-  if (process.platform === 'win32') return 'start'
-  if (process.env['WSL_DISTRO_NAME']) return 'wslview'
-  if (available('xdg-open')) return 'xdg-open'
-  return null
+function launch(cmd: string, args: string[]): void {
+  const child = spawn(cmd, args, { detached: true, stdio: 'ignore', windowsHide: true })
+  child.on('error', () => {})
+  child.unref()
 }
 
 export function openInBrowser(url: string): void {
-  const cmd = detectCommand()
-  if (!cmd) return
-  const child = spawn(cmd, [url], { detached: true, stdio: 'ignore' })
-  child.on('error', () => {})
-  child.unref()
+  if (process.platform === 'win32') {
+    launch('cmd', ['/c', 'start', '""', url])
+    return
+  }
+  if (process.platform === 'darwin') {
+    launch('open', [url])
+    return
+  }
+  if (process.env['WSL_DISTRO_NAME']) {
+    launch('wslview', [url])
+    return
+  }
+  if (available('xdg-open')) launch('xdg-open', [url])
 }

@@ -30,8 +30,12 @@ export type TranslationKey =
   | 'tui.key.submit'
   | 'tui.key.complete'
   | 'tui.key.list'
+  | 'tui.key.clear'
   | 'tui.confirm_quit'
   | 'tui.working'
+
+  // Editor
+  | 'editor.waiting'
 
   // Password tool
   | 'cmd.password.description'
@@ -197,6 +201,8 @@ export type TranslationKey =
   | 'cmd.md.description'
   | 'cmd.md.error.invalid_frontmatter'
   | 'cmd.md.error.invalid_port'
+  | 'cmd.md.error.playwright_unavailable'
+  | 'cmd.md.error.playwright_browser_missing'
   | 'cmd.md.export.description'
   | 'cmd.md.export.opt.path'
   | 'cmd.md.export.opt.output'

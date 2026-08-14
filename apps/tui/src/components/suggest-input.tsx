@@ -58,11 +58,14 @@ export function SuggestInput({
   const suggestion = best ? best.slice(value.length) : ''
 
   useInput(
-    (_input, key) => {
+    (input, key) => {
       if (key.tab && key.shift) {
         setShowListing((prev) => !prev)
       } else if (key.tab && suggestion) {
         onChange(value + suggestion)
+        setRemountKey((k) => k + 1)
+      } else if (key.ctrl && input === 'u') {
+        onChange('')
         setRemountKey((k) => k + 1)
       }
     },
