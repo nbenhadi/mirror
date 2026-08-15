@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { buildContext } from '@nbenhadi/mirror-core'
 import { exportMarkdown } from './export.js'
+import { extractPageTexts } from '../engine/pdf-text.js'
 
 const ctx = buildContext()
 
@@ -84,4 +85,81 @@ describe('export action', () => {
       expect(result.error.message).toBe('cmd.md.export.error.invalid_page_range')
     }
   }, 15000)
+
+  it('resolves real page numbers for the toc plugin through a second export pass', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc]',
+        '---',
+        '::toc{pageNumbers=true}',
+        '',
+        '# Title',
+        '',
+        '## Section one',
+        '',
+        'content one',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'content two',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(2)
+    expect(pages[0]).toMatch(/Section two\D*2/)
+    expect(pages[1]).toContain('Section two')
+  }, 20000)
+
+  it('resolves the correct page even when a heading title is also mentioned as prose earlier in the document', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc]',
+        '---',
+        '::toc{pageNumbers=true}',
+        '',
+        '# Title',
+        '',
+        '## Section one',
+        '',
+        'this part briefly mentions Documentation technique before its real section.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'filler content',
+        '',
+        '::pagebreak',
+        '',
+        '## Documentation technique',
+        '',
+        'the real section content',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(3)
+    expect(pages[0]).toMatch(/Documentation technique\D*3/)
+  }, 20000)
 })

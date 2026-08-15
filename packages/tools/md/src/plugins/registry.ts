@@ -2,10 +2,13 @@ import { pathToFileURL } from 'node:url'
 import { resolve, isAbsolute } from 'node:path'
 import type { MdPlugin } from './types.js'
 import type { PluginEntry } from '../engine/parse.js'
+import { createTocPlugin } from './toc.js'
 
-type PluginFactory = (config: Record<string, unknown>) => MdPlugin
+type PluginFactory = () => MdPlugin
 
-const BUNDLED: Record<string, PluginFactory> = {}
+const BUNDLED: Record<string, PluginFactory> = {
+  toc: createTocPlugin,
+}
 
 const INVALID_PLUGIN_PREFIX = 'invalid md plugin: '
 
@@ -21,28 +24,20 @@ function isMdPlugin(value: unknown): value is MdPlugin {
   )
 }
 
-function normalizeEntry(entry: PluginEntry): { id: string; config: Record<string, unknown> } {
-  if (typeof entry === 'string') return { id: entry, config: {} }
-  const { id, ...config } = entry
-  return { id, config }
-}
-
 export async function loadPlugins(entries: PluginEntry[], baseDir: string): Promise<MdPlugin[]> {
   const plugins: MdPlugin[] = []
 
-  for (const entry of entries) {
-    const { id, config } = normalizeEntry(entry)
+  for (const id of entries) {
     const bundled = BUNDLED[id]
     if (bundled) {
-      plugins.push(bundled(config))
+      plugins.push(bundled())
       continue
     }
 
     const modulePath = isAbsolute(id) ? id : resolve(baseDir, id)
     const mod: unknown = await import(pathToFileURL(modulePath).href)
     const exported = (mod as { default?: unknown }).default ?? mod
-    const candidate =
-      typeof exported === 'function' ? (exported as PluginFactory)(config) : exported
+    const candidate = typeof exported === 'function' ? (exported as PluginFactory)() : exported
 
     if (!isMdPlugin(candidate)) {
       throw new Error(`${INVALID_PLUGIN_PREFIX}${id}`)
