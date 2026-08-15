@@ -9,19 +9,31 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.SYNC_TOKEN }}
 
-      - name: Configure git
+      - name: Open sync PR
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet origin/develop origin/main; then
+            echo "develop is up to date, nothing to sync"
+            exit 0
+          fi
+          gh pr create \
+            --base develop \
+            --head main \
+            --title "chore: sync main into develop" \
+            --body "Automated sync after a merge to main." \
+            || echo "sync PR already open, skipping"
 
-      - name: Sync main into develop
+      - name: Enable auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
-          git checkout develop
-          git merge origin/main --no-edit
-          git push origin develop
+          PR_NUMBER=$(gh pr list --base develop --head main --json number --jq '.[0].number')
+          gh pr merge "$PR_NUMBER" --squash --auto
