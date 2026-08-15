@@ -59,4 +59,17 @@ describe('assignHeadingIds', () => {
     const html = await renderWithAnchors('## Title {#custom-id .some-class}')
     expect(html).toContain('<h2 id="custom-id" class="some-class">Title</h2>')
   })
+
+  it('deduplicates repeated heading text with a numeric suffix', async () => {
+    const html = await renderWithAnchors('## Projects\n\ncontent\n\n## Projects\n\n## Projects')
+    expect(html).toContain('id="projects"')
+    expect(html).toContain('id="projects-2"')
+    expect(html).toContain('id="projects-3"')
+  })
+
+  it('deduplicates a slugified id that collides with an earlier explicit id', async () => {
+    const html = await renderWithAnchors('## Section {#projects}\n\n## Projects')
+    expect(html).toContain('id="projects"')
+    expect(html).toContain('id="projects-2"')
+  })
 })

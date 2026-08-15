@@ -34,6 +34,7 @@ export interface FrontMatter {
   pages?: string
   header?: HeaderFooterConfig
   footer?: HeaderFooterConfig
+  data?: unknown
 }
 
 export interface ParsedDocument {
@@ -87,6 +88,7 @@ export function parseFrontMatter(source: string): ParsedDocument {
     ...(typeof data['pages'] === 'string' && { pages: data['pages'] }),
     ...(header && { header }),
     ...(footer && { footer }),
+    ...(data['data'] !== undefined && { data: data['data'] }),
   }
 
   return { frontMatter, content }

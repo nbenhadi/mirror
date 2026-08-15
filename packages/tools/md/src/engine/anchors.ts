@@ -53,10 +53,18 @@ function extractHeadingAttrs(node: Heading): HeadingAttrs {
   return { ...(id !== undefined && { id }), classes }
 }
 
+function dedupeId(baseId: string, seen: Map<string, number>): string {
+  const count = seen.get(baseId) ?? 0
+  seen.set(baseId, count + 1)
+  return count === 0 ? baseId : `${baseId}-${count + 1}`
+}
+
 export function assignHeadingIds(tree: Root): void {
+  const seen = new Map<string, number>()
+
   visit(tree, 'heading', (node: Heading) => {
     const { id: explicitId, classes } = extractHeadingAttrs(node)
-    const id = explicitId ?? slugify(toString(node))
+    const id = dedupeId(explicitId ?? slugify(toString(node)), seen)
     node.data = {
       ...node.data,
       hProperties: {

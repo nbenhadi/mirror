@@ -4,12 +4,14 @@ import type { MdPlugin } from './types.js'
 import type { PluginEntry } from '../engine/parse.js'
 import { createTocPlugin } from './toc.js'
 import { createGlossaryPlugin } from './glossary.js'
+import { createTemplatePlugin } from './template.js'
 
 type PluginFactory = () => MdPlugin
 
 const BUNDLED: Record<string, PluginFactory> = {
   toc: createTocPlugin,
   glossary: createGlossaryPlugin,
+  template: createTemplatePlugin,
 }
 
 const INVALID_PLUGIN_PREFIX = 'invalid md plugin: '

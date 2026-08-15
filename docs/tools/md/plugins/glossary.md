@@ -89,4 +89,4 @@ The term itself is never a link, never clickable. A separate zero-size invisible
 - Term is always column 1. The leftover column is the definition.
 - Matches whole words only, case-insensitive (`Vault` matches `vault`/`VAULT`, not `vaulting`). Keeps the original casing in the body.
 - Picks the earliest occurrence outside `skipPages`.
-- `pageColumn`/`skipPages` need `format: 'pdf'` and a second export pass, same as [toc](toc.md): render, read real pdf links, render again. `prune` alone works in one pass, any format.
+- `pageColumn`/`skipPages` need `format: 'pdf'` and a second export pass: render, read real pdf links, render again. `prune` alone works in one pass, any format.

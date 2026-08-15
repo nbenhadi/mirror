@@ -212,6 +212,7 @@ export type TranslationKey =
   | 'cmd.md.export.success'
   | 'cmd.md.export.error.invalid_page_range'
   | 'cmd.md.export.error.invalid_plugin'
+  | 'cmd.md.export.error.invalid_template_data'
   | 'cmd.md.import.description'
   | 'cmd.md.import.opt.path'
   | 'cmd.md.import.opt.output'

@@ -33,7 +33,12 @@ export async function renderHtml(
   renderContext: RenderContext,
   includeBaseTag = true
 ): Promise<string> {
-  const tree = await parseMarkdownAst(content)
+  let source = content
+  for (const plugin of plugins) {
+    if (plugin.transformSource) source = await plugin.transformSource(source, renderContext)
+  }
+
+  const tree = await parseMarkdownAst(source)
   assignHeadingIds(tree)
   assignImageAttrs(tree)
 

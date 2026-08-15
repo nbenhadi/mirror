@@ -261,16 +261,17 @@ footer:
 
 Available fields:
 
-| Field    | Type     | Default   | Description                                     |
-| -------- | -------- | --------- | ----------------------------------------------- |
-| `title`  | `string` | -         | Document title (for PDF metadata)               |
-| `theme`  | `string` | `default` | Theme to apply                                  |
-| `paper`  | `string` | `white`   | Paper color (white, cream, grey)                |
-| `accent` | `string` | `indigo`  | Accent color theme                              |
-| `lang`   | `string` | `en`      | Document language                               |
-| `image`  | `object` | -         | Named images for header/footer (path or URL)    |
-| `header` | `object` | -         | Header content (left, center, right, or images) |
-| `footer` | `object` | -         | Footer content (left, center, right, or images) |
+| Field    | Type                        | Default   | Description                                                |
+| -------- | --------------------------- | --------- | ---------------------------------------------------------- |
+| `title`  | `string`                    | -         | Document title (for PDF metadata)                          |
+| `theme`  | `string`                    | `default` | Theme to apply                                             |
+| `paper`  | `string`                    | `white`   | Paper color (white, cream, grey)                           |
+| `accent` | `string`                    | `indigo`  | Accent color theme                                         |
+| `lang`   | `string`                    | `en`      | Document language                                          |
+| `image`  | `object`                    | -         | Named images for header/footer (path or URL)               |
+| `header` | `object`                    | -         | Header content (left, center, right, or images)            |
+| `footer` | `object`                    | -         | Footer content (left, center, right, or images)            |
+| `data`   | `object \| array \| string` | -         | Data source for the [template plugin](plugins/template.md) |
 
 ## Plugins
 
