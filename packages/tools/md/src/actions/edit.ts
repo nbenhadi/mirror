@@ -1,9 +1,9 @@
-import { access, mkdir, writeFile } from 'node:fs/promises'
+import { access, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { EditInput } from '../schema.js'
 import { startPreviewServerSafe } from '../engine/preview.js'
-import { isDirectoryLike } from '../engine/fs-paths.js'
+import { isDirectoryLike, ensureDir } from '../engine/fs-paths.js'
 
 export interface EditResult {
   path: string
@@ -33,7 +33,7 @@ export async function edit(input: EditInput, _ctx: ToolContext): Promise<ToolRes
 
   const created = !(await fileExists(path))
   if (created) {
-    await mkdir(dirname(path), { recursive: true })
+    await ensureDir(dirname(path))
     await writeFile(path, NEW_DOCUMENT_TEMPLATE, 'utf-8')
   }
 

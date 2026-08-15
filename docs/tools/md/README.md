@@ -234,15 +234,9 @@ Justified paragraph text here.
 :::
 ```
 
-Default theme provides: `justify`, `columns`, `row`, `center`, `left`, `right`.
-
-CV theme provides: `justify`, `center`.
+See [themes/](themes/) for the directive classes each theme ships.
 
 Custom themes: define classes in theme.css and use them as directive names.
-
-### Page breaks
-
-Insert `::pagebreak` to force a page break (theme must style with `break-after: page`).
 
 ### Front matter
 
@@ -267,34 +261,38 @@ footer:
 
 Available fields:
 
-| Field    | Type     | Default   | Description                                     |
-| -------- | -------- | --------- | ----------------------------------------------- |
-| `title`  | `string` | -         | Document title (for PDF metadata)               |
-| `theme`  | `string` | `default` | Theme to apply                                  |
-| `paper`  | `string` | `white`   | Paper color (white, cream, grey)                |
-| `accent` | `string` | `indigo`  | Accent color theme                              |
-| `lang`   | `string` | `en`      | Document language                               |
-| `image`  | `object` | -         | Named images for header/footer (path or URL)    |
-| `header` | `object` | -         | Header content (left, center, right, or images) |
-| `footer` | `object` | -         | Footer content (left, center, right, or images) |
+| Field    | Type                        | Default   | Description                                                |
+| -------- | --------------------------- | --------- | ---------------------------------------------------------- |
+| `title`  | `string`                    | -         | Document title (for PDF metadata)                          |
+| `theme`  | `string`                    | `default` | Theme to apply                                             |
+| `paper`  | `string`                    | `white`   | Paper color (white, cream, grey)                           |
+| `accent` | `string`                    | `indigo`  | Accent color theme                                         |
+| `lang`   | `string`                    | `en`      | Document language                                          |
+| `image`  | `object`                    | -         | Named images for header/footer (path or URL)               |
+| `header` | `object`                    | -         | Header content (left, center, right, or images)            |
+| `footer` | `object`                    | -         | Footer content (left, center, right, or images)            |
+| `data`   | `object \| array \| string` | -         | Data source for the [template plugin](plugins/template.md) |
+
+## Plugins
+
+Plugins transform the document during `export`, `preview`, and `edit`. Not supported for `slides`.
+
+Activate a plugin in front matter, by id, to turn it on for the whole document:
+
+```yaml
+---
+plugins:
+  - toc
+---
+```
+
+An entry is a bundled plugin id, or a path to an external module exporting a plugin factory or plugin object as its default export. `plugins` only activates: config always lives on the plugin's own directive, never here.
+
+Available plugins: [plugins/](plugins/).
 
 ## Themes
 
-### Default theme
-
-Bundled theme with soft modern layout. Supports configurable paper (white, cream, grey) and accent (indigo, rust, amber, plum, blue) colors.
-
-Margins: 80px horizontal, 50px vertical.
-
-Supported directive classes: `justify`, `columns`, `row`, `center`, `left`, `right`.
-
-### CV theme
-
-Professional resume/CV theme. Clean, minimal design optimized for single-page documents.
-
-Margins: 43px horizontal, 45px vertical.
-
-Supported directive classes: `justify`, `center`.
+Bundled document themes: [themes/](themes/).
 
 ### Custom themes
 

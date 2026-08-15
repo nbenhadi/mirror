@@ -49,4 +49,27 @@ describe('assignHeadingIds', () => {
     expect(html).not.toContain('{.some-class}')
     expect(html).toContain('id="just-a-title"')
   })
+
+  it('keeps a pandoc-style class attribute as a real class on the heading', async () => {
+    const html = await renderWithAnchors('## Just a title {.some-class}')
+    expect(html).toContain('<h2 id="just-a-title" class="some-class">Just a title</h2>')
+  })
+
+  it('combines an explicit id with a class in the same attribute block', async () => {
+    const html = await renderWithAnchors('## Title {#custom-id .some-class}')
+    expect(html).toContain('<h2 id="custom-id" class="some-class">Title</h2>')
+  })
+
+  it('deduplicates repeated heading text with a numeric suffix', async () => {
+    const html = await renderWithAnchors('## Projects\n\ncontent\n\n## Projects\n\n## Projects')
+    expect(html).toContain('id="projects"')
+    expect(html).toContain('id="projects-2"')
+    expect(html).toContain('id="projects-3"')
+  })
+
+  it('deduplicates a slugified id that collides with an earlier explicit id', async () => {
+    const html = await renderWithAnchors('## Section {#projects}\n\n## Projects')
+    expect(html).toContain('id="projects"')
+    expect(html).toContain('id="projects-2"')
+  })
 })

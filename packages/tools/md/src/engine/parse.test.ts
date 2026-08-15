@@ -17,16 +17,16 @@ describe('parseFrontMatter', () => {
     expect(content.trim()).toBe('# Hello')
   })
 
-  it('ignores non-string, non-object plugin entries', () => {
+  it('ignores plugin entries when any of them is not a string', () => {
     const source = '---\nplugins:\n  - toc\n  - 5\n---\nbody'
     const { frontMatter } = parseFrontMatter(source)
     expect(frontMatter.plugins).toBeUndefined()
   })
 
-  it('accepts plugin entries with config objects', () => {
-    const source = '---\nplugins:\n  - toc\n  - id: glossary\n    fromPage: 2\n---\nbody'
+  it('accepts a list of plugin ids to activate', () => {
+    const source = '---\nplugins:\n  - toc\n  - glossary\n---\nbody'
     const { frontMatter } = parseFrontMatter(source)
-    expect(frontMatter.plugins).toEqual(['toc', { id: 'glossary', fromPage: 2 }])
+    expect(frontMatter.plugins).toEqual(['toc', 'glossary'])
   })
 
   it('parses header/footer slots with text and image content', () => {

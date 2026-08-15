@@ -26,8 +26,10 @@ export const fr: Record<TranslationKey, string> = {
   'tui.key.submit': 'valider',
   'tui.key.complete': 'autocompletion',
   'tui.key.list': 'voir les options',
+  'tui.key.clear': 'effacer',
   'tui.confirm_quit': 'appuyez sur {key} à nouveau pour quitter',
   'tui.working': 'traitement…',
+  'editor.waiting': "ouverture de l'editeur, ctrl+c pour annuler",
 
   // Password tool
   'cmd.password.description': 'générer et analyser des mots de passe',
@@ -249,6 +251,10 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.md.description': 'cree des documents depuis markdown',
   'cmd.md.error.invalid_frontmatter': 'frontmatter invalide dans {path}',
   'cmd.md.error.invalid_port': "impossible d'utiliser le port {port} : privilegie ou deja utilise",
+  'cmd.md.error.playwright_unavailable':
+    "dependance manquante pour l'export pdf/png. lancez : npm install playwright",
+  'cmd.md.error.playwright_browser_missing':
+    "navigateur manquant pour l'export pdf/png. lancez : npx playwright install chromium",
   'cmd.md.export.description': 'exporte un document stylise',
   'cmd.md.export.opt.path': 'chemin fichier markdown',
   'cmd.md.export.opt.output': 'chemin sortie',
@@ -290,6 +296,7 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.md.export.error.invalid_page_range':
     'la plage de pages {pages} est hors limites pour ce document',
   'cmd.md.export.error.invalid_plugin': 'plugin inconnu {plugin}',
+  'cmd.md.export.error.invalid_template_data': 'impossible de lire les donnees du modele',
   'cmd.md.import.success': 'importe vers {path}',
   'cmd.md.import.error.unknown_format': 'format de fichier non supporte: {path}',
   'cmd.md.import.error.convert_failed': 'impossible de convertir {path}',

@@ -94,7 +94,7 @@ const FONT_MONO = "ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', mono
 const FONT_BASE = '16px'
 const FONT_SM = '0.875rem'
 const FONT_H1 = '2.1rem'
-const FONT_H2 = '1.15rem'
+const FONT_H2 = '1.3rem'
 const FONT_H3 = '1.05rem'
 const FONT_H4 = '0.9rem'
 const FONT_H5 = '0.82rem'
@@ -409,6 +409,77 @@ hr {
   border: none;
   border-top: 1px solid var(--border);
   margin: 2em 0;
+}
+
+.toc {
+  margin-bottom: ${SPACE_LG};
+}
+
+.toc-list {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+.toc-item {
+  padding-left: calc(var(--toc-level, 0) * 1.25em);
+}
+
+.toc-item + .toc-item {
+  margin-top: 0.3em;
+}
+
+.toc-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.toc-title {
+  display: flex;
+  align-items: baseline;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.toc-item[data-toc-level="0"] .toc-title {
+  font-weight: 700;
+}
+
+.toc-item:not([data-toc-level="0"]) .toc-title {
+  color: var(--ink-muted);
+}
+
+.toc-link:has(.toc-page) .toc-title::after {
+  content: '';
+  flex: 1 1 auto;
+  min-width: 0.5em;
+  align-self: flex-end;
+  margin: 0 0.35em 0.2em;
+  height: 2px;
+  background-image: linear-gradient(to right, var(--ink-muted) 34%, transparent 34%);
+  background-repeat: repeat-x;
+  background-size: 6px 2px;
+  background-position: left bottom;
+}
+
+.toc-page {
+  flex: none;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.glossary {
+  margin-bottom: ${SPACE_LG};
+}
+
+.glossary-term {
+  color: var(--accent);
 }
 `,
   margins: { x: 80, y: 50 },

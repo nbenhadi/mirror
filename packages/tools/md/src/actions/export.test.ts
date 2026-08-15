@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { buildContext } from '@nbenhadi/mirror-core'
 import { exportMarkdown } from './export.js'
+import { extractPageTexts } from '../engine/pdf-text.js'
 
 const ctx = buildContext()
 
@@ -84,4 +85,197 @@ describe('export action', () => {
       expect(result.error.message).toBe('cmd.md.export.error.invalid_page_range')
     }
   }, 15000)
+
+  it('resolves real page numbers for the toc plugin through a second export pass', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc]',
+        '---',
+        '::toc{pageNumbers=true}',
+        '',
+        '# Title',
+        '',
+        '## Section one',
+        '',
+        'content one',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'content two',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(2)
+    expect(pages[0]).toMatch(/Section two\D*2/)
+    expect(pages[1]).toContain('Section two')
+  }, 20000)
+
+  it('resolves the correct page even when a heading title is also mentioned as prose earlier in the document', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc]',
+        '---',
+        '::toc{pageNumbers=true}',
+        '',
+        '# Title',
+        '',
+        '## Section one',
+        '',
+        'this part briefly mentions Documentation technique before its real section.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'filler content',
+        '',
+        '::pagebreak',
+        '',
+        '## Documentation technique',
+        '',
+        'the real section content',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(3)
+    expect(pages[0]).toMatch(/Documentation technique\D*3/)
+  }, 20000)
+
+  it('fills the glossary page column, skips excluded pages, and prunes unused terms', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [glossary]',
+        '---',
+        ':::glossary{prune=true skipPages=2}',
+        '| Term | Definition | Page |',
+        '| --- | --- | --- |',
+        '| Vault | Encrypted credential store | |',
+        '| Ghost | Never mentioned in the document | |',
+        ':::',
+        '',
+        '# Title',
+        '',
+        '::pagebreak',
+        '',
+        '## Section one',
+        '',
+        'This page briefly mentions Vault for the first time.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'Vault appears again here, on a page that is not excluded.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section three',
+        '',
+        'filler content',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(4)
+    expect(pages[0]).toContain('Vault')
+    expect(pages[0]).not.toContain('Ghost')
+    expect(pages[0]).toMatch(/Vault[^0-9]*3/)
+  }, 20000)
+
+  it('fills a document from a json data file and repeats a block per record, composing with toc', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const dataPath = join(dir, 'patients.json')
+    await writeFile(
+      dataPath,
+      JSON.stringify([
+        { name: 'Ana Perez', dob: '1990-01-01' },
+        { name: 'Luis Gomez', dob: '1985-05-20' },
+      ])
+    )
+
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc, template]',
+        'data: patients.json',
+        '---',
+        '::toc',
+        '',
+        '::pagebreak',
+        '',
+        '{{#each this}}',
+        '## {{name}}',
+        '',
+        'DOB: {{dob}}',
+        '',
+        '::pagebreak',
+        '',
+        '{{/each}}',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(3)
+    expect(pages[0]).toContain('Ana Perez')
+    expect(pages[0]).toContain('Luis Gomez')
+    expect(pages[1]).toContain('Ana Perez')
+    expect(pages[1]).toContain('1990-01-01')
+    expect(pages[2]).toContain('Luis Gomez')
+    expect(pages[2]).toContain('1985-05-20')
+  }, 20000)
+
+  it('returns VALIDATION_ERROR when the template data file does not exist', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      ['---', 'plugins: [template]', 'data: missing.json', '---', '{{name}}'].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'html' }, ctx)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_ERROR')
+      expect(result.error.message).toBe('cmd.md.export.error.invalid_template_data')
+    }
+  })
 })

@@ -26,8 +26,10 @@ export const es: Record<TranslationKey, string> = {
   'tui.key.submit': 'confirmar',
   'tui.key.complete': 'autocompletar',
   'tui.key.list': 'ver opciones',
+  'tui.key.clear': 'borrar',
   'tui.confirm_quit': 'presiona {key} de nuevo para salir',
   'tui.working': 'procesando…',
+  'editor.waiting': 'abriendo editor, ctrl+c para cancelar',
 
   // Password tool
   'cmd.password.description': 'generar y analizar contraseñas',
@@ -248,6 +250,10 @@ export const es: Record<TranslationKey, string> = {
   'cmd.md.description': 'crea documentos desde markdown',
   'cmd.md.error.invalid_frontmatter': 'frontmatter invalido en {path}',
   'cmd.md.error.invalid_port': 'no se puede usar el puerto {port}: privilegiado o ya en uso',
+  'cmd.md.error.playwright_unavailable':
+    'falta una dependencia para exportar a pdf/png. ejecuta: npm install playwright',
+  'cmd.md.error.playwright_browser_missing':
+    'falta el navegador para exportar a pdf/png. ejecuta: npx playwright install chromium',
   'cmd.md.export.description': 'exporta un documento con estilo',
   'cmd.md.export.opt.path': 'ruta archivo markdown',
   'cmd.md.export.opt.output': 'ruta salida',
@@ -289,6 +295,7 @@ export const es: Record<TranslationKey, string> = {
   'cmd.md.export.error.invalid_page_range':
     'el rango de páginas {pages} no existe en este documento',
   'cmd.md.export.error.invalid_plugin': 'plugin desconocido {plugin}',
+  'cmd.md.export.error.invalid_template_data': 'no se pudieron leer los datos de la plantilla',
   'cmd.md.import.success': 'importado a {path}',
   'cmd.md.import.error.unknown_format': 'formato de archivo no soportado: {path}',
   'cmd.md.import.error.convert_failed': 'no se pudo convertir {path}',

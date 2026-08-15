@@ -1,4 +1,3 @@
-import { mkdir } from 'node:fs/promises'
 import { dirname } from 'node:path'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import type { SlidesInput } from '../schema.js'
@@ -8,8 +7,8 @@ import {
   renderSlides,
   buildSlidesHtmlDocument,
 } from '../engine/marp.js'
-import { exportSlides } from '../engine/export-pdf.js'
-import { resolveOutputPath, normalizePath, readSourceFile } from '../engine/fs-paths.js'
+import { exportSlides, toPlaywrightToolError } from '../engine/export-pdf.js'
+import { resolveOutputPath, normalizePath, readSourceFile, ensureDir } from '../engine/fs-paths.js'
 import { resolveThemeCss } from '../engine/themes.js'
 import { isInvalidFrontMatterError } from '../engine/parse.js'
 import { getBundledSlideTheme } from '../themes/slide-registry.js'
@@ -75,13 +74,19 @@ export async function slides(
     normalizedInput.output,
     EXTENSION_BY_FORMAT[normalizedInput.format]
   )
-  await mkdir(dirname(outputPath), { recursive: true })
+  await ensureDir(dirname(outputPath))
 
-  await exportSlides(document, {
-    format: normalizedInput.format,
-    outputPath,
-    baseDir,
-  })
+  try {
+    await exportSlides(document, {
+      format: normalizedInput.format,
+      outputPath,
+      baseDir,
+    })
+  } catch (err) {
+    const playwrightError = toPlaywrightToolError(err)
+    if (playwrightError) return { success: false, error: playwrightError }
+    throw err
+  }
 
   return { success: true, data: { path: outputPath } }
 }

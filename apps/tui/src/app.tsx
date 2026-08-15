@@ -41,7 +41,7 @@ export function App() {
       const tool = registry.get(toolId)
       if (!tool) return null
       const toolProps = getToolProps(toolId, action, navigate)
-      const renderer = getResultRenderer(toolId)
+      const renderer = getResultRenderer(toolId, action)
 
       return (
         <GenericScreen

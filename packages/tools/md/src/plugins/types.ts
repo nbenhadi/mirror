@@ -13,6 +13,7 @@ export type AfterExportResult = { rerender: boolean } | void
 
 export interface MdPlugin {
   id: string
+  transformSource?(source: string, ctx: RenderContext): string | Promise<string>
   transformAst?(tree: Root, ctx: RenderContext): void | Promise<void>
   transformHtml?(html: string, ctx: RenderContext): string | Promise<string>
   afterExport?(

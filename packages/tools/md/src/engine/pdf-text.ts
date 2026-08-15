@@ -15,3 +15,21 @@ export async function extractPageTexts(pdfPath: string): Promise<string[]> {
 
   return pages
 }
+
+export async function resolveAnchorPages(
+  pdfPath: string,
+  ids: string[]
+): Promise<Record<string, number>> {
+  const data = await readFile(pdfPath)
+  const doc = await getDocument({ data: new Uint8Array(data) }).promise
+  const pages: Record<string, number> = {}
+
+  for (const id of ids) {
+    const dest = await doc.getDestination(id)
+    const ref = dest?.[0]
+    if (ref === undefined) continue
+    pages[id] = (await doc.getPageIndex(ref)) + 1
+  }
+
+  return pages
+}
