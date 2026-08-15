@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.SYNC_TOKEN }}
 
-      - name: Open sync PR
+      - name: Open sync PR and enable auto-merge
         env:
           GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
         run: |
@@ -24,6 +24,7 @@ jobs:
             echo "develop is up to date, nothing to sync"
             exit 0
           fi
+
           gh pr create \
             --base develop \
             --head main \
@@ -31,9 +32,5 @@ jobs:
             --body "Automated sync after a merge to main." \
             || echo "sync PR already open, skipping"
 
-      - name: Enable auto-merge
-        env:
-          GH_TOKEN: ${{ secrets.SYNC_TOKEN }}
-        run: |
           PR_NUMBER=$(gh pr list --base develop --head main --json number --jq '.[0].number')
           gh pr merge "$PR_NUMBER" --squash --auto
