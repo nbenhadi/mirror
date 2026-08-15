@@ -4,6 +4,7 @@ import type { ExportInput } from '../schema.js'
 import { preparePipeline, renderHtml, type PreparedPipeline } from '../engine/pipeline.js'
 import { exportDocument, isPageRangeError, toPlaywrightToolError } from '../engine/export-pdf.js'
 import { isInvalidPluginError } from '../plugins/registry.js'
+import { isTemplateDataError } from '../plugins/template.js'
 import { isInvalidFrontMatterError } from '../engine/parse.js'
 import { resolveOutputPath, normalizePath, readSourceFile, ensureDir } from '../engine/fs-paths.js'
 import { buildHeaderFooterTemplate, type HeaderFooterStyle } from '../engine/header-footer.js'
@@ -136,6 +137,12 @@ export async function exportMarkdown(
           message: 'cmd.md.export.error.invalid_page_range',
           params: { pages: input.pages ?? '' },
         },
+      }
+    }
+    if (isTemplateDataError(err)) {
+      return {
+        success: false,
+        error: { code: 'VALIDATION_ERROR', message: 'cmd.md.export.error.invalid_template_data' },
       }
     }
     const playwrightError = toPlaywrightToolError(err)

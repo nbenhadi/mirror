@@ -212,4 +212,70 @@ describe('export action', () => {
     expect(pages[0]).not.toContain('Ghost')
     expect(pages[0]).toMatch(/Vault[^0-9]*3/)
   }, 20000)
+
+  it('fills a document from a json data file and repeats a block per record, composing with toc', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const dataPath = join(dir, 'patients.json')
+    await writeFile(
+      dataPath,
+      JSON.stringify([
+        { name: 'Ana Perez', dob: '1990-01-01' },
+        { name: 'Luis Gomez', dob: '1985-05-20' },
+      ])
+    )
+
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [toc, template]',
+        'data: patients.json',
+        '---',
+        '::toc',
+        '',
+        '::pagebreak',
+        '',
+        '{{#each this}}',
+        '## {{name}}',
+        '',
+        'DOB: {{dob}}',
+        '',
+        '::pagebreak',
+        '',
+        '{{/each}}',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(3)
+    expect(pages[0]).toContain('Ana Perez')
+    expect(pages[0]).toContain('Luis Gomez')
+    expect(pages[1]).toContain('Ana Perez')
+    expect(pages[1]).toContain('1990-01-01')
+    expect(pages[2]).toContain('Luis Gomez')
+    expect(pages[2]).toContain('1985-05-20')
+  }, 20000)
+
+  it('returns VALIDATION_ERROR when the template data file does not exist', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      ['---', 'plugins: [template]', 'data: missing.json', '---', '{{name}}'].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'html' }, ctx)
+
+    expect(result.success).toBe(false)
+    if (!result.success) {
+      expect(result.error.code).toBe('VALIDATION_ERROR')
+      expect(result.error.message).toBe('cmd.md.export.error.invalid_template_data')
+    }
+  })
 })

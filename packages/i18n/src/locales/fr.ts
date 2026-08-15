@@ -296,6 +296,7 @@ export const fr: Record<TranslationKey, string> = {
   'cmd.md.export.error.invalid_page_range':
     'la plage de pages {pages} est hors limites pour ce document',
   'cmd.md.export.error.invalid_plugin': 'plugin inconnu {plugin}',
+  'cmd.md.export.error.invalid_template_data': 'impossible de lire les donnees du modele',
   'cmd.md.import.success': 'importe vers {path}',
   'cmd.md.import.error.unknown_format': 'format de fichier non supporte: {path}',
   'cmd.md.import.error.convert_failed': 'impossible de convertir {path}',

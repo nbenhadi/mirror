@@ -295,6 +295,7 @@ export const es: Record<TranslationKey, string> = {
   'cmd.md.export.error.invalid_page_range':
     'el rango de páginas {pages} no existe en este documento',
   'cmd.md.export.error.invalid_plugin': 'plugin desconocido {plugin}',
+  'cmd.md.export.error.invalid_template_data': 'no se pudieron leer los datos de la plantilla',
   'cmd.md.import.success': 'importado a {path}',
   'cmd.md.import.error.unknown_format': 'formato de archivo no soportado: {path}',
   'cmd.md.import.error.convert_failed': 'no se pudo convertir {path}',

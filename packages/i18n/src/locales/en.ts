@@ -291,6 +291,7 @@ export const en: Record<TranslationKey, string> = {
   'cmd.md.export.success': 'exported to {path}',
   'cmd.md.export.error.invalid_page_range': 'page range {pages} is out of bounds for this document',
   'cmd.md.export.error.invalid_plugin': 'unknown plugin {plugin}',
+  'cmd.md.export.error.invalid_template_data': 'could not read the template data',
   'cmd.md.import.success': 'imported to {path}',
   'cmd.md.import.error.unknown_format': 'unsupported file format: {path}',
   'cmd.md.import.error.convert_failed': 'could not convert {path}',
