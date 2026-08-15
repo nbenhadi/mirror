@@ -47,7 +47,13 @@ Good: `Fix md tool crashing when used from the published TUI binary`
 
 ### Sync
 
-After every merge to `main`, the `sync.yml` workflow automatically merges `main` into `develop`. No manual sync needed.
+After every merge to `main`, the `sync.yml` workflow opens a PR from `main` into `develop` and enables squash auto-merge, so it lands once the required `ci` check passes. No manual sync needed.
+
+`develop` has a ruleset that blocks direct pushes, merge commits, and requires the `ci` check, so the workflow cannot push straight to `develop` and must go through a PR.
+
+It authenticates with a `SYNC_TOKEN` secret, not the default `GITHUB_TOKEN`. PRs opened with the default token do not trigger other workflows, so the `ci` check required for auto-merge would never run.
+
+To create it: GitHub Settings > Developer settings > Personal access tokens > Tokens (classic) > Generate new token (classic). Check only the `repo` scope. Save it as a repository secret named `SYNC_TOKEN` (Settings > Secrets and variables > Actions > New repository secret).
 
 ## Published packages
 
@@ -61,7 +67,7 @@ Registry: `https://npm.pkg.github.com`
 | ------------- | ------------------------------- | ------------------------------------------------------- |
 | `ci.yml`      | Push or PR to `main`, `develop` | Lint, type check, build, test, audit, branch name check |
 | `release.yml` | Push to `main`                  | Create version PR or publish                            |
-| `sync.yml`    | Push to `main`                  | Sync `main` into `develop`                              |
+| `sync.yml`    | Push to `main`                  | Open a PR syncing `main` into `develop`, auto-merge     |
 
 ## Hotfixes
 
