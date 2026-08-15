@@ -23,6 +23,33 @@ Set directly on the directive, per placement: `::toc{minDepth=1 maxDepth=2 pageN
 | `maxDepth`    | `number`  | `3`     | Deepest heading level included                   |
 | `pageNumbers` | `boolean` | `false` | Show the page each heading lands on (`pdf` only) |
 
+## Example
+
+```text
+---
+plugins:
+  - toc
+---
+
+## Table of contents {.no-toc}
+
+::toc{minDepth=2 maxDepth=3 pageNumbers=true}
+
+::pagebreak
+
+# Architecture
+
+## Overview
+
+## Deployment
+
+::pagebreak
+
+## Security
+```
+
+`::toc` collects every `##`/`###` heading in the document, wherever it's placed, and links each one to its own `#slug`. With `pageNumbers=true` and `format: 'pdf'`, each entry also gets the real page it lands on. `{.no-toc}` keeps the "Table of contents" heading itself out of the list it sits above.
+
 ## Markup
 
 ```html
@@ -40,16 +67,16 @@ Set directly on the directive, per placement: `::toc{minDepth=1 maxDepth=2 pageN
 
 Nothing else is generated: no default css classes are shipped except through a theme (see [default theme](../themes/default.md)). Custom themes get this markup unstyled unless they define these selectors themselves.
 
-| Selector           | Wraps                                   | What it controls                                                                                                                                                                    |
-| ------------------ | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.toc`             | The whole `::toc` placement (a `<nav>`) | Container spacing, background, border, max-width. One per `::toc` in the document.                                                                                                  |
-| `.toc-list`        | The entries (an `<ol>`)                 | List reset (`list-style`, `padding`), overall border/radius if the list itself is boxed.                                                                                            |
-| `.toc-item`        | One entry (an `<li>`)                   | Per-row spacing (`margin-top` between entries). Also carries `data-level` (absolute heading depth, e.g. `2` for h2).                                                                |
-| `[data-toc-level]` | Same `<li>`, relative depth attribute   | Depth relative to `minDepth`, `0` for the shallowest included level. Use `[data-toc-level="0"]` to target top-level entries specifically, regardless of what `minDepth` was set to. |
-| `--toc-level`      | Same `<li>`, inline css custom property | Same relative depth as a number, meant for `calc()`, e.g. `padding-left: calc(var(--toc-level, 0) * 1.25em)` for indentation.                                                       |
-| `.toc-link`        | The clickable row (an `<a href="#id">`) | Layout of title + page number together: `display: flex`, alignment, gap, removing the underline.                                                                                    |
-| `.toc-title`       | The heading text (a `<span>`)           | Text color/weight/size, and the leader (e.g. a `border-bottom: dotted` that stretches to fill the row via `flex: 1`).                                                               |
-| `.toc-page`        | The page number (a `<span>`)            | Only present when `pageNumbers` is on and the format is `pdf`. Empty on the first export pass, filled on the second. Color, weight, alignment of the number itself.                 |
+| Selector           | Wraps                                   | What it controls                                                  |
+| ------------------ | --------------------------------------- | ----------------------------------------------------------------- |
+| `.toc`             | The whole `::toc` placement (a `<nav>`) | Container: spacing, background, border, max-width                 |
+| `.toc-list`        | The entries (an `<ol>`)                 | List reset, border/radius if boxed                                |
+| `.toc-item`        | One entry (an `<li>`)                   | Spacing between rows. Carries `data-level` (absolute depth)       |
+| `[data-toc-level]` | Same `<li>`, relative depth attribute   | `0` for the shallowest level, `1` for the next, etc.              |
+| `--toc-level`      | Same `<li>`, inline css custom property | Same depth as a number, for `calc()`-based indentation            |
+| `.toc-link`        | The clickable row (an `<a href="#id">`) | Layout of title + page together: flex, alignment, gap             |
+| `.toc-title`       | The heading text (a `<span>`)           | Text color/weight/size, and the leader between title and page     |
+| `.toc-page`        | The page number (a `<span>`)            | Only present with `pageNumbers` + `pdf`. Color, weight, alignment |
 
 ## Notes
 

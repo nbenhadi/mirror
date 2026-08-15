@@ -58,3 +58,5 @@ Ships css for the [toc plugin](../plugins/toc.md):
 - dotted leader between title and page number
 - top-level entries are bold
 - every level shares the same color and font size (only weight tells them apart)
+
+Ships css for the [glossary plugin](../plugins/glossary.md): `.glossary-term` gets accent color, reads as "defined elsewhere" without looking like a real link.

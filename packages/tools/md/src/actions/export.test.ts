@@ -162,4 +162,54 @@ describe('export action', () => {
     expect(pages).toHaveLength(3)
     expect(pages[0]).toMatch(/Documentation technique\D*3/)
   }, 20000)
+
+  it('fills the glossary page column, skips excluded pages, and prunes unused terms', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'mirror-md-'))
+    const source = join(dir, 'doc.md')
+    await writeFile(
+      source,
+      [
+        '---',
+        'plugins: [glossary]',
+        '---',
+        ':::glossary{prune=true skipPages=2}',
+        '| Term | Definition | Page |',
+        '| --- | --- | --- |',
+        '| Vault | Encrypted credential store | |',
+        '| Ghost | Never mentioned in the document | |',
+        ':::',
+        '',
+        '# Title',
+        '',
+        '::pagebreak',
+        '',
+        '## Section one',
+        '',
+        'This page briefly mentions Vault for the first time.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section two',
+        '',
+        'Vault appears again here, on a page that is not excluded.',
+        '',
+        '::pagebreak',
+        '',
+        '## Section three',
+        '',
+        'filler content',
+      ].join('\n')
+    )
+
+    const result = await exportMarkdown({ action: 'export', path: source, format: 'pdf' }, ctx)
+
+    expect(result.success).toBe(true)
+    if (!result.success) return
+
+    const pages = await extractPageTexts(result.data.path)
+    expect(pages).toHaveLength(4)
+    expect(pages[0]).toContain('Vault')
+    expect(pages[0]).not.toContain('Ghost')
+    expect(pages[0]).toMatch(/Vault[^0-9]*3/)
+  }, 20000)
 })

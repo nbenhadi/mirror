@@ -5,6 +5,7 @@ import type { Element, ElementContent } from 'hast'
 import { getHeadingId, getHeadingClasses } from '../engine/anchors.js'
 import { isDirectiveNode } from '../engine/directives.js'
 import { resolveAnchorPages } from '../engine/pdf-text.js'
+import { toNumber, toBoolean } from './directive-attrs.js'
 import type { MdPlugin, RenderContext, AfterExportResult } from './types.js'
 
 const DEFAULT_MIN_DEPTH = 2
@@ -26,22 +27,6 @@ function isPageMap(value: unknown): value is Record<string, number> {
 
 function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === 'string')
-}
-
-function toNumber(value: unknown): number | undefined {
-  if (typeof value === 'number') return value
-  if (typeof value === 'string' && value.trim() !== '') {
-    const parsed = Number(value)
-    return Number.isFinite(parsed) ? parsed : undefined
-  }
-  return undefined
-}
-
-function toBoolean(value: unknown): boolean | undefined {
-  if (typeof value === 'boolean') return value
-  if (value === 'true') return true
-  if (value === 'false') return false
-  return undefined
 }
 
 function buildTocItem(
