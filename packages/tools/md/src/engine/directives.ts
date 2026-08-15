@@ -4,12 +4,12 @@ import type { Root } from 'mdast'
 
 const DIRECTIVE_NODE_TYPES = new Set(['containerDirective', 'leafDirective', 'textDirective'])
 
-interface DirectiveNode extends Node {
+export interface DirectiveNode extends Node {
   name: string
   attributes?: Record<string, string | null | undefined>
 }
 
-function isDirectiveNode(node: Node): node is DirectiveNode {
+export function isDirectiveNode(node: Node): node is DirectiveNode {
   return DIRECTIVE_NODE_TYPES.has(node.type)
 }
 

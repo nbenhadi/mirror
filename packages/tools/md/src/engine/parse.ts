@@ -12,7 +12,7 @@ export function isInvalidFrontMatterError(err: unknown): err is Error {
   return err instanceof Error && err.name === 'YAMLException'
 }
 
-export type PluginEntry = string | ({ id: string } & Record<string, unknown>)
+export type PluginEntry = string
 
 export type HeaderFooterItem = string | { text: string } | { image: string }
 export type HeaderFooterSlotContent = HeaderFooterItem | HeaderFooterItem[]
@@ -41,17 +41,8 @@ export interface ParsedDocument {
   content: string
 }
 
-function isPluginEntry(value: unknown): value is PluginEntry {
-  if (typeof value === 'string') return true
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    typeof (value as { id?: unknown }).id === 'string'
-  )
-}
-
 function isPluginEntryArray(value: unknown): value is PluginEntry[] {
-  return Array.isArray(value) && value.every(isPluginEntry)
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
 }
 
 function isHeaderFooterItem(value: unknown): value is HeaderFooterItem {

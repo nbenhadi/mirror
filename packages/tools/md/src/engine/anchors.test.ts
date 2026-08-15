@@ -49,4 +49,14 @@ describe('assignHeadingIds', () => {
     expect(html).not.toContain('{.some-class}')
     expect(html).toContain('id="just-a-title"')
   })
+
+  it('keeps a pandoc-style class attribute as a real class on the heading', async () => {
+    const html = await renderWithAnchors('## Just a title {.some-class}')
+    expect(html).toContain('<h2 id="just-a-title" class="some-class">Just a title</h2>')
+  })
+
+  it('combines an explicit id with a class in the same attribute block', async () => {
+    const html = await renderWithAnchors('## Title {#custom-id .some-class}')
+    expect(html).toContain('<h2 id="custom-id" class="some-class">Title</h2>')
+  })
 })
