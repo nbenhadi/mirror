@@ -473,6 +473,14 @@ hr {
   color: var(--ink);
   font-variant-numeric: tabular-nums;
 }
+
+.glossary {
+  margin-bottom: ${SPACE_LG};
+}
+
+.glossary-term {
+  color: var(--accent);
+}
 `,
   margins: { x: 80, y: 50 },
 }

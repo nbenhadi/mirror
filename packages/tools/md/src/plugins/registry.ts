@@ -3,11 +3,13 @@ import { resolve, isAbsolute } from 'node:path'
 import type { MdPlugin } from './types.js'
 import type { PluginEntry } from '../engine/parse.js'
 import { createTocPlugin } from './toc.js'
+import { createGlossaryPlugin } from './glossary.js'
 
 type PluginFactory = () => MdPlugin
 
 const BUNDLED: Record<string, PluginFactory> = {
   toc: createTocPlugin,
+  glossary: createGlossaryPlugin,
 }
 
 const INVALID_PLUGIN_PREFIX = 'invalid md plugin: '
