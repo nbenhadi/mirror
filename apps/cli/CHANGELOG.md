@@ -1,5 +1,20 @@
 # @nbenhadi/mirror-cli
 
+## 1.8.0
+
+### Minor Changes
+
+- 388b73c: Add a table of contents plugin for md exports, with themeable style and optional page numbers
+- 388b73c: Add a glossary plugin for md exports, with automatic page numbers and unused-term cleanup
+- 388b73c: Add a template plugin for md exports, filling documents from json or yaml data and repeating pages per record
+
+### Patch Changes
+
+- 388b73c: Show a clear error instead of crashing when pdf or png export can't run
+- 388b73c: Increase heading size in the default md theme
+- 388b73c: Fix the browser and text editor not opening after md preview or edit on Windows
+- 388b73c: Fix export crashing when saving directly to a drive letter on Windows
+
 ## 1.7.0
 
 ### Minor Changes
