@@ -37,7 +37,7 @@ jobs:
         run: pnpm build
 
       - name: Create Release PR or Publish
-        uses: changesets/action@v2
+        uses: changesets/action@v1
         with:
           publish: pnpm --filter "./apps/cli" --filter "./apps/tui" publish --no-git-checks --access restricted
           version: pnpm changeset version
