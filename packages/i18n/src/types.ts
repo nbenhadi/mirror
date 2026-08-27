@@ -31,6 +31,7 @@ export type TranslationKey =
   | 'tui.key.complete'
   | 'tui.key.list'
   | 'tui.key.clear'
+  | 'tui.key.reveal'
   | 'tui.confirm_quit'
   | 'tui.working'
 
@@ -103,6 +104,7 @@ export type TranslationKey =
   | 'cmd.vault.list.description'
   | 'cmd.vault.list.opt.search'
   | 'cmd.vault.list.opt.tag'
+  | 'cmd.vault.list.opt.reveal'
   | 'cmd.vault.list.empty'
   | 'cmd.vault.list.count_one'
   | 'cmd.vault.list.count_many'
@@ -110,8 +112,8 @@ export type TranslationKey =
   | 'cmd.vault.get.opt.title'
   | 'cmd.vault.get.opt.showPassword'
   | 'cmd.vault.edit.description'
+  | 'cmd.vault.edit.opt.entry'
   | 'cmd.vault.edit.opt.title'
-  | 'cmd.vault.edit.opt.new_title'
   | 'cmd.vault.edit.opt.username'
   | 'cmd.vault.edit.opt.password'
   | 'cmd.vault.edit.opt.url'
@@ -143,6 +145,21 @@ export type TranslationKey =
   | 'cmd.vault.purge.already_empty'
   | 'cmd.vault.purge.all_confirm'
   | 'cmd.vault.error.invalid_password'
+  | 'cmd.vault.tag.description'
+  | 'cmd.vault.tag.add.description'
+  | 'cmd.vault.tag.add.opt.name'
+  | 'cmd.vault.tag.add.success'
+  | 'cmd.vault.tag.list.description'
+  | 'cmd.vault.tag.list.empty'
+  | 'cmd.vault.tag.list.count_one'
+  | 'cmd.vault.tag.list.count_many'
+  | 'cmd.vault.tag.edit.description'
+  | 'cmd.vault.tag.edit.opt.name'
+  | 'cmd.vault.tag.edit.opt.newName'
+  | 'cmd.vault.tag.edit.success'
+  | 'cmd.vault.tag.delete.description'
+  | 'cmd.vault.tag.delete.opt.name'
+  | 'cmd.vault.tag.delete.success'
 
   // Vault tool errors
   | 'tool.vault.error.locked'
@@ -160,6 +177,8 @@ export type TranslationKey =
   | 'tool.vault.error.entry_not_found'
   | 'tool.vault.error.not_in_trash'
   | 'tool.vault.error.init_failed'
+  | 'tool.vault.error.tag_exists'
+  | 'tool.vault.error.tag_not_found'
 
   // Settings tool
   | 'cmd.settings.description'
@@ -189,6 +208,7 @@ export type TranslationKey =
   | 'cmd.settings.opt.tui.keybindings.adjustRight'
   | 'cmd.settings.opt.tui.keybindings.select'
   | 'cmd.settings.opt.tui.keybindings.toggle'
+  | 'cmd.settings.opt.tui.keybindings.revealPassword'
   | 'cmd.settings.opt.tools.vault.path'
 
   // Settings tool errors
@@ -313,6 +333,7 @@ export type TranslationKey =
   | 'tags'
   | 'notes'
   | 'id'
+  | 'count'
   | 'description'
   | 'source'
   | 'key'

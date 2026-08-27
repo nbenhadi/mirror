@@ -78,6 +78,12 @@ export const EDITABLE_FIELDS: FieldDef[] = [
     validate: nonEmptyString,
   },
   {
+    key: 'tui.keybindings.revealPassword',
+    default: KEYBINDINGS_DEFAULTS.revealPassword,
+    description: 'cmd.settings.opt.tui.keybindings.revealPassword',
+    validate: nonEmptyString,
+  },
+  {
     key: 'tools.vault.path',
     default: getUserDataDir(),
     description: 'cmd.settings.opt.tools.vault.path',

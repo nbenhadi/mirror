@@ -13,6 +13,10 @@ import { restore } from './actions/restore.js'
 import { trash } from './actions/trash.js'
 import { purge } from './actions/purge.js'
 import { rekey } from './actions/rekey.js'
+import { tagAdd } from './actions/tag/add.js'
+import { tagList } from './actions/tag/list.js'
+import { tagEdit } from './actions/tag/edit.js'
+import { tagDelete } from './actions/tag/delete.js'
 
 export async function execute(input: VaultInput, ctx: ToolContext): Promise<ToolResult<unknown>> {
   switch (input.action) {
@@ -42,5 +46,13 @@ export async function execute(input: VaultInput, ctx: ToolContext): Promise<Tool
       return purge(input, ctx)
     case 'rekey':
       return rekey(input, ctx)
+    case 'tag.add':
+      return tagAdd(input, ctx)
+    case 'tag.list':
+      return tagList(input, ctx)
+    case 'tag.edit':
+      return tagEdit(input, ctx)
+    case 'tag.delete':
+      return tagDelete(input, ctx)
   }
 }

@@ -28,7 +28,7 @@ describe('add', () => {
   })
 
   it('adds entry with all optional fields', async () => {
-    mockReadVault.mockResolvedValue(makeVault())
+    mockReadVault.mockResolvedValue(makeVault([], ['work']))
     const r = await add(
       {
         action: 'add',
@@ -70,5 +70,37 @@ describe('add', () => {
     )
     const r = await add({ action: 'add', title: 'GitHub', tags: [] }, ctx)
     expect(r.success).toBe(true)
+  })
+})
+
+describe('add tags', () => {
+  it('fails with NOT_FOUND when a tag does not exist yet', async () => {
+    const vault = makeVault()
+    mockReadVault.mockResolvedValue(vault)
+    const r = await add({ action: 'add', title: 'GitHub', tags: ['work'] }, ctx)
+    expect(r.success).toBe(false)
+    if (!r.success) expect(r.error.code).toBe('NOT_FOUND')
+    expect(vault.tags).toEqual([])
+  })
+
+  it('reuses existing tag casing from the registry', async () => {
+    const vault = makeVault([], ['Work'])
+    mockReadVault.mockResolvedValue(vault)
+    const r = await add({ action: 'add', title: 'GitHub', tags: ['work'] }, ctx)
+    expect(r.success).toBe(true)
+    if (r.success) {
+      const id = r.data.id
+      const entry = vault.entries.find((e) => e.id === id)
+      expect(entry?.tags).toEqual(['Work'])
+    }
+    expect(vault.tags).toEqual(['Work'])
+  })
+
+  it('reuses existing tag casing already used by another entry', async () => {
+    const vault = makeVault([makeEntry({ id: 'x', title: 'Other', tags: ['Personal'] })])
+    mockReadVault.mockResolvedValue(vault)
+    await add({ action: 'add', title: 'GitHub', tags: ['personal'] }, ctx)
+    const entry = vault.entries.find((e) => e.title === 'GitHub')
+    expect(entry?.tags).toEqual(['Personal'])
   })
 })

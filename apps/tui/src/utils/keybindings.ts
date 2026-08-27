@@ -24,6 +24,7 @@ function build() {
     adjustRight: o.adjustRight ?? DEFAULTS.adjustRight,
     select: o.select ?? DEFAULTS.select,
     toggle: o.toggle ?? DEFAULTS.toggle,
+    revealPassword: o.revealPassword ?? DEFAULTS.revealPassword,
   }
   return {
     quit: { label: label(c.quit), code: c.quit },
@@ -40,6 +41,7 @@ function build() {
     },
     select: { label: label(c.select), code: c.select },
     toggle: { label: label(c.toggle), code: c.toggle },
+    revealPassword: { label: label(c.revealPassword), code: c.revealPassword },
   }
 }
 

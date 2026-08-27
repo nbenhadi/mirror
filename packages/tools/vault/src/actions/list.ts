@@ -6,9 +6,15 @@ type EntryPreview = {
   username: string
   url: string
   tags: string[]
+  password?: string
 }
 
-type ListInput = { action: 'list'; search?: string | undefined; tag?: string | undefined }
+type ListInput = {
+  action: 'list'
+  search?: string | undefined
+  tag?: string | undefined
+  reveal?: boolean | undefined
+}
 
 function globToRegex(pattern: string): RegExp {
   const escaped = pattern.replace(/[.+^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '.*')
@@ -50,6 +56,7 @@ export async function list(
   return withVaultSession(async ({ vault }) => {
     const search = input.search?.toLowerCase()
     const tag = input.tag
+    const reveal = input.reveal ?? false
 
     const entries: EntryPreview[] = vault.entries
       .filter((e) => {
@@ -66,6 +73,7 @@ export async function list(
         username: e.username ?? '',
         url: e.url ?? '',
         tags: e.tags,
+        ...(e.password !== undefined && { password: reveal ? e.password : '••••••••' }),
       }))
 
     return { success: true, data: { entries, count: entries.length } }

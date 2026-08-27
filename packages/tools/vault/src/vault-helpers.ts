@@ -44,3 +44,44 @@ export function findActiveEntryIndex(entries: Entry[], title: string): number {
   const lower = title.toLowerCase()
   return entries.findIndex((e) => e.title.toLowerCase() === lower && !e.deleted_at)
 }
+
+export function findCanonicalTagName(vault: VaultData, name: string): string | undefined {
+  const lower = name.toLowerCase()
+  const inRegistry = vault.tags.find((t) => t.toLowerCase() === lower)
+  if (inRegistry) return inRegistry
+  for (const entry of vault.entries) {
+    const found = entry.tags.find((t) => t.toLowerCase() === lower)
+    if (found) return found
+  }
+  return undefined
+}
+
+export type ResolveTagsResult = { success: true; tags: string[] } | { success: false; name: string }
+
+export function resolveEntryTags(vault: VaultData, names: string[]): ResolveTagsResult {
+  const resolved: string[] = []
+  for (const raw of names) {
+    const name = raw.trim()
+    if (!name) continue
+    const canonical = findCanonicalTagName(vault, name)
+    if (canonical === undefined) return { success: false, name }
+    if (!resolved.includes(canonical)) resolved.push(canonical)
+  }
+  return { success: true, tags: resolved }
+}
+
+export function allTagNames(vault: VaultData): string[] {
+  const names = [...vault.tags]
+  for (const entry of vault.entries) {
+    for (const tag of entry.tags) {
+      if (!names.some((n) => n.toLowerCase() === tag.toLowerCase())) names.push(tag)
+    }
+  }
+  return names
+}
+
+export function countEntriesByTag(entries: Entry[], tagName: string): number {
+  const lower = tagName.toLowerCase()
+  return entries.filter((e) => !e.deleted_at && e.tags.some((t) => t.toLowerCase() === lower))
+    .length
+}

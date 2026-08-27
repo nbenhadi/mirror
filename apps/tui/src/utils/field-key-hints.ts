@@ -20,9 +20,14 @@ export function fieldKeyHints(spec: FieldSpec, hasSuggestions = false): KeyHint[
       return [{ key: keybindings.adjust.label, label: t('tui.key.adjust') }]
     case 'path':
       return suggestHints()
-    case 'text':
-      return hasSuggestions ? suggestHints() : []
+    case 'text': {
+      const hints = hasSuggestions ? suggestHints() : []
+      return spec.mask
+        ? [...hints, { key: keybindings.revealPassword.label, label: t('tui.key.reveal') }]
+        : hints
+    }
     case 'text-array':
+      return hasSuggestions ? suggestHints() : []
     case 'group-header':
       return []
   }

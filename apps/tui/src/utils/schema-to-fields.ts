@@ -106,7 +106,7 @@ function textField(
         ? autoDesc
         : undefined
 
-  if (label === 'path' || label === 'output') {
+  if (label.toLowerCase().includes('path') || label === 'output') {
     return {
       type: 'path',
       key,
@@ -315,7 +315,10 @@ export function initialValues(fields: FieldSpec[]): FieldValues {
   return values
 }
 
-export function unflattenValues(values: FieldValues): Record<string, unknown> {
+export function unflattenValues(
+  values: FieldValues,
+  keepEmpty: Set<string> = new Set()
+): Record<string, unknown> {
   const result: Record<string, unknown> = {}
   for (const [key, value] of Object.entries(values)) {
     const dot = key.indexOf('.')
@@ -333,7 +336,7 @@ export function unflattenValues(values: FieldValues): Record<string, unknown> {
 
   for (const key of Object.keys(result)) {
     const value = result[key]
-    if (value === '') {
+    if (value === '' && !keepEmpty.has(key)) {
       delete result[key]
     } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       const nested = value as Record<string, unknown>

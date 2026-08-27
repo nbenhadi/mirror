@@ -38,13 +38,14 @@ Press Q or Escape to go back to the previous screen at any point.
 
 Default keybindings can be changed via `mir-cli settings set` or through the settings tool in the TUI.
 
-| Action        | Default key |
-| ------------- | ----------- |
-| Quit          | Ctrl+C      |
-| Back          | Q           |
-| Navigate up   | Arrow Up    |
-| Navigate down | Arrow Down  |
-| Adjust left   | Arrow Left  |
-| Adjust right  | Arrow Right |
-| Select        | Enter       |
-| Toggle        | Space       |
+| Action                 | Default key |
+| ---------------------- | ----------- |
+| Quit                   | Ctrl+C      |
+| Back                   | Q           |
+| Navigate up            | Arrow Up    |
+| Navigate down          | Arrow Down  |
+| Adjust left            | Arrow Left  |
+| Adjust right           | Arrow Right |
+| Select                 | Enter       |
+| Toggle                 | Space       |
+| Reveal masked password | Tab         |

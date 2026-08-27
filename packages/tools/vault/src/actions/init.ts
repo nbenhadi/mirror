@@ -33,6 +33,7 @@ export async function init(
   const vaultData: VaultData = {
     version: 1,
     entries: [],
+    tags: [],
     created_at: new Date().toISOString(),
     salt: salt.toString('base64'),
     kdf: DEFAULT_KDF,

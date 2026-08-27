@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { writeVault } from '../vault-file.js'
-import { withVaultSession, findActiveEntry } from '../vault-helpers.js'
+import { withVaultSession, findActiveEntry, resolveEntryTags } from '../vault-helpers.js'
 import type { Entry } from '../types.js'
 import type { VaultInput } from '../schema.js'
 
@@ -20,11 +20,23 @@ export async function add(input: AddInput, _ctx: ToolContext): Promise<ToolResul
       }
     }
 
+    const resolvedTags = resolveEntryTags(vault, input.tags)
+    if (!resolvedTags.success) {
+      return {
+        success: false,
+        error: {
+          code: 'NOT_FOUND',
+          message: 'tool.vault.error.tag_not_found',
+          params: { name: resolvedTags.name },
+        },
+      }
+    }
+
     const now = new Date().toISOString()
     const entry: Entry = {
       id: randomUUID(),
       title: input.title,
-      tags: input.tags,
+      tags: resolvedTags.tags,
       created_at: now,
       updated_at: now,
       ...(input.password !== undefined && { password: input.password }),

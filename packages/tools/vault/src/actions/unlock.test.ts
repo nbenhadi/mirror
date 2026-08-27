@@ -31,6 +31,7 @@ beforeEach(() => {
   mockReadVault.mockResolvedValue({
     version: 1,
     entries: [],
+    tags: [],
     created_at: '',
     salt: '',
     kdf: TEST_KDF,

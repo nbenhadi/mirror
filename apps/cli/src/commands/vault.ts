@@ -136,12 +136,20 @@ function createListCommand(): Command {
     .description(t('cmd.vault.list.description'))
     .option('-s, --search <query>', t('cmd.vault.list.opt.search'))
     .option('--tag <tag>', t('cmd.vault.list.opt.tag'))
-    .action(async (options: { search?: string; tag?: string }) => {
+    .option('--reveal', t('cmd.vault.list.opt.reveal'), false)
+    .action(async (options: { search?: string; tag?: string; reveal: boolean }) => {
       const { entries, count } = await vaultExecute<{
-        entries: { title: string; username?: string; url?: string; tags: string[] }[]
+        entries: {
+          title: string
+          username?: string
+          url?: string
+          tags: string[]
+          password?: string
+        }[]
         count: number
       }>({
         action: 'list',
+        reveal: options.reveal,
         ...(options.search !== undefined && { search: options.search }),
         ...(options.tag !== undefined && { tag: options.tag }),
       })
@@ -151,8 +159,15 @@ function createListCommand(): Command {
         return
       }
 
-      const rows = entries.map((e) => [e.title, e.username ?? '', e.url ?? '', e.tags.join(', ')])
-      ui.table([t('title'), t('username'), t('url'), t('tags')], rows)
+      const headers = options.reveal
+        ? [t('title'), t('username'), t('url'), t('tags'), t('cmd.vault.add.opt.password')]
+        : [t('title'), t('username'), t('url'), t('tags')]
+      const rows = entries.map((e) =>
+        options.reveal
+          ? [e.title, e.username ?? '', e.url ?? '', e.tags.join(', '), e.password ?? '']
+          : [e.title, e.username ?? '', e.url ?? '', e.tags.join(', ')]
+      )
+      ui.table(headers, rows)
       console.log()
       ui.hint(
         count === 1 ? t('cmd.vault.list.count_one') : t('cmd.vault.list.count_many', { n: count })
@@ -203,7 +218,7 @@ function createGetCommand(): Command {
 function createEditCommand(): Command {
   return new Command('edit <title>')
     .description(t('cmd.vault.edit.description'))
-    .option('--new-title <title>', t('cmd.vault.edit.opt.new_title'))
+    .option('--new-title <title>', t('cmd.vault.edit.opt.title'))
     .option('-u, --username <username>', t('cmd.vault.edit.opt.username'))
     .option('-p, --password <password>', t('cmd.vault.edit.opt.password'))
     .option('--url <url>', t('cmd.vault.edit.opt.url'))
@@ -211,7 +226,7 @@ function createEditCommand(): Command {
     .option('--tags <tags>', t('cmd.vault.edit.opt.tags'))
     .action(
       async (
-        title: string,
+        entry: string,
         options: {
           newTitle?: string
           username?: string
@@ -224,8 +239,8 @@ function createEditCommand(): Command {
         const tags = options.tags ? options.tags.split(',').map((t) => t.trim()) : undefined
         const data = await vaultExecute<{ title: string }>({
           action: 'edit',
-          title,
-          ...(options.newTitle !== undefined && { newTitle: options.newTitle }),
+          entry,
+          ...(options.newTitle !== undefined && { title: options.newTitle }),
           ...(options.username !== undefined && { username: options.username }),
           ...(options.password !== undefined && { password: options.password }),
           ...(options.url !== undefined && { url: options.url }),
@@ -327,6 +342,74 @@ function createPurgeCommand(): Command {
     })
 }
 
+function createTagAddCommand(): Command {
+  return new Command('add <name>')
+    .description(t('cmd.vault.tag.add.description'))
+    .action(async (name: string) => {
+      await vaultExecute<{ name: string }>({ action: 'tag.add', name })
+      ui.printSuccess(t('cmd.vault.tag.add.success', { name }))
+    })
+}
+
+function createTagListCommand(): Command {
+  return new Command('list').description(t('cmd.vault.tag.list.description')).action(async () => {
+    const { tags, count } = await vaultExecute<{
+      tags: { name: string; count: number }[]
+      count: number
+    }>({ action: 'tag.list' })
+
+    if (count === 0) {
+      console.log(t('cmd.vault.tag.list.empty'))
+      return
+    }
+
+    const rows = tags.map((tg) => [tg.name, String(tg.count)])
+    ui.table([t('tags'), t('count')], rows)
+    console.log()
+    ui.hint(
+      count === 1
+        ? t('cmd.vault.tag.list.count_one')
+        : t('cmd.vault.tag.list.count_many', { n: count })
+    )
+  })
+}
+
+function createTagEditCommand(): Command {
+  return new Command('edit <name> <newName>')
+    .description(t('cmd.vault.tag.edit.description'))
+    .action(async (name: string, newName: string) => {
+      const data = await vaultExecute<{ name: string; entriesUpdated: number }>({
+        action: 'tag.edit',
+        name,
+        newName,
+      })
+      ui.printSuccess(t('cmd.vault.tag.edit.success', { name: data.name, n: data.entriesUpdated }))
+    })
+}
+
+function createTagDeleteCommand(): Command {
+  return new Command('delete <name>')
+    .description(t('cmd.vault.tag.delete.description'))
+    .action(async (name: string) => {
+      const data = await vaultExecute<{ name: string; entriesUpdated: number }>({
+        action: 'tag.delete',
+        name,
+      })
+      ui.printSuccess(
+        t('cmd.vault.tag.delete.success', { name: data.name, n: data.entriesUpdated })
+      )
+    })
+}
+
+function createTagCommand(): Command {
+  const cmd = new Command('tag').description(t('cmd.vault.tag.description'))
+  cmd.addCommand(createTagAddCommand())
+  cmd.addCommand(createTagListCommand())
+  cmd.addCommand(createTagEditCommand())
+  cmd.addCommand(createTagDeleteCommand())
+  return cmd
+}
+
 export function createVaultCommand(): Command {
   const cmd = new Command('vault').description(t('cmd.vault.description'))
   cmd.addCommand(createInitCommand())
@@ -338,9 +421,10 @@ export function createVaultCommand(): Command {
   cmd.addCommand(createGetCommand())
   cmd.addCommand(createEditCommand())
   cmd.addCommand(createDeleteCommand())
-  cmd.addCommand(createRestoreCommand())
   cmd.addCommand(createTrashCommand())
-  cmd.addCommand(createRekeyCommand())
+  cmd.addCommand(createRestoreCommand())
   cmd.addCommand(createPurgeCommand())
+  cmd.addCommand(createTagCommand())
+  cmd.addCommand(createRekeyCommand())
   return cmd
 }

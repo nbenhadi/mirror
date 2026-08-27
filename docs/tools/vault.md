@@ -46,13 +46,15 @@ Input: optional `newPath`.
 
 Adds a new entry.
 
-Input: `title` (required), optional `username`, `password`, `url`, `notes`, `tags` (string array).
+Input: `title` (required), optional `username`, `password`, `url`, `notes`, `tags` (string array). Every tag must already exist (see [tags](#tags)): create it first with `tag.add`, otherwise the action fails.
 
 ### list
 
 Lists all non-trashed entries.
 
-Input: optional `search` (matches title or username), optional `tag`.
+Input: optional `search` (matches title or username), optional `tag`, optional `reveal` (default `false`).
+
+By default passwords are masked. Pass `reveal: true` to show them in plaintext. This is opt-in per call, never persisted: the same risk tradeoff as `get`, but for every listed entry at once. Prefer `get` when you only need one password.
 
 ### get
 
@@ -64,7 +66,9 @@ Input: `title`.
 
 Updates fields of an existing entry.
 
-Input: `title` (required), optional `newTitle`, `username`, `password`, `url`, `notes`, `tags`.
+Input: `entry` (required, identifies which entry to edit), optional `title` (rename), `username`, `password`, `url`, `notes`, `tags`.
+
+A field left out of the input is untouched. A field explicitly set to an empty string clears it (`username: ''` removes the username). `tags` follows a different rule since it is an array, not a string: omit it to leave tags untouched, pass `[]` to clear all tags, pass a list to replace them entirely. Every tag must already exist (see [tags](#tags)): create it first with `tag.add`, otherwise the action fails.
 
 ### delete
 
@@ -93,3 +97,31 @@ Input: optional `title`. If omitted, purges all trashed entries.
 Changes the master password. Re-encrypts the entire vault with the new key.
 
 Input: `currentPassword`, `newPassword`.
+
+## Tags
+
+Tags are shared across entries, matched case-insensitively. `add` and `edit` reuse the existing casing when a typed name already matches a known tag, but never create a new one: assigning a name that matches no tag fails with `tool.vault.error.tag_not_found`. Create a tag with `tag.add` before assigning it to an entry.
+
+### tag.add
+
+Creates a new tag with no entries attached yet, so it shows up as a suggestion before anything uses it.
+
+Input: `name`.
+
+### tag.list
+
+Lists every tag with the number of active entries using it, including tags created via `tag.add` that no entry uses yet.
+
+### tag.edit
+
+Renames a tag. Every entry using the old name is updated to the new name.
+
+Input: `name` (current), `newName`.
+
+If `newName` already identifies another tag, the two tags merge: every entry that had either name ends up with just the target name.
+
+### tag.delete
+
+Deletes a tag. Every entry using it has the tag removed; the entries themselves are not affected.
+
+Input: `name`.
