@@ -36,6 +36,55 @@ async function slideThemeSuggestions(prefix: string): Promise<string[]> {
   return themeSuggestions(prefix, 'slide')
 }
 
+async function vaultTitleSuggestions(prefix: string): Promise<string[]> {
+  const result = await execute({ toolId: VAULT_TOOL_ID, input: { action: 'list' } })
+  if (!result.success) return []
+  const { entries } = result.data as { entries: { title: string }[] }
+  return entries
+    .map((e) => e.title)
+    .filter((title) => title.toLowerCase().startsWith(prefix.toLowerCase()))
+}
+
+async function vaultTrashedTitleSuggestions(prefix: string): Promise<string[]> {
+  const result = await execute({ toolId: VAULT_TOOL_ID, input: { action: 'trash' } })
+  if (!result.success) return []
+  const { entries } = result.data as { entries: { title: string }[] }
+  return entries
+    .map((e) => e.title)
+    .filter((title) => title.toLowerCase().startsWith(prefix.toLowerCase()))
+}
+
+async function vaultTagSuggestions(prefix: string): Promise<string[]> {
+  const result = await execute({ toolId: VAULT_TOOL_ID, input: { action: 'tag.list' } })
+  if (!result.success) return []
+  const { tags } = result.data as { tags: { name: string }[] }
+  return tags
+    .map((tg) => tg.name)
+    .filter((name) => name.toLowerCase().startsWith(prefix.toLowerCase()))
+}
+
+async function vaultEntryPrefill(title: string): Promise<FieldValues | null> {
+  const result = await execute({
+    toolId: VAULT_TOOL_ID,
+    input: { action: 'get', title, showPassword: true },
+  })
+  if (!result.success) return null
+  const e = result.data as {
+    username?: string
+    password?: string
+    url?: string
+    notes?: string
+    tags: string[]
+  }
+  return {
+    ...(e.username !== undefined && { username: e.username }),
+    ...(e.password !== undefined && { password: e.password }),
+    ...(e.url !== undefined && { url: e.url }),
+    ...(e.notes !== undefined && { notes: e.notes }),
+    tags: e.tags.join(', '),
+  }
+}
+
 export async function resolveToolEntry(toolId: string): Promise<Screen | null> {
   if (toolId === SETTINGS_TOOL_ID) return { id: 'settings' }
   if (toolId === VAULT_TOOL_ID) {
@@ -55,6 +104,9 @@ export interface ToolProps {
   validateExtra?: (values: FieldValues) => string | null
   fieldSuggestions?: Record<string, (value: string) => Promise<string[]>>
   fieldVisible?: (key: string, values: FieldValues) => boolean
+  prefillOnMatch?: { matchKey: string; fetch: (value: string) => Promise<FieldValues | null> }
+  sendEmptyFor?: string[]
+  dynamicSelect?: Record<string, () => Promise<string[]>>
 }
 
 function exportFieldVisible(key: string, values: FieldValues): boolean {
@@ -171,8 +223,7 @@ export function getToolProps(
   }
 
   const base: ToolProps = {
-    onBack: () =>
-      action ? navigate({ id: 'generic', toolId: VAULT_TOOL_ID }) : navigate({ id: 'home' }),
+    onBack,
     ...(action === 'lock' && { onSuccess: () => navigate({ id: 'home' }) }),
     ...(action === 'unlock' && {
       onSuccess: () => navigate({ id: 'generic', toolId: VAULT_TOOL_ID }),
@@ -187,6 +238,39 @@ export function getToolProps(
   }
   if (action === 'rekey') {
     return { ...base, ...passwordConfirm('confirmNewPassword', 'newPassword') }
+  }
+  if (action === 'add') {
+    return { ...base, fieldSuggestions: { tags: vaultTagSuggestions } }
+  }
+  if (action === 'edit') {
+    return {
+      ...base,
+      fieldSuggestions: { entry: vaultTitleSuggestions, tags: vaultTagSuggestions },
+      dynamicSelect: { entry: () => vaultTitleSuggestions('') },
+      prefillOnMatch: { matchKey: 'entry', fetch: vaultEntryPrefill },
+      sendEmptyFor: ['username', 'password', 'url', 'notes'],
+    }
+  }
+  if (action === 'get' || action === 'delete') {
+    return {
+      ...base,
+      fieldSuggestions: { title: vaultTitleSuggestions },
+      dynamicSelect: { title: () => vaultTitleSuggestions('') },
+    }
+  }
+  if (action === 'restore') {
+    return {
+      ...base,
+      fieldSuggestions: { title: vaultTrashedTitleSuggestions },
+      dynamicSelect: { title: () => vaultTrashedTitleSuggestions('') },
+    }
+  }
+  if (action === 'tag.edit' || action === 'tag.delete') {
+    return {
+      ...base,
+      fieldSuggestions: { name: vaultTagSuggestions },
+      dynamicSelect: { name: () => vaultTagSuggestions('') },
+    }
   }
   return base
 }

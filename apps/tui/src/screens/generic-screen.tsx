@@ -42,6 +42,10 @@ export interface GenericScreenProps {
   validateExtra?: ((values: FieldValues) => string | null) | undefined
   fieldSuggestions?: Record<string, (value: string) => Promise<string[]>> | undefined
   fieldVisible?: ((key: string, values: FieldValues) => boolean) | undefined
+  prefillOnMatch?:
+    { matchKey: string; fetch: (value: string) => Promise<FieldValues | null> } | undefined
+  sendEmptyFor?: string[] | undefined
+  dynamicSelect?: Record<string, () => Promise<string[]>> | undefined
 }
 
 type Item = { kind: 'sub'; node: SubcommandNode } | { kind: 'field'; field: FieldSpec }
@@ -58,6 +62,9 @@ export function GenericScreen({
   validateExtra,
   fieldSuggestions,
   fieldVisible,
+  prefillOnMatch,
+  sendEmptyFor,
+  dynamicSelect,
 }: GenericScreenProps) {
   const isLeaf = useMemo(
     () => action !== undefined && isLeafAction(tool.schema, action),
@@ -82,17 +89,78 @@ export function GenericScreen({
   })
 
   const [values, setValues] = useState<FieldValues>(makeInitialValues)
+  const pristineValues = useRef(values).current
+  const autoFilledKeys = useRef<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!prefillOnMatch) return
+    const raw = values[prefillOnMatch.matchKey]
+    if (typeof raw !== 'string' || raw.length === 0) return
+
+    let cancelled = false
+    void prefillOnMatch.fetch(raw).then((data) => {
+      if (cancelled || data === null) return
+      setValues((prev) => {
+        const merged = { ...prev }
+        for (const [k, v] of Object.entries(data)) {
+          if (k === prefillOnMatch.matchKey) continue
+          if (prev[k] === pristineValues[k] || autoFilledKeys.current.has(k)) {
+            merged[k] = v
+            autoFilledKeys.current.add(k)
+          }
+        }
+        return merged
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [prefillOnMatch, prefillOnMatch && values[prefillOnMatch.matchKey]])
+
+  const [loadedOptions, setLoadedOptions] = useState<Record<string, string[]>>({})
+
+  useEffect(() => {
+    if (!dynamicSelect) return
+    let cancelled = false
+    for (const [key, fetchOptions] of Object.entries(dynamicSelect)) {
+      void fetchOptions().then((options) => {
+        if (cancelled) return
+        setLoadedOptions((prev) => ({ ...prev, [key]: options }))
+        setValues((prev) =>
+          prev[key] === '' && options[0] !== undefined ? { ...prev, [key]: options[0] } : prev
+        )
+      })
+    }
+    return () => {
+      cancelled = true
+    }
+  }, [dynamicSelect])
+
+  const applyDynamicSelect = (field: FieldSpec): FieldSpec => {
+    const options = loadedOptions[field.key]
+    if (!options || options.length === 0) return field
+    return {
+      type: 'select',
+      key: field.key,
+      label: field.label,
+      options,
+      ...(field.indent && { indent: field.indent }),
+      ...(field.description !== undefined && { description: field.description }),
+    }
+  }
 
   const items = useMemo<Item[]>(() => {
     const isVisible = (f: FieldSpec) => !fieldVisible || fieldVisible(f.key, values)
     const base = isLeaf
-      ? fields.filter(isVisible).map((field) => ({ kind: 'field' as const, field }))
+      ? fields
+          .filter(isVisible)
+          .map((field) => ({ kind: 'field' as const, field: applyDynamicSelect(field) }))
       : children.map((node) => ({ kind: 'sub' as const, node }))
     const extra = (extraFields ?? [])
       .filter(isVisible)
-      .map((f) => ({ kind: 'field' as const, field: f }))
+      .map((f) => ({ kind: 'field' as const, field: applyDynamicSelect(f) }))
     return [...base, ...extra]
-  }, [isLeaf, fields, children, extraFields, fieldVisible, values])
+  }, [isLeaf, fields, children, extraFields, fieldVisible, values, loadedOptions])
 
   const firstSelectable = items.findIndex((item) =>
     item.kind === 'sub' ? true : item.field.type !== 'group-header'
@@ -172,7 +240,11 @@ export function GenericScreen({
       }
     }
 
-    const data = await run({ ...constants, ...unflattenValues(plainValues), ...arrayData })
+    const data = await run({
+      ...constants,
+      ...unflattenValues(plainValues, sendEmptyFor && new Set(sendEmptyFor)),
+      ...arrayData,
+    })
     if (data !== null) {
       if (handleResult?.(data)) {
         // side effect handled navigation/rendering itself
@@ -201,6 +273,7 @@ export function GenericScreen({
   }, [])
 
   const onChange = (key: string, value: FieldValue) => {
+    autoFilledKeys.current.delete(key)
     setValues((prev) => ({ ...prev, [key]: value }))
     setLocalError(null)
     clearError()

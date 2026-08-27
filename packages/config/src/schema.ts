@@ -15,6 +15,7 @@ export const keybindingsSchema = z.object({
   adjustRight: z.string(),
   select: z.string(),
   toggle: z.string(),
+  revealPassword: z.string(),
 })
 
 export const kdfParamsSchema = z.object({
@@ -88,6 +89,7 @@ export const CONFIG_DEFAULTS = {
       adjustRight: 'arrowRight',
       select: 'return',
       toggle: 'space',
+      revealPassword: 'tab',
     },
   },
 } as const

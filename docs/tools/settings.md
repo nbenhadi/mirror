@@ -6,18 +6,19 @@ Reads and writes the app config file. All settings map to paths in the config JS
 
 ## Available settings
 
-| Key                            | Default           | Options          | Description          |
-| ------------------------------ | ----------------- | ---------------- | -------------------- |
-| `general.lang`                 | `en`              | `en`, `es`, `fr` | Interface language   |
-| `tui.keybindings.quit`         | `ctrl+c`          | any key string   | Quit the app         |
-| `tui.keybindings.back`         | `q`               | any key string   | Go back              |
-| `tui.keybindings.navigateUp`   | `arrowUp`         | any key string   | Move selection up    |
-| `tui.keybindings.navigateDown` | `arrowDown`       | any key string   | Move selection down  |
-| `tui.keybindings.adjustLeft`   | `arrowLeft`       | any key string   | Adjust value left    |
-| `tui.keybindings.adjustRight`  | `arrowRight`      | any key string   | Adjust value right   |
-| `tui.keybindings.select`       | `return`          | any key string   | Confirm selection    |
-| `tui.keybindings.toggle`       | `space`           | any key string   | Toggle a value       |
-| `tools.vault.path`             | platform data dir | any path         | Vault file directory |
+| Key                              | Default           | Options          | Description                    |
+| -------------------------------- | ----------------- | ---------------- | ------------------------------ |
+| `general.lang`                   | `en`              | `en`, `es`, `fr` | Interface language             |
+| `tui.keybindings.quit`           | `ctrl+c`          | any key string   | Quit the app                   |
+| `tui.keybindings.back`           | `q`               | any key string   | Go back                        |
+| `tui.keybindings.navigateUp`     | `arrowUp`         | any key string   | Move selection up              |
+| `tui.keybindings.navigateDown`   | `arrowDown`       | any key string   | Move selection down            |
+| `tui.keybindings.adjustLeft`     | `arrowLeft`       | any key string   | Adjust value left              |
+| `tui.keybindings.adjustRight`    | `arrowRight`      | any key string   | Adjust value right             |
+| `tui.keybindings.select`         | `return`          | any key string   | Confirm selection              |
+| `tui.keybindings.toggle`         | `space`           | any key string   | Toggle a value                 |
+| `tui.keybindings.revealPassword` | `tab`             | any key string   | Reveal a masked password field |
+| `tools.vault.path`               | platform data dir | any path         | Vault file directory           |
 
 ## Actions
 

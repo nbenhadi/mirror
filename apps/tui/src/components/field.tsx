@@ -33,11 +33,19 @@ export function Field({
   suggestOptions,
 }: FieldProps) {
   const interactive = spec.type === 'toggle' || spec.type === 'number' || spec.type === 'select'
+  const maskable = spec.type === 'text' && spec.mask === true
+  const [revealed, setRevealed] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!focus) setRevealed(false)
+  }, [focus])
 
   useInput(
     (input, key) => {
       if (spec.type === 'toggle' && matchesCode(input, key, keybindings.toggle.code)) {
         onChange(!asBool(value))
+      } else if (maskable && matchesCode(input, key, keybindings.revealPassword.code)) {
+        setRevealed((prev) => !prev)
       } else if (spec.type === 'number') {
         const step = key.shift ? (spec.step ?? 1) * 10 : (spec.step ?? 1)
         const min = spec.min ?? 0
@@ -57,7 +65,7 @@ export function Field({
           onChange(opts[Math.min(opts.length - 1, idx + 1)] ?? curr)
       }
     },
-    { isActive: focus && interactive }
+    { isActive: focus && (interactive || maskable) }
   )
 
   if (spec.type === 'group-header') {
@@ -130,7 +138,7 @@ export function Field({
   }
 
   const maxLength = 'maxLength' in spec ? spec.maxLength : undefined
-  const mask = spec.type === 'text' && spec.mask
+  const mask = maskable && !revealed
   const placeholder = 'placeholder' in spec ? spec.placeholder : undefined
   const handleChange =
     maxLength !== undefined ? (v: string) => onChange(v.slice(0, maxLength)) : onChange
@@ -146,6 +154,36 @@ export function Field({
           {...(placeholder !== undefined && { placeholder })}
           {...(onInfo && { onListing: onInfo })}
         />
+      </FieldShell>
+    )
+  }
+
+  if (spec.type === 'text-array' && suggestOptions) {
+    const raw = asString(value)
+    const segments = raw.split(',')
+    const currentToken = (segments.pop() ?? '').trimStart()
+    const headSegments = segments.map((s) => s.trim()).filter(Boolean)
+    const prefix = headSegments.length > 0 ? `${headSegments.join(', ')}, ` : ''
+
+    const fetchToken = async (token: string): Promise<string[]> => {
+      const results = await suggestOptions(token)
+      return results.filter((r) => !headSegments.some((h) => h.toLowerCase() === r.toLowerCase()))
+    }
+    const handleTokenChange = (token: string) => onChange(prefix + token)
+
+    return (
+      <FieldShell label={label} focus={focus} labelWidth={labelWidth}>
+        <Box>
+          {prefix !== '' && <Text {...dim}>{prefix}</Text>}
+          <SuggestInput
+            value={currentToken}
+            onChange={handleTokenChange}
+            focus={focus}
+            fetchSuggestions={fetchToken}
+            {...(placeholder !== undefined && { placeholder })}
+            {...(onInfo && { onListing: onInfo })}
+          />
+        </Box>
       </FieldShell>
     )
   }

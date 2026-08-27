@@ -32,7 +32,7 @@ function readBinary(buf: Buffer, key: Buffer): VaultData {
   }
   const decrypted = decryptBuffer(buf.subarray(HEADER_SIZE), key)
   const payload = JSON.parse(decrypted) as Omit<VaultData, 'salt' | 'kdf'>
-  return { ...payload, salt, kdf }
+  return { ...payload, tags: payload.tags ?? [], salt, kdf }
 }
 
 export async function readVault(path: string, key: Buffer): Promise<VaultData> {

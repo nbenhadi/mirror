@@ -18,6 +18,7 @@ export interface Entry {
 export interface VaultData {
   version: number
   entries: Entry[]
+  tags: string[]
   created_at: string
   salt: string
   kdf: KdfParams

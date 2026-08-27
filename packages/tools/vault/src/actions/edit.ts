@@ -1,6 +1,6 @@
 import type { ToolContext, ToolResult } from '@nbenhadi/mirror-core'
 import { writeVault } from '../vault-file.js'
-import { withVaultSession, findActiveEntry } from '../vault-helpers.js'
+import { withVaultSession, findActiveEntry, resolveEntryTags } from '../vault-helpers.js'
 import type { VaultInput } from '../schema.js'
 
 type EditInput = Extract<VaultInput, { action: 'edit' }>
@@ -10,7 +10,7 @@ export async function edit(
   _ctx: ToolContext
 ): Promise<ToolResult<{ title: string }>> {
   return withVaultSession(async ({ session, key, vault }) => {
-    const entry = findActiveEntry(vault.entries, input.title)
+    const entry = findActiveEntry(vault.entries, input.entry)
 
     if (!entry) {
       return {
@@ -18,13 +18,13 @@ export async function edit(
         error: {
           code: 'NOT_FOUND',
           message: 'tool.vault.error.entry_not_found',
-          params: { title: input.title },
+          params: { title: input.entry },
         },
       }
     }
 
-    if (input.newTitle !== undefined) {
-      const newTitle = input.newTitle
+    if (input.title !== undefined) {
+      const newTitle = input.title
       const conflict = vault.entries.find(
         (e) =>
           e.id !== entry.id && e.title.toLowerCase() === newTitle.toLowerCase() && !e.deleted_at
@@ -42,11 +42,36 @@ export async function edit(
       entry.title = newTitle
     }
 
-    if (input.username !== undefined) entry.username = input.username
-    if (input.password !== undefined) entry.password = input.password
-    if (input.url !== undefined) entry.url = input.url
-    if (input.notes !== undefined) entry.notes = input.notes
-    if (input.tags !== undefined) entry.tags = input.tags
+    if (input.username !== undefined) {
+      if (input.username === '') delete entry.username
+      else entry.username = input.username
+    }
+    if (input.password !== undefined) {
+      if (input.password === '') delete entry.password
+      else entry.password = input.password
+    }
+    if (input.url !== undefined) {
+      if (input.url === '') delete entry.url
+      else entry.url = input.url
+    }
+    if (input.notes !== undefined) {
+      if (input.notes === '') delete entry.notes
+      else entry.notes = input.notes
+    }
+    if (input.tags !== undefined) {
+      const resolvedTags = resolveEntryTags(vault, input.tags)
+      if (!resolvedTags.success) {
+        return {
+          success: false,
+          error: {
+            code: 'NOT_FOUND',
+            message: 'tool.vault.error.tag_not_found',
+            params: { name: resolvedTags.name },
+          },
+        }
+      }
+      entry.tags = resolvedTags.tags
+    }
 
     entry.updated_at = new Date().toISOString()
     await writeVault(session.vaultPath, vault, key)

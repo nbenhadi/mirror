@@ -65,4 +65,52 @@ describe('schema validation', () => {
       expect(r.data.force).toBe(false)
     }
   })
+
+  it('defaults list reveal to false', () => {
+    const r = schema.safeParse({ action: 'list' })
+    expect(r.success).toBe(true)
+    if (r.success && r.data.action === 'list') {
+      expect(r.data.reveal).toBe(false)
+    }
+  })
+
+  it('accepts edit with empty url to clear it', () => {
+    const r = schema.safeParse({ action: 'edit', entry: 'Test', url: '' })
+    expect(r.success).toBe(true)
+  })
+
+  it('rejects edit with an invalid non-empty url', () => {
+    const r = schema.safeParse({ action: 'edit', entry: 'Test', url: 'not-a-url' })
+    expect(r.success).toBe(false)
+  })
+
+  it('accepts tag.add with a name', () => {
+    const r = schema.safeParse({ action: 'tag.add', name: 'work' })
+    expect(r.success).toBe(true)
+  })
+
+  it('rejects tag.add without a name', () => {
+    const r = schema.safeParse({ action: 'tag.add' })
+    expect(r.success).toBe(false)
+  })
+
+  it('accepts tag.edit with name and newName', () => {
+    const r = schema.safeParse({ action: 'tag.edit', name: 'work', newName: 'job' })
+    expect(r.success).toBe(true)
+  })
+
+  it('rejects tag.edit without newName', () => {
+    const r = schema.safeParse({ action: 'tag.edit', name: 'work' })
+    expect(r.success).toBe(false)
+  })
+
+  it('accepts tag.delete with a name', () => {
+    const r = schema.safeParse({ action: 'tag.delete', name: 'work' })
+    expect(r.success).toBe(true)
+  })
+
+  it('accepts tag.list with no fields', () => {
+    const r = schema.safeParse({ action: 'tag.list' })
+    expect(r.success).toBe(true)
+  })
 })

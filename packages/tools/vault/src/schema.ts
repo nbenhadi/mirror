@@ -35,6 +35,7 @@ const listSchema = z.object({
   action: z.literal('list'),
   search: z.string().optional().describe('cmd.vault.list.opt.search'),
   tag: z.string().optional().describe('cmd.vault.list.opt.tag'),
+  reveal: z.boolean().default(false).describe('cmd.vault.list.opt.reveal'),
 })
 
 const getSchema = z.object({
@@ -45,13 +46,36 @@ const getSchema = z.object({
 
 const editSchema = z.object({
   action: z.literal('edit'),
-  title: z.string().min(1).describe('cmd.vault.edit.opt.title'),
-  newTitle: z.string().min(1).max(200).optional().describe('cmd.vault.edit.opt.new_title'),
+  entry: z.string().min(1).describe('cmd.vault.edit.opt.entry'),
+  title: z.string().min(1).max(200).optional().describe('cmd.vault.edit.opt.title'),
   username: z.string().optional().describe('cmd.vault.edit.opt.username'),
   password: z.string().optional().describe('cmd.vault.edit.opt.password'),
-  url: z.string().url().optional().describe('cmd.vault.edit.opt.url'),
+  url: z
+    .union([z.literal(''), z.string().url()])
+    .optional()
+    .describe('cmd.vault.edit.opt.url'),
   notes: z.string().max(2000).optional().describe('cmd.vault.edit.opt.notes'),
   tags: z.array(z.string()).optional().describe('cmd.vault.edit.opt.tags'),
+})
+
+const tagAddSchema = z.object({
+  action: z.literal('tag.add'),
+  name: z.string().min(1).max(50).describe('cmd.vault.tag.add.opt.name'),
+})
+
+const tagListSchema = z.object({
+  action: z.literal('tag.list'),
+})
+
+const tagEditSchema = z.object({
+  action: z.literal('tag.edit'),
+  name: z.string().min(1).describe('cmd.vault.tag.edit.opt.name'),
+  newName: z.string().min(1).max(50).describe('cmd.vault.tag.edit.opt.newName'),
+})
+
+const tagDeleteSchema = z.object({
+  action: z.literal('tag.delete'),
+  name: z.string().min(1).describe('cmd.vault.tag.delete.opt.name'),
 })
 
 const deleteSchema = z.object({
@@ -90,9 +114,13 @@ export const schema = z.discriminatedUnion('action', [
   getSchema,
   editSchema,
   deleteSchema,
-  restoreSchema,
   trashSchema,
+  restoreSchema,
   purgeSchema,
+  tagAddSchema,
+  tagListSchema,
+  tagEditSchema,
+  tagDeleteSchema,
   rekeySchema,
 ])
 

@@ -24,10 +24,11 @@ export function makeEntry(overrides: Partial<Entry> = {}): Entry {
   }
 }
 
-export function makeVault(entries: Entry[] = []): VaultData {
+export function makeVault(entries: Entry[] = [], tags: string[] = []): VaultData {
   return {
     version: 1,
     entries,
+    tags,
     created_at: '2026-01-01T00:00:00.000Z',
     salt: TEST_SALT,
     kdf: TEST_KDF,

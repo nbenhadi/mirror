@@ -120,6 +120,29 @@ describe('list --tag', () => {
   })
 })
 
+describe('list --reveal', () => {
+  it('masks password by default', async () => {
+    mockReadVault.mockResolvedValue(makeVault([makeEntry({ title: 'GitHub', password: 'secret' })]))
+    const r = await list({ action: 'list' }, ctx)
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.entries[0]?.password).toBe('••••••••')
+  })
+
+  it('reveals password in plaintext when reveal is true', async () => {
+    mockReadVault.mockResolvedValue(makeVault([makeEntry({ title: 'GitHub', password: 'secret' })]))
+    const r = await list({ action: 'list', reveal: true }, ctx)
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.entries[0]?.password).toBe('secret')
+  })
+
+  it('omits password field when entry has none', async () => {
+    mockReadVault.mockResolvedValue(makeVault([makeEntry({ title: 'GitHub' })]))
+    const r = await list({ action: 'list', reveal: true }, ctx)
+    expect(r.success).toBe(true)
+    if (r.success) expect(r.data.entries[0]?.password).toBeUndefined()
+  })
+})
+
 describe('list locked', () => {
   it('fails when vault is locked', async () => {
     mockLoadSession.mockResolvedValue(null)
